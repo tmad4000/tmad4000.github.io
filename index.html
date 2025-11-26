@@ -56,6 +56,64 @@
         .links a:last-child {
             border-bottom: none;
         }
+
+        .archive {
+            position: fixed;
+            bottom: 1.5rem;
+            left: 1.5rem;
+        }
+
+        .archive-toggle {
+            background: none;
+            border: none;
+            color: #bbb;
+            font-size: 0.75rem;
+            cursor: pointer;
+            padding: 0.25rem;
+            transition: color 0.2s;
+        }
+
+        .archive-toggle:hover {
+            color: #888;
+        }
+
+        .archive-content {
+            display: none;
+            position: absolute;
+            bottom: 2rem;
+            left: 0;
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            padding: 0.75rem 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            min-width: 180px;
+        }
+
+        .archive-content.open {
+            display: block;
+        }
+
+        .archive-content h3 {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #999;
+            margin-bottom: 0.5rem;
+        }
+
+        .archive-content a {
+            display: block;
+            color: #666;
+            text-decoration: none;
+            font-size: 0.85rem;
+            padding: 0.25rem 0;
+            transition: color 0.2s;
+        }
+
+        .archive-content a:hover {
+            color: #333;
+        }
     </style>
 </head>
 <body>
@@ -66,5 +124,27 @@
             <a href="https://github.com/tmad4000">GitHub</a>
         </nav>
     </div>
+
+    <div class="archive">
+        <button class="archive-toggle" onclick="toggleArchive()">archive</button>
+        <div class="archive-content" id="archive-content">
+            <h3>Old Projects</h3>
+            <a href="https://raw.githack.com/tmad4000/tmad4000.github.io/archive/progressbars/progressbarsfromgpt.html">Progress Bars (World)</a>
+            <a href="https://raw.githack.com/tmad4000/tmad4000.github.io/archive/progressbars/progressbarsfromgpt-jacob-nvc.html">Progress Bars (NVC Needs)</a>
+        </div>
+    </div>
+
+    <script>
+        function toggleArchive() {
+            document.getElementById('archive-content').classList.toggle('open');
+        }
+
+        document.addEventListener('click', function(e) {
+            const archive = document.querySelector('.archive');
+            if (!archive.contains(e.target)) {
+                document.getElementById('archive-content').classList.remove('open');
+            }
+        });
+    </script>
 </body>
 </html>
