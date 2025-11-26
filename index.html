@@ -13,48 +13,73 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background: #fafafa;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
             color: #333;
             min-height: 100vh;
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
-            padding: 2rem;
+            padding: 15vh 2rem 2rem;
         }
 
         .container {
-            max-width: 400px;
+            max-width: 450px;
             width: 100%;
         }
 
         h1 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 2rem;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
             color: #111;
+        }
+
+        .tagline {
+            color: #666;
+            font-size: 0.95rem;
+            margin-bottom: 2.5rem;
+            line-height: 1.5;
         }
 
         .links {
             display: flex;
             flex-direction: column;
-            gap: 0.75rem;
+            gap: 0.5rem;
         }
 
         .links a {
-            color: #555;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: #444;
             text-decoration: none;
-            padding: 0.75rem 0;
-            border-bottom: 1px solid #eee;
-            transition: color 0.2s, padding-left 0.2s;
+            padding: 1rem 1.25rem;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            transition: all 0.2s ease;
         }
 
         .links a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             color: #000;
-            padding-left: 0.5rem;
         }
 
-        .links a:last-child {
-            border-bottom: none;
+        .links .icon {
+            font-size: 1.25rem;
+            width: 1.5rem;
+            text-align: center;
+        }
+
+        .links .label {
+            font-weight: 500;
+        }
+
+        .links .desc {
+            font-size: 0.8rem;
+            color: #888;
+            margin-left: auto;
         }
 
         .archive {
@@ -84,10 +109,10 @@
             left: 0;
             background: #fff;
             border: 1px solid #eee;
-            border-radius: 4px;
+            border-radius: 8px;
             padding: 0.75rem 1rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            min-width: 180px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            min-width: 200px;
         }
 
         .archive-content.open {
@@ -107,7 +132,7 @@
             color: #666;
             text-decoration: none;
             font-size: 0.85rem;
-            padding: 0.25rem 0;
+            padding: 0.35rem 0;
             transition: color 0.2s;
         }
 
@@ -118,10 +143,19 @@
 </head>
 <body>
     <div class="container">
-        <h1>tmad4000</h1>
+        <h1>Jacob Cole</h1>
+        <p class="tagline">Building things with code and curiosity.</p>
         <nav class="links">
-            <a href="https://github.com/tmad4000/vibe-coding-guide">Vibe Coding Guide</a>
-            <a href="https://github.com/tmad4000">GitHub</a>
+            <a href="https://github.com/tmad4000/vibe-coding-guide" target="_blank" rel="noopener">
+                <span class="icon">📖</span>
+                <span class="label">Vibe Coding Guide</span>
+                <span class="desc">Learn to code with AI</span>
+            </a>
+            <a href="https://github.com/tmad4000" target="_blank" rel="noopener">
+                <span class="icon">💻</span>
+                <span class="label">GitHub</span>
+                <span class="desc">@tmad4000</span>
+            </a>
         </nav>
     </div>
 
@@ -129,8 +163,8 @@
         <button class="archive-toggle" onclick="toggleArchive()">archive</button>
         <div class="archive-content" id="archive-content">
             <h3>Old Projects</h3>
-            <a href="https://raw.githack.com/tmad4000/tmad4000.github.io/archive/progressbars/progressbarsfromgpt.html">Progress Bars (World)</a>
-            <a href="https://raw.githack.com/tmad4000/tmad4000.github.io/archive/progressbars/progressbarsfromgpt-jacob-nvc.html">Progress Bars (NVC Needs)</a>
+            <a href="https://raw.githack.com/tmad4000/tmad4000.github.io/archive/progressbars/progressbarsfromgpt.html" target="_blank" rel="noopener">Progress Bars (World)</a>
+            <a href="https://raw.githack.com/tmad4000/tmad4000.github.io/archive/progressbars/progressbarsfromgpt-jacob-nvc.html" target="_blank" rel="noopener">Progress Bars (NVC Needs)</a>
         </div>
     </div>
 
