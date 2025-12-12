@@ -127,6 +127,36 @@
             font-size: 0.75rem;
         }
 
+        .inline-links {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            margin-left: 2.5rem;
+            margin-top: -0.25rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .inline-links a {
+            font-size: 0.7rem;
+            color: #aaa;
+            text-decoration: none;
+            padding: 0;
+            background: none;
+            box-shadow: none;
+            transition: color 0.2s;
+        }
+
+        .inline-links a:hover {
+            color: #666;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .inline-links .separator {
+            font-size: 0.6rem;
+            color: #ccc;
+        }
+
         .archive {
             position: fixed;
             bottom: 1.5rem;
@@ -202,11 +232,11 @@
                     <span class="label">AI Docs Editor</span>
                     <span class="desc">Cursor-like track changes</span>
                 </a>
-                <a href="https://tmad4000.github.io/CursorDocsGemini/" target="_blank" rel="noopener" class="sub-link">
-                    <span class="icon">🔑</span>
-                    <span class="label">Lightweight version</span>
-                    <span class="desc">Bring your own API key</span>
-                </a>
+                <div class="inline-links">
+                    <a href="https://cursor-docs-gemini-staging.vercel.app" target="_blank" rel="noopener">staging</a>
+                    <span class="separator">|</span>
+                    <a href="https://tmad4000.github.io/CursorDocsGemini/" target="_blank" rel="noopener">BYOK</a>
+                </div>
                 <a href="https://tmad4000.github.io/claude-mind/" target="_blank" rel="noopener">
                     <span class="icon">🧠</span>
                     <span class="label">Claude-Mind</span>
