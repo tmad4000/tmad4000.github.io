@@ -124,6 +124,13 @@
                     // Extract title for page title
                     const h1 = document.querySelector('#content h1');
                     if (h1) document.title = h1.textContent + ' - Brainstorms';
+                    // Open external links in new tab
+                    document.querySelectorAll('#content a').forEach(a => {
+                        if (a.hostname !== location.hostname) {
+                            a.target = '_blank';
+                            a.rel = 'noopener';
+                        }
+                    });
                 })
                 .catch(err => {
                     document.getElementById('content').innerHTML = '<div class="error">Could not load file. <a href="./">Browse ideas</a></div>';
