@@ -36,6 +36,10 @@ It's like being at MIT surrounded by people with "bigger parameters" - but compe
 
 Idea stage. Looking for collaborators interested in defining the benchmark and prize structure.
 
+## Related
+
+- **"Great paper showing how far you can push a single agent with skills"** - [Tweet thread](https://x.com/omarsar0/status/2010005746075975684) (Jan 2026)
+
 ---
 
 *Source: Voice note captured in [Thoughtstream](https://develop.ideaflow.app) (note ID: ObGQK65eE4), Dec 29 2025*
