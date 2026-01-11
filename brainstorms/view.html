@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brainstorm</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #fafafa;
+            color: #333;
+            line-height: 1.7;
+        }
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        .back { color: #666; text-decoration: none; font-size: 0.9rem; }
+        .back:hover { color: #333; }
+        .download {
+            color: #666;
+            text-decoration: none;
+            font-size: 0.8rem;
+            padding: 0.4rem 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        .download:hover { background: #f0f0f0; color: #333; }
+        #content {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+        #content h1 { font-size: 1.75rem; margin-bottom: 0.5rem; color: #111; }
+        #content h2 { font-size: 1.25rem; margin: 1.5rem 0 0.75rem; color: #222; }
+        #content h3 { font-size: 1.1rem; margin: 1.25rem 0 0.5rem; color: #333; }
+        #content p { margin-bottom: 1rem; }
+        #content ul, #content ol { margin: 0.5rem 0 1rem 1.5rem; }
+        #content li { margin: 0.35rem 0; }
+        #content a { color: #0066cc; text-decoration: none; }
+        #content a:hover { text-decoration: underline; }
+        #content code {
+            background: #f4f4f4;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+        #content pre {
+            background: #f4f4f4;
+            padding: 1rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+        #content pre code { background: none; padding: 0; }
+        #content blockquote {
+            border-left: 3px solid #ddd;
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: #666;
+            font-style: italic;
+        }
+        #content hr {
+            border: none;
+            border-top: 1px solid #eee;
+            margin: 1.5rem 0;
+        }
+        #content em { color: #666; }
+        #content strong { color: #111; }
+        .meta {
+            color: #999;
+            font-size: 0.85rem;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #eee;
+        }
+        .error {
+            padding: 2rem;
+            text-align: center;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="./" class="back">&larr; All brainstorms</a>
+            <a href="#" id="download-link" class="download">Download .md</a>
+        </header>
+        <article id="content">
+            <div class="error">Loading...</div>
+        </article>
+        <div class="meta" id="meta"></div>
+    </div>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const file = params.get('f');
+
+        if (!file || !file.endsWith('.md')) {
+            document.getElementById('content').innerHTML = '<div class="error">No file specified. <a href="./">Browse ideas</a></div>';
+        } else {
+            document.getElementById('download-link').href = file;
+            fetch(file)
+                .then(r => {
+                    if (!r.ok) throw new Error('Not found');
+                    return r.text();
+                })
+                .then(md => {
+                    document.getElementById('content').innerHTML = marked.parse(md);
+                    // Extract title for page title
+                    const h1 = document.querySelector('#content h1');
+                    if (h1) document.title = h1.textContent + ' - Brainstorms';
+                })
+                .catch(err => {
+                    document.getElementById('content').innerHTML = '<div class="error">Could not load file. <a href="./">Browse ideas</a></div>';
+                });
+        }
+    </script>
+</body>
+</html>

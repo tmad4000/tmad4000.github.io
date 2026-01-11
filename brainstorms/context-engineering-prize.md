@@ -38,4 +38,4 @@ Idea stage. Looking for collaborators interested in defining the benchmark and p
 
 ---
 
-*Source: Voice note captured in Thoughtstream, Dec 29 2025*
+*Source: Voice note captured in [Thoughtstream](https://develop.ideaflow.app) (note ID: ObGQK65eE4), Dec 29 2025*
