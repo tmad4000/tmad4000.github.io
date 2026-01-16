@@ -28,6 +28,29 @@ Competitors would submit:
 - The system prompt / context
 - The benchmark results
 
+### Real-World Example: Claude's Skill Design
+
+Claude Code's skill system is essentially this in practice. Skills are carefully engineered prompts that give a small model (like Haiku) the context to perform specialized tasks at much higher levels than raw prompting.
+
+The key insight: **skill design IS context engineering**. A well-designed skill includes:
+- Task decomposition patterns
+- Domain knowledge and terminology
+- Tool usage instructions
+- Self-correction strategies
+- Output format constraints
+
+If we could measure how much a skill "amplifies" a small model's performance, we'd have a practical benchmark for context engineering effectiveness.
+
+### Tooling Opportunities
+
+Beyond just prompts, tooling can help small models punch above their weight:
+- Retrieval systems that inject relevant context
+- Tool-use frameworks that offload complex operations
+- Verification loops that catch and correct errors
+- Structured output parsers that constrain responses
+
+The prize could have categories: prompt-only vs. prompt+tools.
+
 ### Analogy
 
 It's like being at MIT surrounded by people with "bigger parameters" - but compensating with better self-control, metacognition, and knowing how to use your capabilities effectively.
