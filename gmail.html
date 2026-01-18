@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gmail Reader - Jacob Cole</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .back-link {
+            color: #666;
+            text-decoration: none;
+            font-size: 1.5rem;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: #333;
+        }
+
+        h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #111;
+        }
+
+        .auth-section {
+            background: #fff;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+        .user-email {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-google {
+            background: #fff;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+
+        .btn-google:hover {
+            background: #f8f8f8;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-google img {
+            width: 20px;
+            height: 20px;
+        }
+
+        .btn-signout {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .btn-signout:hover {
+            background: #eee;
+        }
+
+        .btn-refresh {
+            background: #4285f4;
+            color: #fff;
+            margin-left: 0.5rem;
+        }
+
+        .btn-refresh:hover {
+            background: #3367d6;
+        }
+
+        .setup-info {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            text-align: left;
+        }
+
+        .setup-info summary {
+            cursor: pointer;
+            font-weight: 600;
+            color: #856404;
+        }
+
+        .setup-info ol {
+            margin: 1rem 0 0 1.5rem;
+            color: #856404;
+        }
+
+        .setup-info li {
+            margin-bottom: 0.5rem;
+        }
+
+        .setup-info code {
+            background: rgba(0,0,0,0.1);
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+
+        .setup-info a {
+            color: #0056b3;
+        }
+
+        .config-section {
+            background: #fff;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 1.5rem;
+        }
+
+        .config-section label {
+            display: block;
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        .config-section input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .config-section input:focus {
+            outline: none;
+            border-color: #4285f4;
+        }
+
+        .email-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .email-item {
+            background: #fff;
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .email-item:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .email-item.unread {
+            border-left: 3px solid #4285f4;
+        }
+
+        .email-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.5rem;
+        }
+
+        .email-from {
+            font-weight: 600;
+            color: #111;
+            font-size: 0.95rem;
+        }
+
+        .email-item.unread .email-from {
+            color: #000;
+        }
+
+        .email-date {
+            font-size: 0.8rem;
+            color: #888;
+            white-space: nowrap;
+        }
+
+        .email-subject {
+            font-size: 0.9rem;
+            color: #333;
+            margin-bottom: 0.25rem;
+        }
+
+        .email-item.unread .email-subject {
+            font-weight: 500;
+        }
+
+        .email-snippet {
+            font-size: 0.85rem;
+            color: #666;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #4285f4;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 0.5rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+
+        .email-detail {
+            background: #fff;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 1rem;
+        }
+
+        .email-detail-header {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .email-detail-subject {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #111;
+            margin-bottom: 0.75rem;
+        }
+
+        .email-detail-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .email-detail-body {
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .email-detail-body-html {
+            line-height: 1.6;
+        }
+
+        .email-detail-body-html img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .btn-back {
+            background: #f5f5f5;
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .btn-back:hover {
+            background: #eee;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .search-section {
+            margin-bottom: 1rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: #fff;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #4285f4;
+            box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="index.html" class="back-link">&larr;</a>
+            <h1>Gmail Reader</h1>
+        </div>
+
+        <details class="setup-info" id="setup-info">
+            <summary>Setup Instructions (click to expand)</summary>
+            <ol>
+                <li>Go to <a href="https://console.cloud.google.com/" target="_blank" rel="noopener">Google Cloud Console</a></li>
+                <li>Create a new project or select an existing one</li>
+                <li>Enable the <strong>Gmail API</strong> in APIs & Services</li>
+                <li>Go to <strong>APIs & Services > Credentials</strong></li>
+                <li>Click <strong>Create Credentials > OAuth client ID</strong></li>
+                <li>Select <strong>Web application</strong></li>
+                <li>Add <code>https://tmad4000.github.io</code> to Authorized JavaScript origins</li>
+                <li>Copy your Client ID and paste it below</li>
+                <li>Configure the <strong>OAuth consent screen</strong> (add your email as a test user if in testing mode)</li>
+            </ol>
+        </details>
+
+        <div class="config-section" id="config-section">
+            <label for="client-id">Google OAuth Client ID</label>
+            <input type="text" id="client-id" placeholder="your-client-id.apps.googleusercontent.com" />
+        </div>
+
+        <div class="auth-section" id="auth-section">
+            <div id="signed-out">
+                <p style="margin-bottom: 1rem; color: #666;">Sign in with Google to read your emails</p>
+                <button class="btn btn-google" id="signin-btn" onclick="handleSignIn()">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+                    Sign in with Google
+                </button>
+            </div>
+            <div id="signed-in" class="hidden">
+                <div class="user-info">
+                    <img id="user-avatar" class="user-avatar" src="" alt="">
+                    <span id="user-email" class="user-email"></span>
+                </div>
+                <button class="btn btn-signout" onclick="handleSignOut()">Sign out</button>
+                <button class="btn btn-refresh" onclick="fetchEmails()">Refresh</button>
+            </div>
+        </div>
+
+        <div id="email-list-view">
+            <div class="search-section hidden" id="search-section">
+                <input type="text" class="search-input" id="search-input" placeholder="Search emails..." onkeyup="handleSearch(event)">
+            </div>
+            <div id="email-container"></div>
+        </div>
+
+        <div id="email-detail-view" class="hidden">
+            <button class="btn btn-back" onclick="showEmailList()">&larr; Back to inbox</button>
+            <div class="email-detail">
+                <div class="email-detail-header">
+                    <div class="email-detail-subject" id="detail-subject"></div>
+                    <div class="email-detail-meta">
+                        <span><strong>From:</strong> <span id="detail-from"></span></span>
+                        <span><strong>To:</strong> <span id="detail-to"></span></span>
+                        <span><strong>Date:</strong> <span id="detail-date"></span></span>
+                    </div>
+                </div>
+                <div class="email-detail-body" id="detail-body"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://accounts.google.com/gsi/client"></script>
+    <script>
+        const SCOPES = 'https://www.googleapis.com/auth/gmail.readonly';
+        let tokenClient;
+        let accessToken = null;
+        let emails = [];
+
+        // Load saved client ID
+        const savedClientId = localStorage.getItem('gmail_client_id');
+        if (savedClientId) {
+            document.getElementById('client-id').value = savedClientId;
+        }
+
+        // Save client ID when changed
+        document.getElementById('client-id').addEventListener('change', function() {
+            localStorage.setItem('gmail_client_id', this.value);
+            initializeGoogleAuth();
+        });
+
+        function getClientId() {
+            return document.getElementById('client-id').value.trim();
+        }
+
+        function initializeGoogleAuth() {
+            const clientId = getClientId();
+            if (!clientId) return;
+
+            tokenClient = google.accounts.oauth2.initTokenClient({
+                client_id: clientId,
+                scope: SCOPES,
+                callback: (response) => {
+                    if (response.error) {
+                        showError('Authentication failed: ' + response.error);
+                        return;
+                    }
+                    accessToken = response.access_token;
+                    onSignIn();
+                },
+            });
+        }
+
+        // Initialize on load if client ID exists
+        if (savedClientId) {
+            // Small delay to ensure Google library is loaded
+            setTimeout(initializeGoogleAuth, 500);
+        }
+
+        function handleSignIn() {
+            const clientId = getClientId();
+            if (!clientId) {
+                alert('Please enter your Google OAuth Client ID first');
+                document.getElementById('client-id').focus();
+                return;
+            }
+
+            if (!tokenClient) {
+                initializeGoogleAuth();
+            }
+
+            // Request access token
+            tokenClient.requestAccessToken({ prompt: 'consent' });
+        }
+
+        function handleSignOut() {
+            if (accessToken) {
+                google.accounts.oauth2.revoke(accessToken);
+                accessToken = null;
+            }
+            document.getElementById('signed-in').classList.add('hidden');
+            document.getElementById('signed-out').classList.remove('hidden');
+            document.getElementById('search-section').classList.add('hidden');
+            document.getElementById('email-container').innerHTML = '';
+            emails = [];
+        }
+
+        async function onSignIn() {
+            // Get user info
+            try {
+                const response = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+                    headers: { Authorization: `Bearer ${accessToken}` }
+                });
+                const userInfo = await response.json();
+
+                document.getElementById('user-avatar').src = userInfo.picture || '';
+                document.getElementById('user-email').textContent = userInfo.email;
+                document.getElementById('signed-out').classList.add('hidden');
+                document.getElementById('signed-in').classList.remove('hidden');
+                document.getElementById('search-section').classList.remove('hidden');
+
+                // Hide setup info once signed in
+                document.getElementById('setup-info').removeAttribute('open');
+
+                // Fetch emails
+                await fetchEmails();
+            } catch (error) {
+                showError('Failed to get user info: ' + error.message);
+            }
+        }
+
+        async function fetchEmails() {
+            const container = document.getElementById('email-container');
+            container.innerHTML = '<div class="loading"><div class="loading-spinner"></div><div>Loading emails...</div></div>';
+
+            try {
+                // Get list of messages
+                const listResponse = await fetch(
+                    'https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=50',
+                    { headers: { Authorization: `Bearer ${accessToken}` } }
+                );
+
+                if (!listResponse.ok) {
+                    throw new Error('Failed to fetch email list');
+                }
+
+                const listData = await listResponse.json();
+
+                if (!listData.messages || listData.messages.length === 0) {
+                    container.innerHTML = '<div class="empty-state">No emails found</div>';
+                    return;
+                }
+
+                // Fetch details for each message
+                emails = await Promise.all(
+                    listData.messages.map(async (msg) => {
+                        const msgResponse = await fetch(
+                            `https://gmail.googleapis.com/gmail/v1/users/me/messages/${msg.id}?format=full`,
+                            { headers: { Authorization: `Bearer ${accessToken}` } }
+                        );
+                        return msgResponse.json();
+                    })
+                );
+
+                renderEmailList(emails);
+            } catch (error) {
+                showError('Failed to fetch emails: ' + error.message);
+            }
+        }
+
+        function renderEmailList(emailsToRender) {
+            const container = document.getElementById('email-container');
+
+            if (emailsToRender.length === 0) {
+                container.innerHTML = '<div class="empty-state">No emails match your search</div>';
+                return;
+            }
+
+            container.innerHTML = '<div class="email-list">' + emailsToRender.map(email => {
+                const headers = email.payload.headers;
+                const from = headers.find(h => h.name === 'From')?.value || 'Unknown';
+                const subject = headers.find(h => h.name === 'Subject')?.value || '(No subject)';
+                const date = headers.find(h => h.name === 'Date')?.value || '';
+                const isUnread = email.labelIds?.includes('UNREAD');
+
+                const fromName = from.includes('<') ? from.split('<')[0].trim() : from;
+                const formattedDate = formatDate(date);
+
+                return `
+                    <div class="email-item ${isUnread ? 'unread' : ''}" onclick="showEmailDetail('${email.id}')">
+                        <div class="email-header">
+                            <span class="email-from">${escapeHtml(fromName)}</span>
+                            <span class="email-date">${formattedDate}</span>
+                        </div>
+                        <div class="email-subject">${escapeHtml(subject)}</div>
+                        <div class="email-snippet">${escapeHtml(email.snippet || '')}</div>
+                    </div>
+                `;
+            }).join('') + '</div>';
+        }
+
+        function showEmailDetail(messageId) {
+            const email = emails.find(e => e.id === messageId);
+            if (!email) return;
+
+            const headers = email.payload.headers;
+            const from = headers.find(h => h.name === 'From')?.value || 'Unknown';
+            const to = headers.find(h => h.name === 'To')?.value || 'Unknown';
+            const subject = headers.find(h => h.name === 'Subject')?.value || '(No subject)';
+            const date = headers.find(h => h.name === 'Date')?.value || '';
+
+            document.getElementById('detail-subject').textContent = subject;
+            document.getElementById('detail-from').textContent = from;
+            document.getElementById('detail-to').textContent = to;
+            document.getElementById('detail-date').textContent = date;
+
+            // Get email body
+            const body = getEmailBody(email.payload);
+            const bodyElement = document.getElementById('detail-body');
+
+            if (body.isHtml) {
+                bodyElement.className = 'email-detail-body-html';
+                bodyElement.innerHTML = body.content;
+            } else {
+                bodyElement.className = 'email-detail-body';
+                bodyElement.textContent = body.content;
+            }
+
+            document.getElementById('email-list-view').classList.add('hidden');
+            document.getElementById('email-detail-view').classList.remove('hidden');
+        }
+
+        function showEmailList() {
+            document.getElementById('email-detail-view').classList.add('hidden');
+            document.getElementById('email-list-view').classList.remove('hidden');
+        }
+
+        function getEmailBody(payload) {
+            // Try to find HTML body first, then plain text
+            let htmlBody = '';
+            let textBody = '';
+
+            function searchParts(part) {
+                if (part.mimeType === 'text/html' && part.body?.data) {
+                    htmlBody = atob(part.body.data.replace(/-/g, '+').replace(/_/g, '/'));
+                } else if (part.mimeType === 'text/plain' && part.body?.data) {
+                    textBody = atob(part.body.data.replace(/-/g, '+').replace(/_/g, '/'));
+                }
+
+                if (part.parts) {
+                    part.parts.forEach(searchParts);
+                }
+            }
+
+            searchParts(payload);
+
+            if (htmlBody) {
+                return { content: htmlBody, isHtml: true };
+            } else if (textBody) {
+                return { content: textBody, isHtml: false };
+            } else if (payload.body?.data) {
+                return {
+                    content: atob(payload.body.data.replace(/-/g, '+').replace(/_/g, '/')),
+                    isHtml: false
+                };
+            }
+
+            return { content: 'No content available', isHtml: false };
+        }
+
+        function handleSearch(event) {
+            const query = event.target.value.toLowerCase();
+            if (!query) {
+                renderEmailList(emails);
+                return;
+            }
+
+            const filtered = emails.filter(email => {
+                const headers = email.payload.headers;
+                const from = headers.find(h => h.name === 'From')?.value || '';
+                const subject = headers.find(h => h.name === 'Subject')?.value || '';
+                const snippet = email.snippet || '';
+
+                return from.toLowerCase().includes(query) ||
+                       subject.toLowerCase().includes(query) ||
+                       snippet.toLowerCase().includes(query);
+            });
+
+            renderEmailList(filtered);
+        }
+
+        function formatDate(dateStr) {
+            try {
+                const date = new Date(dateStr);
+                const now = new Date();
+                const isToday = date.toDateString() === now.toDateString();
+
+                if (isToday) {
+                    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                }
+
+                const isThisYear = date.getFullYear() === now.getFullYear();
+                if (isThisYear) {
+                    return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+                }
+
+                return date.toLocaleDateString([], { year: 'numeric', month: 'short', day: 'numeric' });
+            } catch {
+                return dateStr;
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function showError(message) {
+            const container = document.getElementById('email-container');
+            container.innerHTML = `<div class="error">${escapeHtml(message)}</div>`;
+        }
+    </script>
+</body>
+</html>
