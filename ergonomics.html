@@ -43,6 +43,19 @@
         }
         .see-also a { color: #555; }
         .see-also a:hover { color: #111; }
+        .download {
+            display: inline-block;
+            font-size: 0.75rem;
+            color: #888;
+            text-decoration: none;
+            border: 1px solid #ddd;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            margin-top: 0.5rem;
+            margin-right: 0.25rem;
+            transition: all 0.2s;
+        }
+        .download:hover { color: #333; border-color: #999; }
         .back { margin-top: 2rem; }
         .back a { color: #666; text-decoration: none; font-size: 0.9rem; }
         .back a:hover { color: #333; }
@@ -103,6 +116,7 @@
                 <tr><td>3</td><td>Escape</td></tr>
                 <tr><td>4 (hold)</td><td>Control layer (+ click combos for tab switching)</td></tr>
                 <tr><td>5</td><td>Enter</td></tr>
+                <tr><td>6</td><td>fn (for dictation)</td></tr>
                 <tr><td>7 / 10</td><td>Copy / Paste</td></tr>
                 <tr><td>8</td><td>Chrome tab search</td></tr>
                 <tr><td>9</td><td>Screenshot to clipboard</td></tr>
@@ -110,16 +124,20 @@
             </table>
             <p class="desc" style="margin-top: 0.5rem;"><strong>Other:</strong> Caps Lock &rarr; Enter, foot pedals &rarr; Command/Control/Tab via <a href="https://www.ikkegol.com/downloads.html" target="_blank" rel="noopener">ElfKey</a></p>
         </div>
+        <a class="download" href="ergonomics/karabiner.json" download>karabiner.json</a>
+        <a class="download" href="ergonomics/MAPPINGS.md" download>MAPPINGS.md</a>
     </div>
 
     <div class="item">
         <a href="https://www.keyboardmaestro.com/" target="_blank" rel="noopener">Keyboard Maestro</a>
-        <p class="desc">Macro automation for macOS - trigger complex actions with hotkeys, text, or events</p>
+        <p class="desc">Macro automation for macOS - keyboard shortcut remapping, clipboard filters, text transforms</p>
+        <a class="download" href="ergonomics/keyboard-maestro-macros.plist" download>macros.plist</a>
     </div>
 
     <div class="item">
         <a href="https://folivora.ai/" target="_blank" rel="noopener">BetterTouchTool</a>
         <p class="desc">Customize trackpad gestures, Touch Bar, and input devices on Mac</p>
+        <p class="note">Minimal config - export from BTT app via Presets &rarr; Export</p>
     </div>
 
     <p class="back"><a href="/">&#8592; Back to home</a></p>

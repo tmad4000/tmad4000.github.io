@@ -360,6 +360,15 @@
         </section>
     </div>
 
+    <div class="archive" style="right: 1.5rem; left: auto;">
+        <button class="archive-toggle" onclick="toggleRecent()">recently updated</button>
+        <div class="archive-content" id="recent-content" style="right: 0; left: auto;">
+            <h3>Recent Changes</h3>
+            <a href="ergonomics.html">Ergonomics - keyboard configs, iPad Mini, RSI</a>
+            <a href="brainstorms/">Idea List - hackathon & research links</a>
+        </div>
+    </div>
+
     <div class="archive">
         <button class="archive-toggle" onclick="toggleArchive()">archive</button>
         <div class="archive-content" id="archive-content">
@@ -372,12 +381,22 @@
     <script>
         function toggleArchive() {
             document.getElementById('archive-content').classList.toggle('open');
+            document.getElementById('recent-content').classList.remove('open');
+        }
+
+        function toggleRecent() {
+            document.getElementById('recent-content').classList.toggle('open');
+            document.getElementById('archive-content').classList.remove('open');
         }
 
         document.addEventListener('click', function(e) {
             const archive = document.querySelector('.archive');
-            if (!archive.contains(e.target)) {
+            const recent = document.querySelectorAll('.archive');
+            let inside = false;
+            recent.forEach(function(el) { if (el.contains(e.target)) inside = true; });
+            if (!inside) {
                 document.getElementById('archive-content').classList.remove('open');
+                document.getElementById('recent-content').classList.remove('open');
             }
         });
     </script>
