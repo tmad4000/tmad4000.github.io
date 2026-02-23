@@ -30,6 +30,12 @@
         }
         .item a:hover { text-decoration: underline; }
         .item .desc { color: #666; font-size: 0.9rem; margin-top: 0.25rem; }
+        .item .note { color: #888; font-size: 0.8rem; font-style: italic; margin-top: 0.25rem; }
+        .mappings { margin-top: 0.5rem; }
+        .mappings table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        .mappings th { text-align: left; color: #888; font-weight: 500; padding: 0.25rem 0.5rem 0.25rem 0; border-bottom: 1px solid #eee; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        .mappings td { padding: 0.25rem 0.5rem 0.25rem 0; border-bottom: 1px solid #f5f5f5; color: #555; }
+        .mappings td:first-child { font-weight: 500; color: #333; white-space: nowrap; }
         .see-also {
             color: #666;
             font-size: 0.85rem;
@@ -56,6 +62,19 @@
         <p class="desc">Wearable video display - use as a personal screen anywhere, great for ergonomic positioning</p>
     </div>
 
+    <h2>Pocket iPad Mini</h2>
+
+    <div class="item">
+        <a href="https://www.amazon.com/dp/B0BFX1KRWM" target="_blank" rel="noopener">UAG Scout Healthcare Case</a>
+        <p class="desc">Rugged MIL-STD case with hand strap and kickstand for iPad Mini</p>
+        <p class="note">I cut off and filed down the pencil holder so it still fits in my pocket.</p>
+    </div>
+
+    <div class="item">
+        <a href="https://www.amazon.com/dp/B09FF7BPND" target="_blank" rel="noopener">Ailun Tempered Glass Screen Protector (2-Pack)</a>
+        <p class="desc">2.5D edge screen protector for iPad Mini 6th/7th gen - protects against scratches and shocks</p>
+    </div>
+
     <h2>RSI</h2>
 
     <div class="item">
@@ -68,7 +87,40 @@
         <p class="desc">3-key programmable foot switch - offload repetitive key/mouse actions to your feet</p>
     </div>
 
-    <p class="see-also">See also: <a href="https://github.com/tmad4000/VoiceFlow/releases/latest" target="_blank" rel="noopener">VoiceFlow</a> - voice-to-text for Mac, reducing keyboard strain</p>
+    <p class="see-also">See also: <a href="https://github.com/tmad4000/VoiceFlow/releases/latest" target="_blank" rel="noopener">VoiceFlow</a> - voice-to-text for Mac, reducing keyboard strain | <a href="http://rsiwiki.jacobcole.net/" target="_blank" rel="noopener">RSI Wiki</a></p>
+
+    <h2>Keyboard & Shortcuts</h2>
+
+    <div class="item">
+        <a href="https://karabiner-elements.pqrs.org/" target="_blank" rel="noopener">Karabiner-Elements</a>
+        <p class="desc">Keyboard remapping for macOS - remap any key, create layers, and program mouse buttons</p>
+        <div class="mappings">
+            <p class="desc" style="margin-bottom: 0.5rem;"><strong>My gaming mouse mappings (Redragon M908):</strong></p>
+            <table>
+                <tr><th>Button</th><th>Action</th></tr>
+                <tr><td>1 (hold)</td><td>Command layer (+ click combos for app/tab switching)</td></tr>
+                <tr><td>2</td><td>Cmd+Tab (app switch)</td></tr>
+                <tr><td>3</td><td>Escape</td></tr>
+                <tr><td>4 (hold)</td><td>Control layer (+ click combos for tab switching)</td></tr>
+                <tr><td>5</td><td>Enter</td></tr>
+                <tr><td>7 / 10</td><td>Copy / Paste</td></tr>
+                <tr><td>8</td><td>Chrome tab search</td></tr>
+                <tr><td>9</td><td>Screenshot to clipboard</td></tr>
+                <tr><td>11 / 12</td><td>Switch window forward / back</td></tr>
+            </table>
+            <p class="desc" style="margin-top: 0.5rem;"><strong>Other:</strong> Caps Lock &rarr; Enter, foot pedals &rarr; Command/Control/Tab via <a href="https://www.ikkegol.com/downloads.html" target="_blank" rel="noopener">ElfKey</a></p>
+        </div>
+    </div>
+
+    <div class="item">
+        <a href="https://www.keyboardmaestro.com/" target="_blank" rel="noopener">Keyboard Maestro</a>
+        <p class="desc">Macro automation for macOS - trigger complex actions with hotkeys, text, or events</p>
+    </div>
+
+    <div class="item">
+        <a href="https://folivora.ai/" target="_blank" rel="noopener">BetterTouchTool</a>
+        <p class="desc">Customize trackpad gestures, Touch Bar, and input devices on Mac</p>
+    </div>
 
     <p class="back"><a href="/">&#8592; Back to home</a></p>
 </body>
