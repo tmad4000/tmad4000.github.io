@@ -134,7 +134,7 @@
         <a href="https://karabiner-elements.pqrs.org/" target="_blank" rel="noopener">Karabiner-Elements</a>
         <p class="desc">Keyboard remapping for macOS - remap any key, create layers, and program mouse buttons</p>
         <div class="mappings">
-            <p class="desc" style="margin-bottom: 0.5rem;"><strong>My gaming mouse mappings (Redragon M908):</strong></p>
+            <p class="desc" style="margin-bottom: 0.5rem;"><strong>Gaming mouse mappings (Redragon M908):</strong></p>
             <table>
                 <tr><th>Button</th><th>Action</th></tr>
                 <tr><td>1 (hold)</td><td>Command layer (+ click combos for app/tab switching)</td></tr>
@@ -142,13 +142,26 @@
                 <tr><td>3</td><td>Escape</td></tr>
                 <tr><td>4 (hold)</td><td>Control layer (+ click combos for tab switching)</td></tr>
                 <tr><td>5</td><td>Enter</td></tr>
-                <tr><td>6</td><td>fn (for dictation)</td></tr>
+                <tr><td>6</td><td>Backslash</td></tr>
                 <tr><td>7 / 10</td><td>Copy / Paste</td></tr>
                 <tr><td>8</td><td>Chrome tab search</td></tr>
                 <tr><td>9</td><td>Screenshot to clipboard</td></tr>
                 <tr><td>11 / 12</td><td>Switch window forward / back</td></tr>
             </table>
-            <p class="desc" style="margin-top: 0.5rem;"><strong>Other:</strong> Caps Lock &rarr; Enter, foot pedals &rarr; Command/Control/Tab via <a href="https://www.ikkegol.com/downloads.html" target="_blank" rel="noopener">ElfKey</a></p>
+            <p class="desc" style="margin-top: 0.75rem; margin-bottom: 0.5rem;"><strong>Keyboard remappings:</strong></p>
+            <table>
+                <tr><th>Shortcut</th><th>Action</th></tr>
+                <tr><td>Caps Lock</td><td>Enter</td></tr>
+                <tr><td>Cmd+=</td><td>Cmd+` (switch window)</td></tr>
+                <tr><td>Cmd+Shift+=</td><td>Cmd+Shift+` (reverse)</td></tr>
+                <tr><td>Cmd+Opt+=</td><td>Normal Cmd+= (zoom in)</td></tr>
+                <tr><td>Cmd+.</td><td>Cmd+Tab (switch app)</td></tr>
+                <tr><td>Cmd+Shift+.</td><td>Cmd+Shift+Tab (reverse)</td></tr>
+                <tr><td>Left Shift+Caps Lock</td><td>Page Down</td></tr>
+                <tr><td>Right Shift+Caps Lock</td><td>Cmd+Mission Control</td></tr>
+                <tr><td>Left+Right click</td><td>Cmd+Tab</td></tr>
+            </table>
+            <p class="desc" style="margin-top: 0.5rem;">Foot pedals &rarr; Command/Control/Tab via <a href="https://www.ikkegol.com/downloads.html" target="_blank" rel="noopener">ElfKey</a></p>
         </div>
         <a class="download" href="ergonomics/karabiner.json" download>karabiner.json</a>
         <a class="download" href="ergonomics/MAPPINGS.md" download>MAPPINGS.md</a>
@@ -156,7 +169,18 @@
 
     <div class="item">
         <a href="https://www.keyboardmaestro.com/" target="_blank" rel="noopener">Keyboard Maestro</a>
-        <p class="desc">Macro automation for macOS - keyboard shortcut remapping, clipboard filters, text transforms</p>
+        <p class="desc">Macro automation for macOS - clipboard filters (OCR, case transforms, image rotation), text transforms, and custom hotkeys</p>
+        <div class="mappings">
+            <p class="desc" style="margin-bottom: 0.5rem;"><strong>Key macros:</strong></p>
+            <table>
+                <tr><th>Macro</th><th>Description</th></tr>
+                <tr><td>Clipboard Filters</td><td>OCR, capitalize, lowercase, title case, remove styles, image rotate/flip</td></tr>
+                <tr><td>Cmd+= &rarr; Cmd+`</td><td>Switch window (also in Karabiner for redundancy)</td></tr>
+                <tr><td>Cmd+. &rarr; Cmd+Tab</td><td>Switch app (also in Karabiner)</td></tr>
+                <tr><td>Middle-double-click</td><td>Cmd+Tab</td></tr>
+                <tr><td>Foot pedal fn</td><td>Triggers dictation via foot switch</td></tr>
+            </table>
+        </div>
         <a class="download" href="ergonomics/keyboard-maestro-macros.plist" download>macros.plist</a>
     </div>
 
@@ -164,6 +188,28 @@
         <a href="https://folivora.ai/" target="_blank" rel="noopener">BetterTouchTool</a>
         <p class="desc">Customize trackpad gestures, Touch Bar, and input devices on Mac</p>
         <p class="note">Minimal config - export from BTT app via Presets &rarr; Export</p>
+    </div>
+
+    <div class="item">
+        <a href="https://espanso.org/" target="_blank" rel="noopener">Espanso</a>
+        <p class="desc">Cross-platform text expander - type abbreviations that auto-expand into commands, emails, and snippets</p>
+        <div class="mappings">
+            <p class="desc" style="margin-bottom: 0.5rem;"><strong>Snippets:</strong></p>
+            <table>
+                <tr><th>Trigger</th><th>Expands to</th></tr>
+                <tr><td>:cld</td><td>claude --dangerously-skip-permissions</td></tr>
+                <tr><td>:clc</td><td>claude ... --continue</td></tr>
+                <tr><td>:clr</td><td>claude ... --resume</td></tr>
+                <tr><td>:cdx</td><td>codex --yolo --search</td></tr>
+                <tr><td>:gmn</td><td>gemini -m gemini-3-flash-preview --yolo</td></tr>
+                <tr><td>:nsl</td><td>nosleep --on</td></tr>
+                <tr><td>:sma</td><td>ssh hostmyapple</td></tr>
+                <tr><td>:@@</td><td>email address</td></tr>
+                <tr><td>:date</td><td>current date (YYYY-MM-DD)</td></tr>
+            </table>
+            <p class="desc" style="margin-top: 0.25rem; color: #888; font-size: 0.8rem;">All triggers also work without the colon prefix. Full list in the config file.</p>
+        </div>
+        <a class="download" href="ergonomics/espanso-snippets.yml" download>espanso-snippets.yml</a>
     </div>
 
     <p class="back"><a href="/">&#8592; Back to home</a></p>

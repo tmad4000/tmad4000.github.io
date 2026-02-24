@@ -645,8 +645,24 @@
                         ]
                     },
                     {
-                        "description": "Cmd+= → Cmd+` (switch window), Cmd+Shift+= → Cmd+Shift+` (reverse)",
+                        "description": "Cmd+= → Cmd+` (switch window), Cmd+Shift+= → Cmd+Shift+` (reverse), Cmd+Opt+= → normal zoom in",
                         "manipulators": [
+                            {
+                                "from": {
+                                    "key_code": "equal_sign",
+                                    "modifiers": {
+                                        "mandatory": ["command", "option"],
+                                        "optional": ["any"]
+                                    }
+                                },
+                                "to": [
+                                    {
+                                        "key_code": "equal_sign",
+                                        "modifiers": ["command"]
+                                    }
+                                ],
+                                "type": "basic"
+                            },
                             {
                                 "from": {
                                     "key_code": "equal_sign",

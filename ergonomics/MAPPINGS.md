@@ -44,6 +44,7 @@
 | Left+Right click | Cmd+Tab (simultaneous) |
 | Cmd+= | Cmd+` (switch window) |
 | Cmd+Shift+= | Cmd+Shift+` (reverse) |
+| Cmd+Opt+= | Normal Cmd+= (zoom in) |
 | Cmd+. | Cmd+Tab |
 | Cmd+Shift+. | Cmd+Shift+Tab |
 | Left Shift+Caps Lock | Page Down |
