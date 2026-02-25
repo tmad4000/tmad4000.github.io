@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>tmad4000</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -35,10 +38,11 @@
         }
 
         .tagline {
-            color: #888;
-            font-size: 0.85rem;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
+            font-family: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+            font-weight: 300;
+            color: #777;
+            font-size: 1.15rem;
+            letter-spacing: 0.04em;
             margin-bottom: 1.25rem;
             line-height: 1.5;
         }
@@ -235,6 +239,98 @@
 
         .archive-content a:hover {
             color: #333;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: linear-gradient(135deg, #1a1d21 0%, #2a2d32 100%);
+                color: #d4d4d4;
+            }
+
+            h1 {
+                color: #f0f0f0;
+            }
+
+            .tagline {
+                color: #999;
+            }
+
+            .quote {
+                color: #aaa;
+                background: rgba(255, 255, 255, 0.06);
+                border-left-color: #555;
+            }
+
+            .section-title {
+                color: #777;
+            }
+
+            .links a {
+                color: #ccc;
+                background: rgba(255, 255, 255, 0.07);
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            }
+
+            .links a:hover {
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+                color: #fff;
+            }
+
+            .links .desc {
+                color: #888;
+            }
+
+            .links .sub-link {
+                background: rgba(255, 255, 255, 0.04);
+            }
+
+            .inline-links a {
+                color: #777;
+            }
+
+            .inline-links a:hover {
+                color: #aaa;
+            }
+
+            .inline-links .separator {
+                color: #555;
+            }
+
+            .badge-alpha {
+                background: rgba(220, 38, 38, 0.15);
+                color: #f87171;
+            }
+
+            .badge-beta {
+                background: rgba(217, 119, 6, 0.15);
+                color: #fbbf24;
+            }
+
+            .archive-toggle {
+                color: #666;
+            }
+
+            .archive-toggle:hover {
+                color: #999;
+            }
+
+            .archive-content {
+                background: #2a2d32;
+                border-color: #3a3d42;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            }
+
+            .archive-content h3 {
+                color: #777;
+            }
+
+            .archive-content a {
+                color: #999;
+            }
+
+            .archive-content a:hover {
+                color: #ddd;
+            }
         }
     </style>
 </head>
