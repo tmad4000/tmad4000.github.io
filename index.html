@@ -4,10 +4,75 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>tmad4000</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg-start: #f5f7fa;
+            --bg-end: #e4e8ec;
+            --text: #333;
+            --heading: #111;
+            --tagline: #888;
+            --quote-text: #555;
+            --quote-bg: rgba(255, 255, 255, 0.7);
+            --quote-border: #999;
+            --section-title: #999;
+            --link-text: #444;
+            --link-bg: #fff;
+            --link-shadow: rgba(0, 0, 0, 0.08);
+            --link-hover-shadow: rgba(0, 0, 0, 0.1);
+            --link-hover-text: #000;
+            --desc: #888;
+            --sub-link-bg: #f9f9fa;
+            --inline-link: #aaa;
+            --inline-link-hover: #666;
+            --separator: #ccc;
+            --badge-alpha-bg: #fee2e2;
+            --badge-alpha-text: #dc2626;
+            --badge-beta-bg: #fef3c7;
+            --badge-beta-text: #d97706;
+            --archive-btn: #bbb;
+            --archive-btn-hover: #888;
+            --archive-bg: #fff;
+            --archive-border: #eee;
+            --archive-shadow: rgba(0, 0, 0, 0.1);
+            --archive-title: #999;
+            --archive-link: #666;
+            --archive-link-hover: #333;
+        }
+
+        [data-theme="dark"] {
+            --bg-start: #24272c;
+            --bg-end: #2e3238;
+            --text: #c8c8c8;
+            --heading: #e8e8e8;
+            --tagline: #8a8a8a;
+            --quote-text: #a0a0a0;
+            --quote-bg: rgba(255, 255, 255, 0.05);
+            --quote-border: #505050;
+            --section-title: #6a6a6a;
+            --link-text: #bbb;
+            --link-bg: rgba(255, 255, 255, 0.06);
+            --link-shadow: rgba(0, 0, 0, 0.2);
+            --link-hover-shadow: rgba(0, 0, 0, 0.3);
+            --link-hover-text: #e8e8e8;
+            --desc: #808080;
+            --sub-link-bg: rgba(255, 255, 255, 0.03);
+            --inline-link: #707070;
+            --inline-link-hover: #a0a0a0;
+            --separator: #505050;
+            --badge-alpha-bg: rgba(220, 38, 38, 0.12);
+            --badge-alpha-text: #f87171;
+            --badge-beta-bg: rgba(217, 119, 6, 0.12);
+            --badge-beta-text: #fbbf24;
+            --archive-btn: #606060;
+            --archive-btn-hover: #909090;
+            --archive-bg: #2e3238;
+            --archive-border: #3a3e44;
+            --archive-shadow: rgba(0, 0, 0, 0.3);
+            --archive-title: #6a6a6a;
+            --archive-link: #909090;
+            --archive-link-hover: #c8c8c8;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -16,13 +81,14 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
-            color: #333;
+            background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
+            color: var(--text);
             min-height: 100vh;
             display: flex;
             align-items: flex-start;
             justify-content: center;
             padding: 15vh 2rem 2rem;
+            transition: background 0.3s, color 0.3s;
         }
 
         .container {
@@ -34,28 +100,27 @@
             font-size: 2rem;
             font-weight: 700;
             margin-bottom: 0.5rem;
-            color: #111;
+            color: var(--heading);
         }
 
         .tagline {
-            font-family: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
-            font-weight: 300;
-            color: #777;
-            font-size: 1.15rem;
-            letter-spacing: 0.04em;
+            color: var(--tagline);
+            font-size: 0.85rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
             margin-bottom: 1.25rem;
             line-height: 1.5;
         }
 
         .quote {
             font-style: italic;
-            color: #555;
+            color: var(--quote-text);
             font-size: 0.9rem;
             line-height: 1.6;
             margin: 0 0 2.5rem 0;
             padding: 1rem 1.25rem;
-            background: rgba(255, 255, 255, 0.7);
-            border-left: 3px solid #999;
+            background: var(--quote-bg);
+            border-left: 3px solid var(--quote-border);
             border-radius: 0 8px 8px 0;
         }
 
@@ -71,7 +136,7 @@
             font-size: 0.7rem;
             text-transform: uppercase;
             letter-spacing: 0.1em;
-            color: #999;
+            color: var(--section-title);
             margin-bottom: 0.75rem;
             padding-left: 0.25rem;
         }
@@ -86,19 +151,19 @@
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            color: #444;
+            color: var(--link-text);
             text-decoration: none;
             padding: 1rem 1.25rem;
-            background: #fff;
+            background: var(--link-bg);
             border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            box-shadow: 0 1px 3px var(--link-shadow);
             transition: all 0.2s ease;
         }
 
         .links a:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            color: #000;
+            box-shadow: 0 4px 12px var(--link-hover-shadow);
+            color: var(--link-hover-text);
         }
 
         .links .icon {
@@ -113,14 +178,14 @@
 
         .links .desc {
             font-size: 0.8rem;
-            color: #888;
+            color: var(--desc);
             margin-left: auto;
         }
 
         .links .sub-link {
             margin-left: 2.25rem;
             padding: 0.6rem 1rem;
-            background: #f9f9fa;
+            background: var(--sub-link-bg);
             font-size: 0.9rem;
         }
 
@@ -144,7 +209,7 @@
 
         .inline-links a {
             font-size: 0.7rem;
-            color: #aaa;
+            color: var(--inline-link);
             text-decoration: none;
             padding: 0;
             background: none;
@@ -153,14 +218,14 @@
         }
 
         .inline-links a:hover {
-            color: #666;
+            color: var(--inline-link-hover);
             transform: none;
             box-shadow: none;
         }
 
         .inline-links .separator {
             font-size: 0.6rem;
-            color: #ccc;
+            color: var(--separator);
         }
 
         .badge {
@@ -174,13 +239,13 @@
         }
 
         .badge-alpha {
-            background: #fee2e2;
-            color: #dc2626;
+            background: var(--badge-alpha-bg);
+            color: var(--badge-alpha-text);
         }
 
         .badge-beta {
-            background: #fef3c7;
-            color: #d97706;
+            background: var(--badge-beta-bg);
+            color: var(--badge-beta-text);
         }
 
         .archive {
@@ -192,7 +257,7 @@
         .archive-toggle {
             background: none;
             border: none;
-            color: #bbb;
+            color: var(--archive-btn);
             font-size: 0.75rem;
             cursor: pointer;
             padding: 0.25rem;
@@ -200,7 +265,7 @@
         }
 
         .archive-toggle:hover {
-            color: #888;
+            color: var(--archive-btn-hover);
         }
 
         .archive-content {
@@ -208,11 +273,11 @@
             position: absolute;
             bottom: 2rem;
             left: 0;
-            background: #fff;
-            border: 1px solid #eee;
+            background: var(--archive-bg);
+            border: 1px solid var(--archive-border);
             border-radius: 8px;
             padding: 0.75rem 1rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px var(--archive-shadow);
             min-width: 200px;
         }
 
@@ -224,13 +289,13 @@
             font-size: 0.7rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            color: #999;
+            color: var(--archive-title);
             margin-bottom: 0.5rem;
         }
 
         .archive-content a {
             display: block;
-            color: #666;
+            color: var(--archive-link);
             text-decoration: none;
             font-size: 0.85rem;
             padding: 0.35rem 0;
@@ -238,103 +303,31 @@
         }
 
         .archive-content a:hover {
-            color: #333;
+            color: var(--archive-link-hover);
         }
 
-        @media (prefers-color-scheme: dark) {
-            body {
-                background: linear-gradient(135deg, #1a1d21 0%, #2a2d32 100%);
-                color: #d4d4d4;
-            }
+        .theme-toggle {
+            position: fixed;
+            top: 1.25rem;
+            right: 1.25rem;
+            background: none;
+            border: none;
+            font-size: 0.85rem;
+            cursor: pointer;
+            opacity: 0.3;
+            transition: opacity 0.2s;
+            padding: 0.25rem;
+            line-height: 1;
+        }
 
-            h1 {
-                color: #f0f0f0;
-            }
-
-            .tagline {
-                color: #999;
-            }
-
-            .quote {
-                color: #aaa;
-                background: rgba(255, 255, 255, 0.06);
-                border-left-color: #555;
-            }
-
-            .section-title {
-                color: #777;
-            }
-
-            .links a {
-                color: #ccc;
-                background: rgba(255, 255, 255, 0.07);
-                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-            }
-
-            .links a:hover {
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-                color: #fff;
-            }
-
-            .links .desc {
-                color: #888;
-            }
-
-            .links .sub-link {
-                background: rgba(255, 255, 255, 0.04);
-            }
-
-            .inline-links a {
-                color: #777;
-            }
-
-            .inline-links a:hover {
-                color: #aaa;
-            }
-
-            .inline-links .separator {
-                color: #555;
-            }
-
-            .badge-alpha {
-                background: rgba(220, 38, 38, 0.15);
-                color: #f87171;
-            }
-
-            .badge-beta {
-                background: rgba(217, 119, 6, 0.15);
-                color: #fbbf24;
-            }
-
-            .archive-toggle {
-                color: #666;
-            }
-
-            .archive-toggle:hover {
-                color: #999;
-            }
-
-            .archive-content {
-                background: #2a2d32;
-                border-color: #3a3d42;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-            }
-
-            .archive-content h3 {
-                color: #777;
-            }
-
-            .archive-content a {
-                color: #999;
-            }
-
-            .archive-content a:hover {
-                color: #ddd;
-            }
+        .theme-toggle:hover {
+            opacity: 0.65;
         }
     </style>
 </head>
 <body>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme"></button>
+
     <div class="container">
         <h1>Jacob Cole</h1>
         <p class="tagline">Engineering the Renaissance</p>
@@ -476,6 +469,59 @@
     </div>
 
     <script>
+        // Theme toggle — cycles: system → light → dark → system
+        (function() {
+            var btn = document.getElementById('theme-toggle');
+            var root = document.documentElement;
+
+            function getSystemTheme() {
+                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            }
+
+            function applyTheme() {
+                var saved = localStorage.getItem('theme');
+                if (saved) {
+                    root.setAttribute('data-theme', saved);
+                } else {
+                    root.setAttribute('data-theme', getSystemTheme());
+                }
+                updateButton();
+            }
+
+            function updateButton() {
+                var current = root.getAttribute('data-theme');
+                btn.textContent = current === 'dark' ? '☀️' : '🌙';
+            }
+
+            btn.addEventListener('click', function() {
+                var current = root.getAttribute('data-theme');
+                var systemTheme = getSystemTheme();
+
+                if (!localStorage.getItem('theme')) {
+                    // Currently following system — switch to opposite
+                    var next = systemTheme === 'dark' ? 'light' : 'dark';
+                    localStorage.setItem('theme', next);
+                } else if (localStorage.getItem('theme') !== systemTheme) {
+                    // Already overridden to opposite — go back to system
+                    localStorage.removeItem('theme');
+                } else {
+                    // Overridden but matches system — switch to opposite
+                    var next = current === 'dark' ? 'light' : 'dark';
+                    localStorage.setItem('theme', next);
+                }
+                applyTheme();
+            });
+
+            // Listen for system changes
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() {
+                if (!localStorage.getItem('theme')) {
+                    applyTheme();
+                }
+            });
+
+            applyTheme();
+        })();
+
         function toggleArchive() {
             document.getElementById('archive-content').classList.toggle('open');
             document.getElementById('recent-content').classList.remove('open');
@@ -487,9 +533,9 @@
         }
 
         document.addEventListener('click', function(e) {
-            const archive = document.querySelector('.archive');
-            const recent = document.querySelectorAll('.archive');
-            let inside = false;
+            var archive = document.querySelector('.archive');
+            var recent = document.querySelectorAll('.archive');
+            var inside = false;
             recent.forEach(function(el) { if (el.contains(e.target)) inside = true; });
             if (!inside) {
                 document.getElementById('archive-content').classList.remove('open');
