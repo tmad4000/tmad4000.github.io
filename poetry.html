@@ -19,6 +19,8 @@
             --poem-text: #333;
             --poem-date: #999;
             --separator: #e0e0e0;
+            --highlight-text: #555;
+            --highlight-border: rgba(0, 0, 0, 0.06);
         }
 
         [data-theme="dark"] {
@@ -35,6 +37,8 @@
             --poem-text: #c8c8c8;
             --poem-date: #6a6a6a;
             --separator: #3a3e44;
+            --highlight-text: #a0a0a0;
+            --highlight-border: rgba(255, 255, 255, 0.04);
         }
 
         * {
@@ -117,6 +121,37 @@
             letter-spacing: 0.03em;
         }
 
+        .highlights {
+            display: flex;
+            flex-direction: column;
+            gap: 1.75rem;
+            margin-bottom: 3rem;
+            padding-bottom: 2.5rem;
+            border-bottom: 1px solid var(--highlight-border);
+        }
+
+        .highlights .poem {
+            background: none;
+            box-shadow: none;
+            padding: 0 0.5rem;
+        }
+
+        .highlights .poem p {
+            font-size: 1.1rem;
+            line-height: 1.9;
+            color: var(--highlight-text);
+        }
+
+        .highlights .poem .poem-title {
+            font-style: normal;
+            font-weight: 600;
+            font-size: 0.8rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--poem-date);
+            margin-bottom: 0.5rem;
+        }
+
         .theme-toggle {
             position: fixed;
             top: 1.25rem;
@@ -146,13 +181,27 @@
             <p class="subtitle">Fragments caught in motion</p>
         </header>
 
-        <div class="poems">
+        <div class="highlights">
             <div class="poem">
                 <p>When mind is chaotic, scrabbling for nature,<br>
                 sometimes I forget that Earth is here,<br>
                 just inches below the pavement.</p>
-                <div class="date">July 2019</div>
             </div>
+
+            <div class="poem">
+                <div class="poem-title">The Perfect Fifth</div>
+                <p>I am the perfect fifth,<br>
+                crying out in mournful exultation<br>
+                Awaiting my following chord<br>
+                Even as I fade<br>
+                Knowing I am the beginning of an arc<br>
+                To a greater closure<br>
+                Along a distant path<br>
+                that comes only through falling.</p>
+            </div>
+        </div>
+
+        <div class="poems">
 
             <div class="poem">
                 <p>I think the place I am right now actually has a lot to teach &mdash;<br>
@@ -169,7 +218,8 @@
             </div>
 
             <div class="poem">
-                <p>In the cold as the garage opens,<br>
+                <p><strong>Rochester</strong><br><br>
+                In the cold as the garage opens,<br>
                 all I see is peace and excitement<br>
                 and crisp, pristine snow.</p>
                 <div class="date">July 2019</div>
@@ -235,19 +285,6 @@
                 and fly free on the wings of my fingertips<br>
                 into the eternity-realm beyond thought.</p>
                 <div class="date">2026</div>
-            </div>
-
-            <div class="poem">
-                <p><strong>The Perfect Fifth</strong><br><br>
-                I am the perfect fifth,<br>
-                crying out in mournful exultation<br>
-                Awaiting my following chord<br>
-                Even as I fade<br>
-                Knowing I am the beginning of an arc<br>
-                To a greater closure<br>
-                Along a distant path<br>
-                that comes only through falling.</p>
-                <div class="date">April 2021</div>
             </div>
 
             <div class="poem">
