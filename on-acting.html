@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>On Acting - Jacob Cole</title>
+    <style>
+        :root {
+            --bg-start: #f5f7fa;
+            --bg-end: #e4e8ec;
+            --text: #333;
+            --heading: #111;
+            --subtitle: #666;
+            --back-link: #666;
+            --back-link-hover: #333;
+            --article-bg: #fff;
+            --article-shadow: rgba(0, 0, 0, 0.08);
+            --article-text: #333;
+        }
+
+        [data-theme="dark"] {
+            --bg-start: #24272c;
+            --bg-end: #2e3238;
+            --text: #c8c8c8;
+            --heading: #e8e8e8;
+            --subtitle: #8a8a8a;
+            --back-link: #909090;
+            --back-link-hover: #c8c8c8;
+            --article-bg: rgba(255, 255, 255, 0.06);
+            --article-shadow: rgba(0, 0, 0, 0.2);
+            --article-text: #c8c8c8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 2rem;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 2.5rem;
+        }
+
+        .back-link {
+            color: var(--back-link);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: var(--back-link-hover);
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--heading);
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--subtitle);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .article {
+            background: var(--article-bg);
+            border-radius: 10px;
+            padding: 2rem 2.25rem;
+            box-shadow: 0 1px 4px var(--article-shadow);
+            color: var(--article-text);
+            line-height: 1.8;
+            font-size: 1.05rem;
+        }
+
+        .article p {
+            margin-bottom: 1rem;
+        }
+
+        .article p:last-child {
+            margin-bottom: 0;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 1.25rem;
+            right: 1.25rem;
+            background: none;
+            border: none;
+            font-size: 0.85rem;
+            cursor: pointer;
+            opacity: 0.3;
+            transition: opacity 0.2s;
+            padding: 0.25rem;
+            line-height: 1;
+        }
+
+        .theme-toggle:hover {
+            opacity: 0.65;
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme"></button>
+
+    <div class="container">
+        <header>
+            <a href="/" class="back-link">&larr; Home</a>
+            <h1>On Acting</h1>
+        </header>
+
+        <div class="article">
+            <p>For the duration that you are acting a character in a stage scene, you functionally are that character, because people are constructing the interactive world that behaves exactly as if you were.</p>
+            <p>If you've ever wanted to experience what it's like to be someone or get to be someone in particular, acting is a really powerful way to do it, and kids succeed at this all the time by playing pretend.</p>
+            <p>I wonder if this is a pathway to make you more pluripotent.</p>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            var btn = document.getElementById('theme-toggle');
+            var root = document.documentElement;
+
+            function getSystemTheme() {
+                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            }
+
+            function applyTheme() {
+                var saved = localStorage.getItem('theme');
+                if (saved) {
+                    root.setAttribute('data-theme', saved);
+                } else {
+                    root.setAttribute('data-theme', getSystemTheme());
+                }
+                updateButton();
+            }
+
+            function updateButton() {
+                var current = root.getAttribute('data-theme');
+                btn.textContent = current === 'dark' ? '\u2600\uFE0F' : '\uD83C\uDF19';
+            }
+
+            btn.addEventListener('click', function() {
+                var current = root.getAttribute('data-theme');
+                var systemTheme = getSystemTheme();
+
+                if (!localStorage.getItem('theme')) {
+                    var next = systemTheme === 'dark' ? 'light' : 'dark';
+                    localStorage.setItem('theme', next);
+                } else if (localStorage.getItem('theme') !== systemTheme) {
+                    localStorage.removeItem('theme');
+                } else {
+                    var next = current === 'dark' ? 'light' : 'dark';
+                    localStorage.setItem('theme', next);
+                }
+                applyTheme();
+            });
+
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() {
+                if (!localStorage.getItem('theme')) {
+                    applyTheme();
+                }
+            });
+
+            applyTheme();
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meditate Effortlessly - Jacob Cole</title>
+    <style>
+        :root {
+            --bg-start: #f5f7fa;
+            --bg-end: #e4e8ec;
+            --text: #333;
+            --heading: #111;
+            --subtitle: #666;
+            --back-link: #666;
+            --back-link-hover: #333;
+            --article-bg: #fff;
+            --article-shadow: rgba(0, 0, 0, 0.08);
+            --article-text: #333;
+            --section-border: #e8e8e8;
+            --section-title: #888;
+        }
+
+        [data-theme="dark"] {
+            --bg-start: #24272c;
+            --bg-end: #2e3238;
+            --text: #c8c8c8;
+            --heading: #e8e8e8;
+            --subtitle: #8a8a8a;
+            --back-link: #909090;
+            --back-link-hover: #c8c8c8;
+            --article-bg: rgba(255, 255, 255, 0.06);
+            --article-shadow: rgba(0, 0, 0, 0.2);
+            --article-text: #c8c8c8;
+            --section-border: #3a3e44;
+            --section-title: #6a6a6a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 2rem;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 2.5rem;
+        }
+
+        .back-link {
+            color: var(--back-link);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: var(--back-link-hover);
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--heading);
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--subtitle);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .article {
+            background: var(--article-bg);
+            border-radius: 10px;
+            padding: 2rem 2.25rem;
+            box-shadow: 0 1px 4px var(--article-shadow);
+            color: var(--article-text);
+            line-height: 1.8;
+            font-size: 1.05rem;
+        }
+
+        .article .section {
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--section-border);
+        }
+
+        .article .section:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .article .section-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--section-title);
+            margin-bottom: 1rem;
+        }
+
+        .article p {
+            margin-bottom: 1rem;
+        }
+
+        .article p:last-child {
+            margin-bottom: 0;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 1.25rem;
+            right: 1.25rem;
+            background: none;
+            border: none;
+            font-size: 0.85rem;
+            cursor: pointer;
+            opacity: 0.3;
+            transition: opacity 0.2s;
+            padding: 0.25rem;
+            line-height: 1;
+        }
+
+        .theme-toggle:hover {
+            opacity: 0.65;
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme"></button>
+
+    <div class="container">
+        <header>
+            <a href="/" class="back-link">&larr; Home</a>
+            <h1>Meditate Effortlessly</h1>
+            <p class="subtitle">On nervous systems, trees, and living inside each other</p>
+        </header>
+
+        <div class="article">
+            <div class="section">
+                <div class="section-title">Unhooking the Nervous System</div>
+                <p>The simplest meditation is to unhook the nervous system. Whatever you're thinking about &mdash; past, present, or future &mdash; just unhook yourself from it. Then it settles like an old forest.</p>
+                <p>Very effortless, simple instruction.</p>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Meditating with Trees</div>
+                <p>In a certain sense, we are all one nervous system &mdash; it's just desynchronized. When you can synchronize your nervous system to the pace of the trees, the pace of the old forest &mdash; tune in to what is actually going on there on an energetic level &mdash; it helps.</p>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Living Inside Each Other's Nervous Systems</div>
+                <p>When you're staying in somebody's house, you are really inside their nervous system, their externalized nervous system, and being interacted with, pushed and pulled. And interacting with them &mdash; moving their furniture &mdash; is really like doing brain surgery in their expanded consciousness. It is informationally and sometimes emotionally disorienting. So you learn to tread gently on their nervous system, to be the kind of person who can be in harmony with them.</p>
+                <p>We are living inside each other's nervous systems as well as in the world. That is ultimately the learning that you can get from being in the presence of a spiritual master. You are part of their nervous system when you're in their presence, and as long as they are thinking of you, you can fall into the vision they see for you there. And the question for them is, can they see you with all your noise and imperfection as sublimely beautiful?</p>
+                <p>The same power present in giving a good compliment or making a good introduction, where you share what is beautiful about someone, is that it helps presence. It helps everyone remember and see it and embody it &mdash; fall into that character, that identity.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            var btn = document.getElementById('theme-toggle');
+            var root = document.documentElement;
+
+            function getSystemTheme() {
+                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            }
+
+            function applyTheme() {
+                var saved = localStorage.getItem('theme');
+                if (saved) {
+                    root.setAttribute('data-theme', saved);
+                } else {
+                    root.setAttribute('data-theme', getSystemTheme());
+                }
+                updateButton();
+            }
+
+            function updateButton() {
+                var current = root.getAttribute('data-theme');
+                btn.textContent = current === 'dark' ? '\u2600\uFE0F' : '\uD83C\uDF19';
+            }
+
+            btn.addEventListener('click', function() {
+                var current = root.getAttribute('data-theme');
+                var systemTheme = getSystemTheme();
+
+                if (!localStorage.getItem('theme')) {
+                    var next = systemTheme === 'dark' ? 'light' : 'dark';
+                    localStorage.setItem('theme', next);
+                } else if (localStorage.getItem('theme') !== systemTheme) {
+                    localStorage.removeItem('theme');
+                } else {
+                    var next = current === 'dark' ? 'light' : 'dark';
+                    localStorage.setItem('theme', next);
+                }
+                applyTheme();
+            });
+
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() {
+                if (!localStorage.getItem('theme')) {
+                    applyTheme();
+                }
+            });
+
+            applyTheme();
+        })();
+    </script>
+</body>
+</html>
