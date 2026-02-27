@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surfing in the Fog - Jacob Cole</title>
+    <style>
+        :root {
+            --bg-start: #f5f7fa;
+            --bg-end: #e4e8ec;
+            --text: #333;
+            --heading: #111;
+            --subtitle: #666;
+            --back-link: #666;
+            --back-link-hover: #333;
+            --article-bg: #fff;
+            --article-shadow: rgba(0, 0, 0, 0.08);
+            --article-text: #333;
+        }
+
+        [data-theme="dark"] {
+            --bg-start: #24272c;
+            --bg-end: #2e3238;
+            --text: #c8c8c8;
+            --heading: #e8e8e8;
+            --subtitle: #8a8a8a;
+            --back-link: #909090;
+            --back-link-hover: #c8c8c8;
+            --article-bg: rgba(255, 255, 255, 0.06);
+            --article-shadow: rgba(0, 0, 0, 0.2);
+            --article-text: #c8c8c8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 2rem;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 2.5rem;
+        }
+
+        .back-link {
+            color: var(--back-link);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: var(--back-link-hover);
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--heading);
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--subtitle);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .epigraph {
+            font-style: italic;
+            color: var(--subtitle);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-top: 1rem;
+        }
+
+        .epigraph .attribution {
+            display: block;
+            margin-top: 0.25rem;
+            font-style: normal;
+            font-size: 0.85rem;
+        }
+
+        .article {
+            background: var(--article-bg);
+            border-radius: 10px;
+            padding: 2rem 2.25rem;
+            box-shadow: 0 1px 4px var(--article-shadow);
+            color: var(--article-text);
+            line-height: 1.8;
+            font-size: 1.05rem;
+        }
+
+        .article p {
+            margin-bottom: 1rem;
+            text-indent: 2em;
+        }
+
+        .article p:first-child {
+            text-indent: 0;
+        }
+
+        .article p:last-child {
+            margin-bottom: 0;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 1.25rem;
+            right: 1.25rem;
+            background: none;
+            border: none;
+            font-size: 0.85rem;
+            cursor: pointer;
+            opacity: 0.3;
+            transition: opacity 0.2s;
+            padding: 0.25rem;
+            line-height: 1;
+        }
+
+        .theme-toggle:hover {
+            opacity: 0.65;
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme"></button>
+
+    <div class="container">
+        <header>
+            <a href="/" class="back-link">&larr; Home</a>
+            <h1>Surfing in the Fog</h1>
+            <div class="epigraph">
+                "Place yourself in the middle of the stream of power and wisdom which animates all whom it floats, and you are without effort impelled to truth, to right and a perfect contentment."
+                <span class="attribution">&mdash;Ralph Waldo Emerson, <em>Spiritual Laws</em></span>
+            </div>
+        </header>
+
+        <div class="article">
+            <p>As a transcendentalist, Emerson found inspiration in places where "the stream of power and wisdom flow" &ndash; where the truth is not sought but omnipresent &ndash; like his woodland cabin at Walden Pond. As a surfer, I find my own form of "truth" and "contentment" amidst the swells and fog.</p>
+
+            <p>It is my belief that paddling out into the lineup through a bank of heavy mist and suddenly finding yourself unable to see the shore is among the most surreal and inspiring experiences a person can have. Emerging from the thickest part of the onshore fog and into the realm of brighter sunlight outside is like crossing the border into a parallel world utterly isolated from our daily, land-lubberish lives. The feeling must be akin to that which drove the ancient Polynesians to their outrigger canoes, Shackleton to the Antarctic, Emerson to his leaps of insight in the face of rugged beauty. It is the euphoria and mystery that greet those who dare to leap where no one has ever looked, who realize that there is no emotion truer than that which comes from floating adrift in a flimsy, tiny capsule through a chaotic universe unimaginably larger than they. It is only when we are lost that we finally find ourselves.</p>
+
+            <p>When surfing in the fog I am directly prompted to think philosophically. I inevitably ponder the counterintuitive truism in quantum mechanics stating that all that is unseen could be &ndash; and in fact is &ndash; anything and everything it can be. As fellow wave riders &ndash; strangers and friends &ndash; wink out of my sphere of sight and consciousness, as the steadfast constructs of society become transient and melt into the muffling grayness, all standards for comparison and preconceptions of perspective vanish and my thoughts branch out unfettered. As I ride (or duck beneath) the waves that silently materialize before me, concepts that have long eluded me suddenly coalesce. The parallel pathfinding algorithm underlying my project for the Intel STS came to me not in a laboratory or classroom but as I watched the branching rivulets of water find their way down my surfboard as I emerged from underneath a wave (I saw how signals splitting and rejoining as they propagate through a network can simulate the shortest path problem in computer science). Often, I find it more productive to open my mind to the vast ocean's meditative lull than to study.</p>
+
+            <p>Sitting at peace in the stillness between the hollow waves is but one tributary of the vast "stream of power and wisdom" that animates me, the great river of physical and spiritual truth that emanates from nature. Running my hand along the ice-glazed needles of the fallen pine, inhaling the green-diffracted God-thought-breath of the morning forest, laughing as I hold wide my windbreaker and lean euphorically into the rushing torrents of the rain: this timeless rapture is my inspiration, this intricate, organic splendor a sanctified model for my thoughts. This is why I paddle out, never knowing exactly where I'll return to shore.</p>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            var btn = document.getElementById('theme-toggle');
+            var root = document.documentElement;
+
+            function getSystemTheme() {
+                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            }
+
+            function applyTheme() {
+                var saved = localStorage.getItem('theme');
+                if (saved) {
+                    root.setAttribute('data-theme', saved);
+                } else {
+                    root.setAttribute('data-theme', getSystemTheme());
+                }
+                updateButton();
+            }
+
+            function updateButton() {
+                var current = root.getAttribute('data-theme');
+                btn.textContent = current === 'dark' ? '\u2600\uFE0F' : '\uD83C\uDF19';
+            }
+
+            btn.addEventListener('click', function() {
+                var current = root.getAttribute('data-theme');
+                var systemTheme = getSystemTheme();
+
+                if (!localStorage.getItem('theme')) {
+                    var next = systemTheme === 'dark' ? 'light' : 'dark';
+                    localStorage.setItem('theme', next);
+                } else if (localStorage.getItem('theme') !== systemTheme) {
+                    localStorage.removeItem('theme');
+                } else {
+                    var next = current === 'dark' ? 'light' : 'dark';
+                    localStorage.setItem('theme', next);
+                }
+                applyTheme();
+            });
+
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() {
+                if (!localStorage.getItem('theme')) {
+                    applyTheme();
+                }
+            });
+
+            applyTheme();
+        })();
+    </script>
+</body>
+</html>
