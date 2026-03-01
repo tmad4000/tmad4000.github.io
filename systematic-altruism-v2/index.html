@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Systematic Altruism</title>
+    <meta name="description" content="Free, open knowledge infrastructure for human flourishing. 50+ curated resources spanning health, learning, community, and global problem-solving.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #fffdf8;
+            --text: #2d2a24;
+            --muted: #8c8577;
+            --warm: #c2410c;
+            --warm-light: #fff7ed;
+            --warm-border: #fed7aa;
+            --teal: #0d9488;
+            --teal-light: #f0fdfa;
+            --teal-border: #99f6e4;
+            --violet: #7c3aed;
+            --violet-light: #f5f3ff;
+            --violet-border: #ddd6fe;
+            --rose: #be123c;
+            --rose-light: #fff1f2;
+            --rose-border: #fecdd3;
+            --amber: #b45309;
+            --amber-light: #fffbeb;
+            --amber-border: #fde68a;
+            --card-bg: #fff;
+            --card-border: #f0ece4;
+            --card-shadow: 0 1px 2px rgba(0,0,0,0.04);
+            --hero-bg: #1b1510;
+            --divider: #e8e3db;
+        }
+
+        [data-theme="dark"] {
+            --bg: #181614;
+            --text: #e5e0d8;
+            --muted: #8c8577;
+            --warm-light: rgba(194, 65, 12, 0.1);
+            --warm-border: rgba(194, 65, 12, 0.25);
+            --teal-light: rgba(13, 148, 136, 0.1);
+            --teal-border: rgba(13, 148, 136, 0.25);
+            --violet-light: rgba(124, 58, 237, 0.1);
+            --violet-border: rgba(124, 58, 237, 0.25);
+            --rose-light: rgba(190, 18, 60, 0.1);
+            --rose-border: rgba(190, 18, 60, 0.25);
+            --amber-light: rgba(180, 83, 9, 0.1);
+            --amber-border: rgba(180, 83, 9, 0.25);
+            --card-bg: #242220;
+            --card-border: #342f2a;
+            --card-shadow: 0 1px 2px rgba(0,0,0,0.15);
+            --hero-bg: #0e0c0a;
+            --divider: #302c28;
+            --warm: #fb923c;
+            --teal: #2dd4bf;
+            --violet: #a78bfa;
+            --rose: #fb7185;
+            --amber: #fbbf24;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Hero */
+        .hero {
+            background: var(--hero-bg);
+            color: #f5f0e8;
+            padding: 5rem 2rem 4.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 200px;
+            background: linear-gradient(to bottom, transparent, var(--bg));
+            pointer-events: none;
+        }
+
+        .hero-inner {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-eyebrow {
+            font-size: 0.75rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: rgba(245, 240, 232, 0.4);
+            margin-bottom: 1.5rem;
+        }
+
+        .hero h1 {
+            font-family: 'DM Serif Display', Georgia, serif;
+            font-size: 3.5rem;
+            font-weight: 400;
+            line-height: 1.15;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.01em;
+        }
+
+        .hero h1 em {
+            font-style: normal;
+            color: #fb923c;
+        }
+
+        .hero-body {
+            font-size: 1.1rem;
+            color: rgba(245, 240, 232, 0.65);
+            max-width: 560px;
+            line-height: 1.75;
+            margin-bottom: 2.5rem;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 3rem;
+        }
+
+        .stat {
+            text-align: left;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #f5f0e8;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: rgba(245, 240, 232, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-top: 0.25rem;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            width: 36px;
+            height: 36px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .theme-toggle:hover { background: rgba(255,255,255,0.15); }
+
+        /* Content */
+        .content {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 3rem 2rem 5rem;
+        }
+
+        /* Spotlight section */
+        .spotlight {
+            margin-bottom: 4rem;
+        }
+
+        .spotlight-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .spotlight-header h2 {
+            font-family: 'DM Serif Display', Georgia, serif;
+            font-size: 1.75rem;
+            font-weight: 400;
+        }
+
+        .spotlight-header .arrow {
+            color: var(--muted);
+            font-size: 1.25rem;
+        }
+
+        .spotlight-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .spotlight-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.25s ease;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .spotlight-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+        }
+
+        .spotlight-card.warm { border-left: 3px solid var(--warm); }
+        .spotlight-card.teal { border-left: 3px solid var(--teal); }
+        .spotlight-card.violet { border-left: 3px solid var(--violet); }
+        .spotlight-card.rose { border-left: 3px solid var(--rose); }
+        .spotlight-card.amber { border-left: 3px solid var(--amber); }
+
+        .spotlight-card .sc-icon {
+            font-size: 1.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .spotlight-card h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 0.35rem;
+            line-height: 1.3;
+        }
+
+        .spotlight-card p {
+            font-size: 0.85rem;
+            color: var(--muted);
+            line-height: 1.55;
+            flex-grow: 1;
+        }
+
+        .spotlight-card .sc-domain {
+            font-size: 0.72rem;
+            color: var(--muted);
+            margin-top: 0.75rem;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            opacity: 0.7;
+        }
+
+        /* Category sections */
+        .category {
+            margin-bottom: 3rem;
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--divider);
+            margin-bottom: 1rem;
+        }
+
+        .category-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .category-dot.warm { background: var(--warm); }
+        .category-dot.teal { background: var(--teal); }
+        .category-dot.violet { background: var(--violet); }
+        .category-dot.rose { background: var(--rose); }
+        .category-dot.amber { background: var(--amber); }
+
+        .category-header h2 {
+            font-family: 'DM Serif Display', Georgia, serif;
+            font-size: 1.35rem;
+            font-weight: 400;
+            flex-grow: 1;
+        }
+
+        .category-header .cat-count {
+            font-size: 0.75rem;
+            color: var(--muted);
+        }
+
+        .items {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 0.5rem;
+        }
+
+        .item {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            padding: 0.7rem 0.85rem;
+            border-radius: 8px;
+            text-decoration: none;
+            color: inherit;
+            transition: background 0.15s;
+        }
+
+        .item:hover {
+            background: var(--card-bg);
+        }
+
+        .item .item-icon {
+            font-size: 1.1rem;
+            width: 1.4rem;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .item .item-text {
+            min-width: 0;
+        }
+
+        .item .item-name {
+            font-size: 0.88rem;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+
+        .item .item-desc {
+            font-size: 0.75rem;
+            color: var(--muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Footer */
+        footer {
+            border-top: 1px solid var(--divider);
+            padding: 2.5rem 2rem;
+            text-align: center;
+        }
+
+        footer p {
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+
+        footer a {
+            color: var(--muted);
+            text-decoration: underline;
+            text-decoration-color: var(--divider);
+            text-underline-offset: 2px;
+            transition: color 0.2s;
+        }
+
+        footer a:hover { color: var(--text); }
+
+        footer .footer-note {
+            font-size: 0.75rem;
+            color: var(--muted);
+            opacity: 0.6;
+            margin-top: 0.5rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 700px) {
+            .hero { padding: 3.5rem 1.5rem 3rem; }
+            .hero h1 { font-size: 2.4rem; }
+            .hero-body { font-size: 1rem; }
+            .hero-stats { gap: 2rem; }
+            .stat-number { font-size: 1.5rem; }
+            .content { padding: 2rem 1.25rem 4rem; }
+            .spotlight-grid { grid-template-columns: 1fr; }
+            .items { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme"></button>
+
+    <header class="hero">
+        <div class="hero-inner">
+            <p class="hero-eyebrow">An Open Project</p>
+            <h1>What if we built <em>infrastructure</em> for human flourishing?</h1>
+            <p class="hero-body">
+                Systematic Altruism is a growing collection of free, curated resources
+                designed to help everyone &mdash; with health, learning, connection,
+                career, and the biggest problems facing humanity.
+            </p>
+            <div class="hero-stats">
+                <div class="stat">
+                    <div class="stat-number">50+</div>
+                    <div class="stat-label">Resources</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">12</div>
+                    <div class="stat-label">Categories</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">7</div>
+                    <div class="stat-label">Cities Mapped</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="content">
+
+        <!-- Spotlight -->
+        <section class="spotlight">
+            <div class="spotlight-header">
+                <h2>Highest Impact</h2>
+            </div>
+            <div class="spotlight-grid">
+                <a class="spotlight-card warm" href="https://nvctranslator.com/" target="_blank" rel="noopener">
+                    <span class="sc-icon">💚</span>
+                    <h3>NVC Translator</h3>
+                    <p>Translate any message into Nonviolent Communication. De-escalate conflicts before they start.</p>
+                    <span class="sc-domain">nvctranslator.com</span>
+                </a>
+                <a class="spotlight-card teal" href="https://easilysolvableworldproblems.jacobcole.net/" target="_blank" rel="noopener">
+                    <span class="sc-icon">🎯</span>
+                    <h3>Easily Solvable World Problems</h3>
+                    <p>High-impact issues with tractable solutions. They just need someone to pick them up.</p>
+                    <span class="sc-domain">easilysolvableworldproblems.jacobcole.net</span>
+                </a>
+                <a class="spotlight-card violet" href="https://chronicpain.jacobcole.net/" target="_blank" rel="noopener">
+                    <span class="sc-icon">🌱</span>
+                    <h3>Chronic Pain Resource Hub</h3>
+                    <p>Comprehensive, evidence-based tools for the millions living with chronic pain every day.</p>
+                    <span class="sc-domain">chronicpain.jacobcole.net</span>
+                </a>
+                <a class="spotlight-card rose" href="https://existentialcrisis.jacobcole.net/" target="_blank" rel="noopener">
+                    <span class="sc-icon">🔥</span>
+                    <h3>Existential Crisis &rarr; Transformation</h3>
+                    <p>Resources for when meaning collapses &mdash; turning the darkest moments into catalysts for growth.</p>
+                    <span class="sc-domain">existentialcrisis.jacobcole.net</span>
+                </a>
+                <a class="spotlight-card amber" href="https://healingartsgrant.jacobcole.net/" target="_blank" rel="noopener">
+                    <span class="sc-icon">💛</span>
+                    <h3>Healing Arts Grant</h3>
+                    <p>Making alternative healthcare accessible &mdash; grants for bodywork, acupuncture, and healing arts.</p>
+                    <span class="sc-domain">healingartsgrant.jacobcole.net</span>
+                </a>
+                <a class="spotlight-card teal" href="https://issuetracker.world/" target="_blank" rel="noopener">
+                    <span class="sc-icon">📋</span>
+                    <h3>IssueTracker.world</h3>
+                    <p>A universal issue tracker for civilization. File a bug report for the world.</p>
+                    <span class="sc-domain">issuetracker.world</span>
+                </a>
+                <a class="spotlight-card violet" href="https://pureland.jacobcole.net/" target="_blank" rel="noopener">
+                    <span class="sc-icon">🕊️</span>
+                    <h3>Pureland</h3>
+                    <p>A refuge and resource hub for highly sensitive people in a world not designed for them.</p>
+                    <span class="sc-domain">pureland.jacobcole.net</span>
+                </a>
+                <a class="spotlight-card warm" href="https://worldproblems.jacobcole.net/" target="_blank" rel="noopener">
+                    <span class="sc-icon">🌍</span>
+                    <h3>World Problems</h3>
+                    <p>Naming problems clearly is the first step to solving them. An open directory of global issues.</p>
+                    <span class="sc-domain">worldproblems.jacobcole.net</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- Knowledge & Learning -->
+        <section class="category">
+            <div class="category-header">
+                <span class="category-dot violet"></span>
+                <h2>Knowledge & Learning</h2>
+                <span class="cat-count">6</span>
+            </div>
+            <div class="items">
+                <a class="item" href="https://knowledgebase.world/" target="_blank" rel="noopener">
+                    <span class="item-icon">📚</span>
+                    <div class="item-text">
+                        <div class="item-name">KnowledgeBase.world</div>
+                        <div class="item-desc">Central knowledge repository</div>
+                    </div>
+                </a>
+                <a class="item" href="https://manifestos.world/" target="_blank" rel="noopener">
+                    <span class="item-icon">📜</span>
+                    <div class="item-text">
+                        <div class="item-name">Manifestos.world</div>
+                        <div class="item-desc">Crowdsourced personal visions</div>
+                    </div>
+                </a>
+                <a class="item" href="https://ideabank.global/" target="_blank" rel="noopener">
+                    <span class="item-icon">💡</span>
+                    <div class="item-text">
+                        <div class="item-name">IdeaBank.global</div>
+                        <div class="item-desc">Strategic ideas database</div>
+                    </div>
+                </a>
+                <a class="item" href="https://purplepill.wiki/" target="_blank" rel="noopener">
+                    <span class="item-icon">💊</span>
+                    <div class="item-text">
+                        <div class="item-name">PurplePill.wiki</div>
+                        <div class="item-desc">Transformative texts</div>
+                    </div>
+                </a>
+                <a class="item" href="https://salon.jacobcole.net/" target="_blank" rel="noopener">
+                    <span class="item-icon">🎩</span>
+                    <div class="item-text">
+                        <div class="item-name">Salon</div>
+                        <div class="item-desc">Intellectual salon notes</div>
+                    </div>
+                </a>
+                <a class="item" href="https://thoughtfulweb.jacobcole.net/" target="_blank" rel="noopener">
+                    <span class="item-icon">🌐</span>
+                    <div class="item-text">
+                        <div class="item-name">Thoughtful Web</div>
+                        <div class="item-desc">Curated thoughtful content</div>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Wellness & Health -->
+        <section class="category">
+            <div class="category-header">
+                <span class="category-dot teal"></span>
+                <h2>Wellness & Health</h2>
+                <span class="cat-count">8</span>
+            </div>
+            <div class="items">
+                <a class="item" href="https://chronicpain.jacobcole.net/" target="_blank" rel="noopener">
+                    <span class="item-icon">🌱</span>
+                    <div class="item-text">
+                        <div class="item-name">Chronic Pain Hub</div>
+                        <div class="item-desc">Evidence-based tools & strategies</div>
+                    </div>
+                </a>
+                <a class="item" href="https://qigong.garden/" target="_blank" rel="noopener">
+                    <span class="item-icon">🌿</span>
+                    <div class="item-text">
+                        <div class="item-name">Qigong.garden</div>
+                        <div class="item-desc">Exercises & research</div>
+                    </div>
+                </a>
+                <a class="item" href="https://meditation.jacobcole.net/" target="_blank" rel="noopener">
+                    <span class="item-icon">🧘</span>
+                    <div class="item-text">
+                        <div class="item-name">Meditation</div>
+                        <div class="item-desc">Practices & guides</div>
+                    </div>
+                </a>
+                <a class="item" href="https://sleep.jacobcole.net/" target="_blank" rel="noopener">
+                    <span class="item-icon">😴</span>
+                    <div class="item-text">
+                        <div class="item-name">Sleep</div>
+                        <div class="item-desc">Sleep science & optimization</div>
+                    </div>
+                </a>
+                <a class="item" href="https://adhd.jacobcole.net/" target="_blank" rel="noopener">
+                    <span class="item-icon">⚡</span>
+                    <div class="item-text">
+                        <div class="item-name">ADHD Strategies</div>
+                        <div class="item-desc">Focus tools & techniques</div>
+                    </div>
+                </a>
+                <a class="item" href="https://energymedicine.jacobcole.net/" target="_blank" rel="noopener">
+                    <span class="item-icon">✨</span>
+                    <div class="item-text">
+                        <div class="item-name">Energy Medicine</div>
+                        <div class="item-desc">Alternative healing modalities</div>
+                    </div>
+                </a>
+                <a class="item" href="https://rsiwiki.jacobcole.net/" target="_blank" rel="noopener">
+                    <span class="item-icon">🖐️</span>
+                    <div class="item-text">
+                        <div class="item-name">RSI Wiki</div>
+                        <div class="item-desc">Repetitive strain injury recovery</div>
+                    </div>
+                </a>
+                <a class="item" href="https://buoyantfitness.jacobcole.net/" target="_blank" rel="noopener">
+                    <span class="item-icon">💪</span>
+                    <div class="item-text">
+                        <div class="item-name">Buoyant Fitness</div>
+                        <div class="item-desc">Fitness resources</div>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Mental Health & Support -->
+        <section class="category">
+            <div class="category-header">
+                <span class="category-dot rose"></span>
+                <h2>Mental Health & Support</h2>
+                <span class="cat-count">4</span>
+            </div>
+            <div class="items">
+                <a class="item" href="https://existentialcrisis.jacobcole.net/" target="_blank" rel="noopener">
+                    <span class="item-icon">🔥</span>
+                    <div class="item-text">
+                        <div class="item-name">Existential Crisis &rarr; Transformation</div>
+                        <div class="item-desc">When meaning collapses</div>
+                    </div>
+                </a>
+                <a class="item" href="https://pureland.jacobcole.net/" target="_blank" rel="noopener">
+                    <span class="item-icon">🕊️</span>
+                    <div class="item-text">
+                        <div class="item-name">Pureland</div>
+                        <div class="item-desc">For highly sensitive people</div>
+                    </div>
+                </a>
+                <a class="item" href="https://mentalstatehacks.jacobcole.net/" target="_blank" rel="noopener">
+                    <span class="item-icon">🧠</span>
+                    <div class="item-text">
+                        <div class="item-name">Mental State Hacks</div>
+                        <div class="item-desc">State optimization</div>
+                    </div>
+                </a>
+                <a class="item" href="https://lifechangingthings.jacobcole.net/" target="_blank" rel="noopener">
+                    <span class="item-icon">🌟</span>
+                    <div class="item-text">
+                        <div class="item-name">Life-Changing Things</div>
+                        <div class="item-desc">Transformative experiences</div>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Global Issues -->
+        <section class="category">
+            <div class="category-header">
+                <span class="category-dot warm"></span>
+                <h2>Global Issues & Solutions</h2>
+                <span class="cat-count">5</span>
+            </div>
+            <div class="items">
+                <a class="item" href="https://worldproblems.jacobcole.net/" target="_blank" rel="noopener">
+                    <span class="item-icon">🌍</span>
+                    <div class="item-text">
+                        <div class="item-name">World Problems</div>
+                        <div class="item-desc">Global issues directory</div>
+                    </div>
+                </a>
+                <a class="item" href="https://easilysolvableworldproblems.jacobcole.net/" target="_blank" rel="noopener">
+                    <span class="item-icon">🎯</span>
+                    <div class="item-text">
+                        <div class="item-name">Easily Solvable World Problems</div>
+                        <div class="item-desc">Tractable high-impact problems</div>
+                    </div>
+                </a>
+                <a class="item" href="https://issuetracker.world/" target="_blank" rel="noopener">
+                    <span class="item-icon">📋</span>
+                    <div class="item-text">
+                        <div class="item-name">IssueTracker.world</div>
+                        <div class="item-desc">Bug reports for civilization</div>
+                    </div>
+                </a>
+                <a class="item" href="https://climatechange.jacobcole.net/" target="_blank" rel="noopener">
+                    <span class="item-icon">🌡️</span>
+                    <div class="item-text">
+                        <div class="item-name">Climate Change</div>
+                        <div class="item-desc">Climate action resources</div>
+                    </div>
+                </a>
+                <a class="item" href="https://covid19hackideas.jacobcole.net/" target="_blank" rel="noopener">
+                    <span class="item-icon">🦠</span>
+                    <div class="item-text">
+                        <div class="item-name">COVID-19 Hack Ideas</div>
+                        <div class="item-desc">Pandemic solutions</div>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Community & Connection -->
+        <section class="category">
+            <div class="category-header">
+                <span class="category-dot amber"></span>
+                <h2>Community & Connection</h2>
+                <span class="cat-count">5</span>
+            </div>
+            <div class="items">
+                <a class="item" href="https://jcombinator.network/" target="_blank" rel="noopener">
+                    <span class="item-icon">🤝</span>
+                    <div class="item-text">
+                        <div class="item-name">J-Combinator</div>
+                        <div class="item-desc">Founder & investor matching</div>
+                    </div>
+                </a>
+                <a class="item" href="https://intronet.network/" target="_blank" rel="noopener">
+                    <span class="item-icon">👋</span>
+                    <div class="item-text">
+                        <div class="item-name">Intronet</div>
+                        <div class="item-desc">Introduction requests</div>
+                    </div>
+                </a>
+                <a class="item" href="https://favorverse.jacobcole.net/" target="_blank" rel="noopener">
+                    <span class="item-icon">🎁</span>
+                    <div class="item-text">
+                        <div class="item-name">Favorverse</div>
+                        <div class="item-desc">Favor exchange network</div>
+                    </div>
+                </a>
+                <a class="item" href="https://housinglist.jacobcole.net/" target="_blank" rel="noopener">
+                    <span class="item-icon">🏠</span>
+                    <div class="item-text">
+                        <div class="item-name">Housing List</div>
+                        <div class="item-desc">Community housing listings</div>
+                    </div>
+                </a>
+                <a class="item" href="https://worldquestguild.connectr.site/" target="_blank" rel="noopener">
+                    <span class="item-icon">⚔️</span>
+                    <div class="item-text">
+                        <div class="item-name">World Quest Guild</div>
+                        <div class="item-desc">Quest-based community</div>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Career & Startups -->
+        <section class="category">
+            <div class="category-header">
+                <span class="category-dot warm"></span>
+                <h2>Career & Startups</h2>
+                <span class="cat-count">3</span>
+            </div>
+            <div class="items">
+                <a class="item" href="https://startupideas.jacobcole.net/" target="_blank" rel="noopener">
+                    <span class="item-icon">🚀</span>
+                    <div class="item-text">
+                        <div class="item-name">Startup Ideas</div>
+                        <div class="item-desc">Well-specified concepts</div>
+                    </div>
+                </a>
+                <a class="item" href="https://startuptrickswiki.jacobcole.net/" target="_blank" rel="noopener">
+                    <span class="item-icon">🎪</span>
+                    <div class="item-text">
+                        <div class="item-name">Startup Tricks Wiki</div>
+                        <div class="item-desc">Founding playbooks</div>
+                    </div>
+                </a>
+                <a class="item" href="https://hiringlist.jacobcole.net/" target="_blank" rel="noopener">
+                    <span class="item-icon">💼</span>
+                    <div class="item-text">
+                        <div class="item-name">Hiring List</div>
+                        <div class="item-desc">Startup opportunities</div>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Education -->
+        <section class="category">
+            <div class="category-header">
+                <span class="category-dot violet"></span>
+                <h2>Education</h2>
+                <span class="cat-count">2</span>
+            </div>
+            <div class="items">
+                <a class="item" href="https://admitsphere.jacobcole.net/" target="_blank" rel="noopener">
+                    <span class="item-icon">🎓</span>
+                    <div class="item-text">
+                        <div class="item-name">Admitsphere</div>
+                        <div class="item-desc">College essays & admissions</div>
+                    </div>
+                </a>
+                <a class="item" href="https://stanfordclasses.jacobcole.net/" target="_blank" rel="noopener">
+                    <span class="item-icon">🏫</span>
+                    <div class="item-text">
+                        <div class="item-name">Stanford Classes</div>
+                        <div class="item-desc">Course recommendations</div>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Curated Lists -->
+        <section class="category">
+            <div class="category-header">
+                <span class="category-dot amber"></span>
+                <h2>Curated Lists</h2>
+                <span class="cat-count">7</span>
+            </div>
+            <div class="items">
+                <a class="item" href="https://books.jacobcole.net/" target="_blank" rel="noopener">
+                    <span class="item-icon">📖</span>
+                    <div class="item-text">
+                        <div class="item-name">Books</div>
+                        <div class="item-desc">Recommendations</div>
+                    </div>
+                </a>
+                <a class="item" href="https://foodslist.jacobcole.net/" target="_blank" rel="noopener">
+                    <span class="item-icon">🍳</span>
+                    <div class="item-text">
+                        <div class="item-name">Foods List</div>
+                        <div class="item-desc">Recipes, cheese, chocolate, tea</div>
+                    </div>
+                </a>
+                <a class="item" href="https://philosophy.jacobcole.net/" target="_blank" rel="noopener">
+                    <span class="item-icon">🏛️</span>
+                    <div class="item-text">
+                        <div class="item-name">Philosophy</div>
+                        <div class="item-desc">Materials & readings</div>
+                    </div>
+                </a>
+                <a class="item" href="https://yogalist.jacobcole.net/" target="_blank" rel="noopener">
+                    <span class="item-icon">🧘‍♀️</span>
+                    <div class="item-text">
+                        <div class="item-name">Yoga List</div>
+                        <div class="item-desc">Resources & studios</div>
+                    </div>
+                </a>
+                <a class="item" href="https://quoteslist.jacobcole.net/" target="_blank" rel="noopener">
+                    <span class="item-icon">💬</span>
+                    <div class="item-text">
+                        <div class="item-name">Quotes</div>
+                        <div class="item-desc">Inspiring quotes</div>
+                    </div>
+                </a>
+                <a class="item" href="https://kidactivities.jacobcole.net/" target="_blank" rel="noopener">
+                    <span class="item-icon">🎨</span>
+                    <div class="item-text">
+                        <div class="item-name">Kid Activities</div>
+                        <div class="item-desc">Children's projects</div>
+                    </div>
+                </a>
+                <a class="item" href="https://culturalendangeredspecies.jacobcole.net/" target="_blank" rel="noopener">
+                    <span class="item-icon">🏺</span>
+                    <div class="item-text">
+                        <div class="item-name">Cultural Endangered Species</div>
+                        <div class="item-desc">Fading ways of life</div>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Trusted Services -->
+        <section class="category">
+            <div class="category-header">
+                <span class="category-dot teal"></span>
+                <h2>Trusted Services</h2>
+                <span class="cat-count">3</span>
+            </div>
+            <div class="items">
+                <a class="item" href="https://bodymasters.jacobcole.net/" target="_blank" rel="noopener">
+                    <span class="item-icon">💆</span>
+                    <div class="item-text">
+                        <div class="item-name">Body Masters</div>
+                        <div class="item-desc">Vetted bodywork pros</div>
+                    </div>
+                </a>
+                <a class="item" href="https://greataccountants.jacobcole.net/" target="_blank" rel="noopener">
+                    <span class="item-icon">📊</span>
+                    <div class="item-text">
+                        <div class="item-name">Great Accountants</div>
+                        <div class="item-desc">Recommended services</div>
+                    </div>
+                </a>
+                <a class="item" href="https://greatlawyers.jacobcole.net/" target="_blank" rel="noopener">
+                    <span class="item-icon">⚖️</span>
+                    <div class="item-text">
+                        <div class="item-name">Great Lawyers</div>
+                        <div class="item-desc">Recommended services</div>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Hidden Gems -->
+        <section class="category">
+            <div class="category-header">
+                <span class="category-dot rose"></span>
+                <h2>Hidden Gems by City</h2>
+                <span class="cat-count">7</span>
+            </div>
+            <div class="items">
+                <a class="item" href="https://thingsyoudidntknowexisted.jacobcole.net/" target="_blank" rel="noopener">
+                    <span class="item-icon">🗺️</span>
+                    <div class="item-text">
+                        <div class="item-name">Main Directory</div>
+                        <div class="item-desc">All hidden attractions</div>
+                    </div>
+                </a>
+                <a class="item" href="https://thingsyoudidntknowexisted.jacobcole.net/nyc" target="_blank" rel="noopener">
+                    <span class="item-icon">🗽</span>
+                    <div class="item-text">
+                        <div class="item-name">New York City</div>
+                    </div>
+                </a>
+                <a class="item" href="https://thingsyoudidntknowexisted.jacobcole.net/sf" target="_blank" rel="noopener">
+                    <span class="item-icon">🌉</span>
+                    <div class="item-text">
+                        <div class="item-name">San Francisco</div>
+                    </div>
+                </a>
+                <a class="item" href="https://thingsyoudidntknowexisted.jacobcole.net/sandiego" target="_blank" rel="noopener">
+                    <span class="item-icon">🏖️</span>
+                    <div class="item-text">
+                        <div class="item-name">San Diego</div>
+                    </div>
+                </a>
+                <a class="item" href="https://thingsyoudidntknowexisted.jacobcole.net/mit" target="_blank" rel="noopener">
+                    <span class="item-icon">🎓</span>
+                    <div class="item-text">
+                        <div class="item-name">MIT</div>
+                    </div>
+                </a>
+                <a class="item" href="https://thingsyoudidntknowexisted.jacobcole.net/hawaii" target="_blank" rel="noopener">
+                    <span class="item-icon">🌺</span>
+                    <div class="item-text">
+                        <div class="item-name">Hawaii</div>
+                    </div>
+                </a>
+                <a class="item" href="https://thingsyoudidntknowexisted.jacobcole.net/portland" target="_blank" rel="noopener">
+                    <span class="item-icon">🌲</span>
+                    <div class="item-text">
+                        <div class="item-name">Portland</div>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Experimental -->
+        <section class="category">
+            <div class="category-header">
+                <span class="category-dot violet"></span>
+                <h2>Experimental</h2>
+                <span class="cat-count">4</span>
+            </div>
+            <div class="items">
+                <a class="item" href="https://vrcoralreefs.jacobcole.net/" target="_blank" rel="noopener">
+                    <span class="item-icon">🐠</span>
+                    <div class="item-text">
+                        <div class="item-name">VR Coral Reefs</div>
+                        <div class="item-desc">Climate education in the metaverse</div>
+                    </div>
+                </a>
+                <a class="item" href="https://globalyogivillage.com/" target="_blank" rel="noopener">
+                    <span class="item-icon">🌏</span>
+                    <div class="item-text">
+                        <div class="item-name">Global Yogi Village</div>
+                        <div class="item-desc">Worldwide yoga community</div>
+                    </div>
+                </a>
+                <a class="item" href="https://quantummafia.jacobcole.net/" target="_blank" rel="noopener">
+                    <span class="item-icon">⚛️</span>
+                    <div class="item-text">
+                        <div class="item-name">Quantum Mafia</div>
+                        <div class="item-desc">Quantum computing study group</div>
+                    </div>
+                </a>
+                <a class="item" href="https://cryptoconnect.jacobcole.net/" target="_blank" rel="noopener">
+                    <span class="item-icon">🔗</span>
+                    <div class="item-text">
+                        <div class="item-name">CryptoConnect</div>
+                        <div class="item-desc">Cryptocurrency network</div>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>An open project by <a href="https://jacobcole.ai">Jacob Cole</a> &amp; <a href="mailto:trattner@alum.mit.edu">Andrew Trattner</a></p>
+        <p class="footer-note">Helping everyone, not just those who ask.</p>
+    </footer>
+
+    <script>
+        (function() {
+            var btn = document.getElementById('theme-toggle');
+            var root = document.documentElement;
+
+            function getSystemTheme() {
+                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            }
+
+            function applyTheme() {
+                var saved = localStorage.getItem('sa-theme');
+                root.setAttribute('data-theme', saved || getSystemTheme());
+                btn.textContent = root.getAttribute('data-theme') === 'dark' ? '\u2600\uFE0F' : '\uD83C\uDF19';
+            }
+
+            btn.addEventListener('click', function() {
+                var current = root.getAttribute('data-theme');
+                localStorage.setItem('sa-theme', current === 'dark' ? 'light' : 'dark');
+                applyTheme();
+            });
+
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() {
+                if (!localStorage.getItem('sa-theme')) applyTheme();
+            });
+
+            applyTheme();
+        })();
+    </script>
+</body>
+</html>
