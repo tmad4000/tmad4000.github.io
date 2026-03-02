@@ -18,6 +18,10 @@
             --back-link: #aaa;
             --back-link-hover: #666;
             --desc: #888;
+            --tag-bg: #f0f0f0;
+            --tag-text: #777;
+            --tag-active-bg: #e0e7ff;
+            --tag-active-text: #4338ca;
         }
 
         [data-theme="dark"] {
@@ -33,6 +37,10 @@
             --back-link: #707070;
             --back-link-hover: #a0a0a0;
             --desc: #808080;
+            --tag-bg: rgba(255, 255, 255, 0.08);
+            --tag-text: #909090;
+            --tag-active-bg: rgba(99, 102, 241, 0.15);
+            --tag-active-text: #a5b4fc;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -59,7 +67,33 @@
         .back:hover { color: var(--back-link-hover); }
 
         h1 { font-size: 1.75rem; font-weight: 700; color: var(--heading); margin-bottom: 0.5rem; }
-        .subtitle { color: var(--tagline); font-size: 0.85rem; margin-bottom: 2.5rem; line-height: 1.5; }
+        .subtitle { color: var(--tagline); font-size: 0.85rem; margin-bottom: 1.5rem; line-height: 1.5; }
+
+        .filter-bar {
+            display: flex;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-btn {
+            font-size: 0.7rem;
+            padding: 0.3rem 0.6rem;
+            border-radius: 100px;
+            border: none;
+            background: var(--tag-bg);
+            color: var(--tag-text);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .filter-btn:hover { opacity: 0.8; }
+
+        .filter-btn.active {
+            background: var(--tag-active-bg);
+            color: var(--tag-active-text);
+        }
 
         .cards {
             display: flex;
@@ -69,7 +103,7 @@
 
         .card {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             gap: 0.75rem;
             color: var(--text);
             text-decoration: none;
@@ -86,10 +120,29 @@
             box-shadow: 0 4px 12px var(--card-shadow);
         }
 
-        .card .icon { font-size: 1.25rem; width: 1.5rem; text-align: center; flex-shrink: 0; }
+        .card.hidden { display: none; }
+
+        .card .icon { font-size: 1.25rem; width: 1.5rem; text-align: center; flex-shrink: 0; margin-top: 0.1rem; }
         .card .content { flex: 1; min-width: 0; }
         .card .label { font-weight: 500; color: var(--heading); }
         .card .desc { font-size: 0.8rem; color: var(--desc); margin-top: 0.2rem; line-height: 1.4; }
+
+        .card .tags {
+            display: flex;
+            gap: 0.3rem;
+            margin-top: 0.4rem;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            font-size: 0.6rem;
+            padding: 0.15rem 0.45rem;
+            border-radius: 100px;
+            background: var(--tag-bg);
+            color: var(--tag-text);
+            text-transform: lowercase;
+            letter-spacing: 0.02em;
+        }
 
         .theme-toggle {
             position: fixed; top: 1.25rem; right: 1.25rem;
@@ -109,12 +162,43 @@
         <h1>Blog</h1>
         <p class="subtitle">Long-form writing and works in progress.</p>
 
+        <div class="filter-bar">
+            <button class="filter-btn active" data-tag="all">all</button>
+            <button class="filter-btn" data-tag="meditation">meditation</button>
+            <button class="filter-btn" data-tag="ai">AI</button>
+            <button class="filter-btn" data-tag="philosophy">philosophy</button>
+        </div>
+
         <nav class="cards">
-            <a class="card" href="wip.html">
+            <a class="card" href="meditate-effortlessly.html" data-tags="meditation philosophy">
+                <span class="icon">🌲</span>
+                <div class="content">
+                    <div class="label">Meditate Effortlessly</div>
+                    <div class="desc">Nervous systems & trees</div>
+                    <div class="tags">
+                        <span class="tag">meditation</span>
+                        <span class="tag">philosophy</span>
+                    </div>
+                </div>
+            </a>
+            <a class="card" href="prompts.html" data-tags="ai">
+                <span class="icon">💬</span>
+                <div class="content">
+                    <div class="label">Interesting Prompts</div>
+                    <div class="desc">AI conversations</div>
+                    <div class="tags">
+                        <span class="tag">AI</span>
+                    </div>
+                </div>
+            </a>
+            <a class="card" href="wip.html" data-tags="philosophy">
                 <span class="icon">🚧</span>
                 <div class="content">
                     <div class="label">WIP: How to Be a Human 3.0</div>
                     <div class="desc">Work in progress</div>
+                    <div class="tags">
+                        <span class="tag">philosophy</span>
+                    </div>
                 </div>
             </a>
         </nav>
@@ -122,6 +206,7 @@
 
     <script>
         (function() {
+            // Theme toggle
             var btn = document.getElementById('theme-toggle');
             var root = document.documentElement;
             function getSystemTheme() { return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; }
@@ -139,6 +224,25 @@
             });
             window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() { if (!localStorage.getItem('theme')) applyTheme(); });
             applyTheme();
+
+            // Tag filtering
+            var filterBtns = document.querySelectorAll('.filter-btn');
+            var cards = document.querySelectorAll('.card');
+            filterBtns.forEach(function(b) {
+                b.addEventListener('click', function() {
+                    filterBtns.forEach(function(x) { x.classList.remove('active'); });
+                    b.classList.add('active');
+                    var tag = b.getAttribute('data-tag');
+                    cards.forEach(function(card) {
+                        if (tag === 'all') {
+                            card.classList.remove('hidden');
+                        } else {
+                            var cardTags = card.getAttribute('data-tags') || '';
+                            card.classList.toggle('hidden', cardTags.indexOf(tag) === -1);
+                        }
+                    });
+                });
+            });
         })();
     </script>
 </body>
