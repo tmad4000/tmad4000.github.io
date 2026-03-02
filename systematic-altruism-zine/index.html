@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SYSTEMATIC ALTRUISM // A Radical Resource Zine</title>
+  <meta name="description" content="50+ free resources for human flourishing. Helping everyone. Not just those who ask.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #fff;
+      --fg: #000;
+      --accent: #CCFF00;
+      --accent2: #FF0099;
+      --border: 3px solid #000;
+      --border-thin: 2px solid #000;
+    }
+
+    [data-theme="dark"] {
+      --bg: #000;
+      --fg: #fff;
+      --border: 3px solid #fff;
+      --border-thin: 2px solid #fff;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: Georgia, 'Times New Roman', Times, serif;
+      line-height: 1.5;
+      overflow-x: hidden;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    a {
+      color: var(--fg);
+      text-decoration: underline;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 3px;
+      transition: all 0.1s;
+    }
+
+    a:hover {
+      background: var(--fg);
+      color: var(--bg);
+      text-decoration: none;
+      padding: 0 4px;
+    }
+
+    .accent-link:hover {
+      background: var(--accent);
+      color: #000;
+    }
+
+    /* ========== THEME TOGGLE ========== */
+    .theme-toggle {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 9999;
+      background: var(--fg);
+      color: var(--bg);
+      border: none;
+      padding: 8px 14px;
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 14px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      transition: all 0.1s;
+    }
+
+    .theme-toggle:hover {
+      background: var(--accent);
+      color: #000;
+    }
+
+    /* ========== MARQUEE ========== */
+    .marquee-strip {
+      background: var(--accent);
+      color: #000;
+      border-bottom: var(--border);
+      border-top: var(--border);
+      overflow: hidden;
+      white-space: nowrap;
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 14px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      padding: 6px 0;
+    }
+
+    .marquee-inner {
+      display: inline-block;
+      animation: marquee 30s linear infinite;
+    }
+
+    @keyframes marquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* ========== HERO ========== */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 80px 20px 40px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-title {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: clamp(60px, 18vw, 220px);
+      line-height: 0.85;
+      text-transform: uppercase;
+      letter-spacing: -0.03em;
+      position: relative;
+    }
+
+    .hero-title .line1 {
+      display: block;
+      transform: translateX(-5px);
+    }
+
+    .hero-title .line2 {
+      display: block;
+      color: var(--accent);
+      -webkit-text-stroke: 3px var(--fg);
+      paint-order: stroke fill;
+    }
+
+    [data-theme="dark"] .hero-title .line2 {
+      -webkit-text-stroke: 3px var(--fg);
+    }
+
+    .hero-tagline {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: clamp(18px, 3.5vw, 42px);
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      margin-top: 30px;
+      padding: 12px 20px;
+      background: var(--accent2);
+      color: #fff;
+      display: inline-block;
+      transform: rotate(-1.5deg);
+      border: var(--border);
+    }
+
+    .hero-sub {
+      font-size: clamp(14px, 2vw, 20px);
+      margin-top: 30px;
+      max-width: 600px;
+      font-style: italic;
+    }
+
+    .hero-count {
+      position: absolute;
+      top: 80px;
+      right: 30px;
+      font-family: 'Archivo Black', sans-serif;
+      font-size: clamp(80px, 12vw, 180px);
+      color: var(--accent);
+      opacity: 0.2;
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    /* Diagonal slash decoration */
+    .hero::after {
+      content: '';
+      position: absolute;
+      top: -20%;
+      right: 10%;
+      width: 4px;
+      height: 140%;
+      background: var(--accent2);
+      transform: rotate(15deg);
+      opacity: 0.3;
+    }
+
+    /* ========== SECTION HEADERS ========== */
+    .section-header {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: clamp(36px, 8vw, 90px);
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
+      padding: 20px;
+      border-bottom: var(--border);
+      position: relative;
+    }
+
+    .section-header .num {
+      font-size: 0.4em;
+      vertical-align: super;
+      color: var(--accent2);
+    }
+
+    /* ========== FEATURED PROJECTS ========== */
+    .featured-section {
+      border-bottom: var(--border);
+    }
+
+    .featured-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    @media (max-width: 768px) {
+      .featured-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .featured-card {
+      border: var(--border);
+      padding: 30px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.15s;
+      margin: -1.5px;
+    }
+
+    .featured-card:hover {
+      background: var(--fg);
+      color: var(--bg);
+    }
+
+    .featured-card:hover a {
+      color: var(--bg);
+    }
+
+    .featured-card:hover .featured-emoji {
+      transform: scale(1.3) rotate(-10deg);
+    }
+
+    .featured-emoji {
+      font-size: 48px;
+      display: block;
+      margin-bottom: 12px;
+      transition: transform 0.2s;
+    }
+
+    .featured-card h3 {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: clamp(22px, 3vw, 32px);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+
+    .featured-card .desc {
+      font-size: 16px;
+      font-style: italic;
+      margin-bottom: 12px;
+      opacity: 0.85;
+    }
+
+    .featured-card .url {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    /* Accent stripe on select cards */
+    .featured-card.stripe-green::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 6px;
+      height: 100%;
+      background: var(--accent);
+    }
+
+    .featured-card.stripe-pink::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 6px;
+      height: 100%;
+      background: var(--accent2);
+    }
+
+    /* Rotated label */
+    .featured-card .badge {
+      position: absolute;
+      top: 12px;
+      right: -30px;
+      background: var(--accent);
+      color: #000;
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 10px;
+      padding: 4px 40px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      transform: rotate(45deg);
+    }
+
+    /* ========== CATEGORY SECTIONS ========== */
+    .category-section {
+      border-bottom: var(--border);
+      padding: 0;
+    }
+
+    .category-header {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: clamp(20px, 4vw, 36px);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      padding: 20px;
+      background: var(--fg);
+      color: var(--bg);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .category-header .cat-count {
+      background: var(--accent);
+      color: #000;
+      font-size: 14px;
+      padding: 2px 10px;
+      letter-spacing: 0;
+    }
+
+    .category-items {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 0;
+    }
+
+    .cat-item {
+      border: var(--border-thin);
+      padding: 16px 20px;
+      margin: -1px;
+      transition: all 0.1s;
+      display: block;
+      text-decoration: none;
+    }
+
+    .cat-item:hover {
+      background: var(--fg);
+      color: var(--bg);
+      padding: 16px 20px;
+      transform: scale(1.02);
+      z-index: 2;
+      position: relative;
+    }
+
+    .cat-item .item-emoji {
+      font-size: 20px;
+      margin-right: 6px;
+    }
+
+    .cat-item .item-name {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 15px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .cat-item .item-url {
+      display: block;
+      font-size: 11px;
+      letter-spacing: 1px;
+      opacity: 0.6;
+      margin-top: 4px;
+      font-family: monospace;
+    }
+
+    /* ========== HIDDEN GEMS SPECIAL ========== */
+    .gems-section {
+      border-bottom: var(--border);
+    }
+
+    .gems-grid {
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    .gem-item {
+      flex: 1 1 auto;
+      border: var(--border-thin);
+      padding: 14px 20px;
+      margin: -1px;
+      text-decoration: none;
+      display: block;
+      transition: all 0.1s;
+      text-align: center;
+      min-width: 140px;
+    }
+
+    .gem-item:hover {
+      background: var(--accent);
+      color: #000;
+      transform: scale(1.05);
+      z-index: 2;
+      position: relative;
+      padding: 14px 20px;
+    }
+
+    .gem-item .gem-emoji {
+      font-size: 28px;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .gem-item .gem-name {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* ========== ANGLED TEXT BREAK ========== */
+    .angled-break {
+      padding: 60px 20px;
+      overflow: hidden;
+      position: relative;
+      border-bottom: var(--border);
+    }
+
+    .angled-text {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: clamp(28px, 6vw, 70px);
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      transform: rotate(-3deg);
+      color: var(--accent2);
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    /* ========== MANIFESTO STRIP ========== */
+    .manifesto-strip {
+      background: var(--accent2);
+      color: #fff;
+      padding: 40px 20px;
+      border-bottom: var(--border);
+    }
+
+    .manifesto-strip blockquote {
+      max-width: 800px;
+      margin: 0 auto;
+      font-size: clamp(18px, 3vw, 28px);
+      font-style: italic;
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    /* ========== FOOTER ========== */
+    .footer {
+      padding: 40px 20px;
+      border-top: var(--border);
+      text-align: center;
+    }
+
+    .footer-title {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      margin-bottom: 16px;
+    }
+
+    .footer p {
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .footer .footer-links {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .footer .footer-links a {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      padding: 8px 16px;
+      border: var(--border-thin);
+      text-decoration: none;
+      transition: all 0.1s;
+    }
+
+    .footer .footer-links a:hover {
+      background: var(--accent);
+      color: #000;
+      padding: 8px 16px;
+    }
+
+    /* ========== GLITCH / RAW DECORATIONS ========== */
+    .raw-divider {
+      height: 8px;
+      background: repeating-linear-gradient(
+        90deg,
+        var(--fg) 0px,
+        var(--fg) 10px,
+        transparent 10px,
+        transparent 20px
+      );
+    }
+
+    .dot-grid {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: radial-gradient(var(--fg) 1px, transparent 1px);
+      background-size: 20px 20px;
+      opacity: 0.04;
+      pointer-events: none;
+    }
+
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 600px) {
+      .hero {
+        padding: 60px 12px 30px;
+      }
+
+      .hero-count {
+        display: none;
+      }
+
+      .hero::after {
+        display: none;
+      }
+
+      .featured-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .category-items {
+        grid-template-columns: 1fr;
+      }
+
+      .gems-grid {
+        flex-direction: column;
+      }
+
+      .hero-tagline {
+        transform: rotate(0deg);
+      }
+    }
+
+    /* ========== STICKER DECORATIONS ========== */
+    .sticker {
+      display: inline-block;
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      padding: 4px 12px;
+      border: var(--border-thin);
+      transform: rotate(-2deg);
+      margin: 4px;
+    }
+
+    .sticker.green { background: var(--accent); color: #000; }
+    .sticker.pink { background: var(--accent2); color: #fff; }
+    .sticker.outline { background: transparent; }
+  </style>
+</head>
+<body>
+
+  <!-- Theme Toggle -->
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode">
+    <span id="theme-icon">DARK</span>
+  </button>
+
+  <!-- Marquee Strip -->
+  <div class="marquee-strip">
+    <div class="marquee-inner">
+      FREE RESOURCES FOR HUMAN FLOURISHING &nbsp;&bull;&nbsp; HELPING EVERYONE NOT JUST THOSE WHO ASK &nbsp;&bull;&nbsp; 50+ OPEN PROJECTS &nbsp;&bull;&nbsp; NO PAYWALLS NO GATEKEEPING &nbsp;&bull;&nbsp; SYSTEMATIC ALTRUISM IS A PRACTICE &nbsp;&bull;&nbsp; FREE RESOURCES FOR HUMAN FLOURISHING &nbsp;&bull;&nbsp; HELPING EVERYONE NOT JUST THOSE WHO ASK &nbsp;&bull;&nbsp; 50+ OPEN PROJECTS &nbsp;&bull;&nbsp; NO PAYWALLS NO GATEKEEPING &nbsp;&bull;&nbsp; SYSTEMATIC ALTRUISM IS A PRACTICE &nbsp;&bull;&nbsp;
+    </div>
+  </div>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="dot-grid"></div>
+    <div class="hero-count">50+</div>
+    <h1 class="hero-title">
+      <span class="line1">Systematic</span>
+      <span class="line2">Altruism</span>
+    </h1>
+    <div class="hero-tagline">Helping everyone. Not just those who ask.</div>
+    <p class="hero-sub">
+      A directory of 50+ free, open resources for human flourishing &mdash; health, knowledge, community, solutions. No paywalls. No gatekeeping. Just tools that work.
+    </p>
+    <div style="margin-top: 24px;">
+      <span class="sticker green">Open Source</span>
+      <span class="sticker pink">Free Forever</span>
+      <span class="sticker outline">For Everyone</span>
+    </div>
+  </section>
+
+  <div class="raw-divider"></div>
+
+  <!-- Featured Section -->
+  <section class="featured-section">
+    <div class="section-header">
+      Featured<span class="num">08</span>
+    </div>
+    <div class="featured-grid">
+
+      <a href="https://nvctranslator.com" target="_blank" rel="noopener" class="featured-card stripe-green" style="text-decoration:none;">
+        <div class="badge">New</div>
+        <span class="featured-emoji">💚</span>
+        <h3>NVC Translator</h3>
+        <div class="desc">"De-escalate conflicts before they start"</div>
+        <div class="url">nvctranslator.com</div>
+      </a>
+
+      <a href="https://easilysolvableworldproblems.jacobcole.net" target="_blank" rel="noopener" class="featured-card stripe-pink" style="text-decoration:none;">
+        <span class="featured-emoji">🎯</span>
+        <h3>Easily Solvable World Problems</h3>
+        <div class="desc">"They just need someone to pick them up"</div>
+        <div class="url">easilysolvableworldproblems.jacobcole.net</div>
+      </a>
+
+      <a href="https://chronicpain.jacobcole.net" target="_blank" rel="noopener" class="featured-card stripe-green" style="text-decoration:none;">
+        <span class="featured-emoji">🌱</span>
+        <h3>Chronic Pain Resource Hub</h3>
+        <div class="desc">"Evidence-based tools for millions"</div>
+        <div class="url">chronicpain.jacobcole.net</div>
+      </a>
+
+      <a href="https://existentialcrisis.jacobcole.net" target="_blank" rel="noopener" class="featured-card stripe-pink" style="text-decoration:none;">
+        <span class="featured-emoji">🔥</span>
+        <h3>Existential Crisis &rarr; Transformation</h3>
+        <div class="desc">"When meaning collapses"</div>
+        <div class="url">existentialcrisis.jacobcole.net</div>
+      </a>
+
+      <a href="https://healingartsgrant.jacobcole.net" target="_blank" rel="noopener" class="featured-card stripe-green" style="text-decoration:none;">
+        <span class="featured-emoji">💛</span>
+        <h3>Healing Arts Grant</h3>
+        <div class="desc">"Making healthcare accessible"</div>
+        <div class="url">healingartsgrant.jacobcole.net</div>
+      </a>
+
+      <a href="https://issuetracker.world" target="_blank" rel="noopener" class="featured-card stripe-pink" style="text-decoration:none;">
+        <div class="badge">Hot</div>
+        <span class="featured-emoji">📋</span>
+        <h3>IssueTracker.world</h3>
+        <div class="desc">"File a bug report for the world"</div>
+        <div class="url">issuetracker.world</div>
+      </a>
+
+      <a href="https://pureland.jacobcole.net" target="_blank" rel="noopener" class="featured-card stripe-green" style="text-decoration:none;">
+        <span class="featured-emoji">🕊️</span>
+        <h3>Pureland</h3>
+        <div class="desc">"For highly sensitive people"</div>
+        <div class="url">pureland.jacobcole.net</div>
+      </a>
+
+      <a href="https://worldproblems.jacobcole.net" target="_blank" rel="noopener" class="featured-card stripe-pink" style="text-decoration:none;">
+        <span class="featured-emoji">🌍</span>
+        <h3>World Problems</h3>
+        <div class="desc">"Name it to solve it"</div>
+        <div class="url">worldproblems.jacobcole.net</div>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- Angled Break -->
+  <div class="angled-break">
+    <div class="angled-text">Every resource free.<br>Every link open.<br>No exceptions.</div>
+  </div>
+
+  <!-- ========== CATEGORIES ========== -->
+
+  <!-- Knowledge & Learning -->
+  <section class="category-section">
+    <div class="category-header">
+      Knowledge &amp; Learning <span class="cat-count">6</span>
+    </div>
+    <div class="category-items">
+      <a href="https://knowledgebase.world" target="_blank" rel="noopener" class="cat-item">
+        <span class="item-emoji">📚</span>
+        <span class="item-name">KnowledgeBase.world</span>
+        <span class="item-url">knowledgebase.world</span>
+      </a>
+      <a href="https://manifestos.world" target="_blank" rel="noopener" class="cat-item">
+        <span class="item-emoji">📜</span>
+        <span class="item-name">Manifestos.world</span>
+        <span class="item-url">manifestos.world</span>
+      </a>
+      <a href="https://ideabank.global" target="_blank" rel="noopener" class="cat-item">
+        <span class="item-emoji">💡</span>
+        <span class="item-name">IdeaBank.global</span>
+        <span class="item-url">ideabank.global</span>
+      </a>
+      <a href="https://purplepill.wiki" target="_blank" rel="noopener" class="cat-item">
+        <span class="item-emoji">💊</span>
+        <span class="item-name">PurplePill.wiki</span>
+        <span class="item-url">purplepill.wiki</span>
+      </a>
+      <a href="https://salon.jacobcole.net" target="_blank" rel="noopener" class="cat-item">
+        <span class="item-emoji">🎩</span>
+        <span class="item-name">Salon</span>
+        <span class="item-url">salon.jacobcole.net</span>
+      </a>
+      <a href="https://thoughtfulweb.jacobcole.net" target="_blank" rel="noopener" class="cat-item">
+        <span class="item-emoji">🌐</span>
+        <span class="item-name">Thoughtful Web</span>
+        <span class="item-url">thoughtfulweb.jacobcole.net</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- Wellness & Health -->
+  <section class="category-section">
+    <div class="category-header">
+      Wellness &amp; Health <span class="cat-count">8</span>
+    </div>
+    <div class="category-items">
+      <a href="https://chronicpain.jacobcole.net" target="_blank" rel="noopener" class="cat-item">
+        <span class="item-emoji">🌱</span>
+        <span class="item-name">Chronic Pain Hub</span>
+        <span class="item-url">chronicpain.jacobcole.net</span>
+      </a>
+      <a href="https://qigong.garden" target="_blank" rel="noopener" class="cat-item">
+        <span class="item-emoji">🌿</span>
+        <span class="item-name">Qigong.garden</span>
+        <span class="item-url">qigong.garden</span>
+      </a>
+      <a href="https://meditation.jacobcole.net" target="_blank" rel="noopener" class="cat-item">
+        <span class="item-emoji">🧘</span>
+        <span class="item-name">Meditation</span>
+        <span class="item-url">meditation.jacobcole.net</span>
+      </a>
+      <a href="https://sleep.jacobcole.net" target="_blank" rel="noopener" class="cat-item">
+        <span class="item-emoji">😴</span>
+        <span class="item-name">Sleep</span>
+        <span class="item-url">sleep.jacobcole.net</span>
+      </a>
+      <a href="https://adhd.jacobcole.net" target="_blank" rel="noopener" class="cat-item">
+        <span class="item-emoji">⚡</span>
+        <span class="item-name">ADHD Strategies</span>
+        <span class="item-url">adhd.jacobcole.net</span>
+      </a>
+      <a href="https://energymedicine.jacobcole.net" target="_blank" rel="noopener" class="cat-item">
+        <span class="item-emoji">✨</span>
+        <span class="item-name">Energy Medicine</span>
+        <span class="item-url">energymedicine.jacobcole.net</span>
+      </a>
+      <a href="https://rsiwiki.jacobcole.net" target="_blank" rel="noopener" class="cat-item">
+        <span class="item-emoji">🖐️</span>
+        <span class="item-name">RSI Wiki</span>
+        <span class="item-url">rsiwiki.jacobcole.net</span>
+      </a>
+      <a href="https://buoyantfitness.jacobcole.net" target="_blank" rel="noopener" class="cat-item">
+        <span class="item-emoji">💪</span>
+        <span class="item-name">Buoyant Fitness</span>
+        <span class="item-url">buoyantfitness.jacobcole.net</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- Marquee strip 2 -->
+  <div class="marquee-strip" style="background: var(--accent2); border-color: var(--accent2);">
+    <div class="marquee-inner" style="animation-direction: reverse;">
+      WELLNESS &bull; KNOWLEDGE &bull; COMMUNITY &bull; SOLUTIONS &bull; OPEN ACCESS &bull; HUMAN FLOURISHING &bull; WELLNESS &bull; KNOWLEDGE &bull; COMMUNITY &bull; SOLUTIONS &bull; OPEN ACCESS &bull; HUMAN FLOURISHING &bull; WELLNESS &bull; KNOWLEDGE &bull; COMMUNITY &bull; SOLUTIONS &bull; OPEN ACCESS &bull; HUMAN FLOURISHING &bull;
+    </div>
+  </div>
+
+  <!-- Mental Health & Support -->
+  <section class="category-section">
+    <div class="category-header">
+      Mental Health &amp; Support <span class="cat-count">4</span>
+    </div>
+    <div class="category-items">
+      <a href="https://existentialcrisis.jacobcole.net" target="_blank" rel="noopener" class="cat-item">
+        <span class="item-emoji">🔥</span>
+        <span class="item-name">Existential Crisis &rarr; Transformation</span>
+        <span class="item-url">existentialcrisis.jacobcole.net</span>
+      </a>
+      <a href="https://pureland.jacobcole.net" target="_blank" rel="noopener" class="cat-item">
+        <span class="item-emoji">🕊️</span>
+        <span class="item-name">Pureland</span>
+        <span class="item-url">pureland.jacobcole.net</span>
+      </a>
+      <a href="https://mentalstatehacks.jacobcole.net" target="_blank" rel="noopener" class="cat-item">
+        <span class="item-emoji">🧠</span>
+        <span class="item-name">Mental State Hacks</span>
+        <span class="item-url">mentalstatehacks.jacobcole.net</span>
+      </a>
+      <a href="https://lifechangingthings.jacobcole.net" target="_blank" rel="noopener" class="cat-item">
+        <span class="item-emoji">🌟</span>
+        <span class="item-name">Life-Changing Things</span>
+        <span class="item-url">lifechangingthings.jacobcole.net</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- Global Issues & Solutions -->
+  <section class="category-section">
+    <div class="category-header">
+      Global Issues &amp; Solutions <span class="cat-count">5</span>
+    </div>
+    <div class="category-items">
+      <a href="https://worldproblems.jacobcole.net" target="_blank" rel="noopener" class="cat-item">
+        <span class="item-emoji">🌍</span>
+        <span class="item-name">World Problems</span>
+        <span class="item-url">worldproblems.jacobcole.net</span>
+      </a>
+      <a href="https://easilysolvableworldproblems.jacobcole.net" target="_blank" rel="noopener" class="cat-item">
+        <span class="item-emoji">🎯</span>
+        <span class="item-name">Easily Solvable World Problems</span>
+        <span class="item-url">easilysolvableworldproblems.jacobcole.net</span>
+      </a>
+      <a href="https://issuetracker.world" target="_blank" rel="noopener" class="cat-item">
+        <span class="item-emoji">📋</span>
+        <span class="item-name">IssueTracker.world</span>
+        <span class="item-url">issuetracker.world</span>
+      </a>
+      <a href="https://climatechange.jacobcole.net" target="_blank" rel="noopener" class="cat-item">
+        <span class="item-emoji">🌡️</span>
+        <span class="item-name">Climate Change</span>
+        <span class="item-url">climatechange.jacobcole.net</span>
+      </a>
+      <a href="https://covid19hackideas.jacobcole.net" target="_blank" rel="noopener" class="cat-item">
+        <span class="item-emoji">🦠</span>
+        <span class="item-name">COVID-19 Hack Ideas</span>
+        <span class="item-url">covid19hackideas.jacobcole.net</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- Community & Connection -->
+  <section class="category-section">
+    <div class="category-header">
+      Community &amp; Connection <span class="cat-count">5</span>
+    </div>
+    <div class="category-items">
+      <a href="https://jcombinator.network" target="_blank" rel="noopener" class="cat-item">
+        <span class="item-emoji">🤝</span>
+        <span class="item-name">J-Combinator</span>
+        <span class="item-url">jcombinator.network</span>
+      </a>
+      <a href="https://intronet.network" target="_blank" rel="noopener" class="cat-item">
+        <span class="item-emoji">👋</span>
+        <span class="item-name">Intronet</span>
+        <span class="item-url">intronet.network</span>
+      </a>
+      <a href="https://favorverse.jacobcole.net" target="_blank" rel="noopener" class="cat-item">
+        <span class="item-emoji">🎁</span>
+        <span class="item-name">Favorverse</span>
+        <span class="item-url">favorverse.jacobcole.net</span>
+      </a>
+      <a href="https://housinglist.jacobcole.net" target="_blank" rel="noopener" class="cat-item">
+        <span class="item-emoji">🏠</span>
+        <span class="item-name">Housing List</span>
+        <span class="item-url">housinglist.jacobcole.net</span>
+      </a>
+      <a href="https://worldquestguild.connectr.site" target="_blank" rel="noopener" class="cat-item">
+        <span class="item-emoji">⚔️</span>
+        <span class="item-name">World Quest Guild</span>
+        <span class="item-url">worldquestguild.connectr.site</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- Career & Startups -->
+  <section class="category-section">
+    <div class="category-header">
+      Career &amp; Startups <span class="cat-count">3</span>
+    </div>
+    <div class="category-items">
+      <a href="https://startupideas.jacobcole.net" target="_blank" rel="noopener" class="cat-item">
+        <span class="item-emoji">🚀</span>
+        <span class="item-name">Startup Ideas</span>
+        <span class="item-url">startupideas.jacobcole.net</span>
+      </a>
+      <a href="https://startuptrickswiki.jacobcole.net" target="_blank" rel="noopener" class="cat-item">
+        <span class="item-emoji">🎪</span>
+        <span class="item-name">Startup Tricks Wiki</span>
+        <span class="item-url">startuptrickswiki.jacobcole.net</span>
+      </a>
+      <a href="https://hiringlist.jacobcole.net" target="_blank" rel="noopener" class="cat-item">
+        <span class="item-emoji">💼</span>
+        <span class="item-name">Hiring List</span>
+        <span class="item-url">hiringlist.jacobcole.net</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- Education -->
+  <section class="category-section">
+    <div class="category-header">
+      Education <span class="cat-count">2</span>
+    </div>
+    <div class="category-items">
+      <a href="https://admitsphere.jacobcole.net" target="_blank" rel="noopener" class="cat-item">
+        <span class="item-emoji">🎓</span>
+        <span class="item-name">Admitsphere</span>
+        <span class="item-url">admitsphere.jacobcole.net</span>
+      </a>
+      <a href="https://stanfordclasses.jacobcole.net" target="_blank" rel="noopener" class="cat-item">
+        <span class="item-emoji">🏫</span>
+        <span class="item-name">Stanford Classes</span>
+        <span class="item-url">stanfordclasses.jacobcole.net</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- Angled Break 2 -->
+  <div class="angled-break" style="background: var(--accent); border-bottom: var(--border);">
+    <div class="angled-text" style="color: #000; transform: rotate(2deg);">
+      Curate. Share. Repeat.
+    </div>
+  </div>
+
+  <!-- Curated Lists -->
+  <section class="category-section">
+    <div class="category-header">
+      Curated Lists <span class="cat-count">7</span>
+    </div>
+    <div class="category-items">
+      <a href="https://books.jacobcole.net" target="_blank" rel="noopener" class="cat-item">
+        <span class="item-emoji">📖</span>
+        <span class="item-name">Books</span>
+        <span class="item-url">books.jacobcole.net</span>
+      </a>
+      <a href="https://foodslist.jacobcole.net" target="_blank" rel="noopener" class="cat-item">
+        <span class="item-emoji">🍳</span>
+        <span class="item-name">Foods List</span>
+        <span class="item-url">foodslist.jacobcole.net</span>
+      </a>
+      <a href="https://philosophy.jacobcole.net" target="_blank" rel="noopener" class="cat-item">
+        <span class="item-emoji">🏛️</span>
+        <span class="item-name">Philosophy</span>
+        <span class="item-url">philosophy.jacobcole.net</span>
+      </a>
+      <a href="https://yogalist.jacobcole.net" target="_blank" rel="noopener" class="cat-item">
+        <span class="item-emoji">🧘‍♀️</span>
+        <span class="item-name">Yoga List</span>
+        <span class="item-url">yogalist.jacobcole.net</span>
+      </a>
+      <a href="https://quoteslist.jacobcole.net" target="_blank" rel="noopener" class="cat-item">
+        <span class="item-emoji">💬</span>
+        <span class="item-name">Quotes</span>
+        <span class="item-url">quoteslist.jacobcole.net</span>
+      </a>
+      <a href="https://kidactivities.jacobcole.net" target="_blank" rel="noopener" class="cat-item">
+        <span class="item-emoji">🎨</span>
+        <span class="item-name">Kid Activities</span>
+        <span class="item-url">kidactivities.jacobcole.net</span>
+      </a>
+      <a href="https://culturalendangeredspecies.jacobcole.net" target="_blank" rel="noopener" class="cat-item">
+        <span class="item-emoji">🏺</span>
+        <span class="item-name">Cultural Endangered Species</span>
+        <span class="item-url">culturalendangeredspecies.jacobcole.net</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- Trusted Services -->
+  <section class="category-section">
+    <div class="category-header">
+      Trusted Services <span class="cat-count">3</span>
+    </div>
+    <div class="category-items">
+      <a href="https://bodymasters.jacobcole.net" target="_blank" rel="noopener" class="cat-item">
+        <span class="item-emoji">💆</span>
+        <span class="item-name">Body Masters</span>
+        <span class="item-url">bodymasters.jacobcole.net</span>
+      </a>
+      <a href="https://greataccountants.jacobcole.net" target="_blank" rel="noopener" class="cat-item">
+        <span class="item-emoji">📊</span>
+        <span class="item-name">Great Accountants</span>
+        <span class="item-url">greataccountants.jacobcole.net</span>
+      </a>
+      <a href="https://greatlawyers.jacobcole.net" target="_blank" rel="noopener" class="cat-item">
+        <span class="item-emoji">⚖️</span>
+        <span class="item-name">Great Lawyers</span>
+        <span class="item-url">greatlawyers.jacobcole.net</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- Hidden Gems by City -->
+  <section class="gems-section">
+    <div class="category-header">
+      Hidden Gems by City <span class="cat-count">7</span>
+    </div>
+    <div class="gems-grid">
+      <a href="https://thingsyoudidntknowexisted.jacobcole.net" target="_blank" rel="noopener" class="gem-item">
+        <span class="gem-emoji">🗺️</span>
+        <span class="gem-name">Main</span>
+      </a>
+      <a href="https://thingsyoudidntknowexisted.jacobcole.net/nyc" target="_blank" rel="noopener" class="gem-item">
+        <span class="gem-emoji">🗽</span>
+        <span class="gem-name">NYC</span>
+      </a>
+      <a href="https://thingsyoudidntknowexisted.jacobcole.net/sf" target="_blank" rel="noopener" class="gem-item">
+        <span class="gem-emoji">🌉</span>
+        <span class="gem-name">SF</span>
+      </a>
+      <a href="https://thingsyoudidntknowexisted.jacobcole.net/sandiego" target="_blank" rel="noopener" class="gem-item">
+        <span class="gem-emoji">🏖️</span>
+        <span class="gem-name">San Diego</span>
+      </a>
+      <a href="https://thingsyoudidntknowexisted.jacobcole.net/mit" target="_blank" rel="noopener" class="gem-item">
+        <span class="gem-emoji">🎓</span>
+        <span class="gem-name">MIT</span>
+      </a>
+      <a href="https://thingsyoudidntknowexisted.jacobcole.net/hawaii" target="_blank" rel="noopener" class="gem-item">
+        <span class="gem-emoji">🌺</span>
+        <span class="gem-name">Hawaii</span>
+      </a>
+      <a href="https://thingsyoudidntknowexisted.jacobcole.net/portland" target="_blank" rel="noopener" class="gem-item">
+        <span class="gem-emoji">🌲</span>
+        <span class="gem-name">Portland</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- Experimental -->
+  <section class="category-section">
+    <div class="category-header" style="background: var(--accent2); color: #fff;">
+      Experimental <span class="cat-count" style="background: #fff; color: var(--accent2);">4</span>
+    </div>
+    <div class="category-items">
+      <a href="https://vrcoralreefs.jacobcole.net" target="_blank" rel="noopener" class="cat-item">
+        <span class="item-emoji">🐠</span>
+        <span class="item-name">VR Coral Reefs</span>
+        <span class="item-url">vrcoralreefs.jacobcole.net</span>
+      </a>
+      <a href="https://globalyogivillage.com" target="_blank" rel="noopener" class="cat-item">
+        <span class="item-emoji">🌏</span>
+        <span class="item-name">Global Yogi Village</span>
+        <span class="item-url">globalyogivillage.com</span>
+      </a>
+      <a href="https://quantummafia.jacobcole.net" target="_blank" rel="noopener" class="cat-item">
+        <span class="item-emoji">⚛️</span>
+        <span class="item-name">Quantum Mafia</span>
+        <span class="item-url">quantummafia.jacobcole.net</span>
+      </a>
+      <a href="https://cryptoconnect.jacobcole.net" target="_blank" rel="noopener" class="cat-item">
+        <span class="item-emoji">🔗</span>
+        <span class="item-name">CryptoConnect</span>
+        <span class="item-url">cryptoconnect.jacobcole.net</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- Manifesto Strip -->
+  <div class="manifesto-strip">
+    <blockquote>
+      "The best time to help was yesterday. The second best time is right now. These resources exist because someone decided to start."
+    </blockquote>
+  </div>
+
+  <!-- Marquee Strip Bottom -->
+  <div class="marquee-strip">
+    <div class="marquee-inner">
+      SYSTEMATIC ALTRUISM &nbsp;&bull;&nbsp; ALL RESOURCES FREE &nbsp;&bull;&nbsp; SHARE WIDELY &nbsp;&bull;&nbsp; FORK FREELY &nbsp;&bull;&nbsp; BUILD ON TOP &nbsp;&bull;&nbsp; SYSTEMATIC ALTRUISM &nbsp;&bull;&nbsp; ALL RESOURCES FREE &nbsp;&bull;&nbsp; SHARE WIDELY &nbsp;&bull;&nbsp; FORK FREELY &nbsp;&bull;&nbsp; BUILD ON TOP &nbsp;&bull;&nbsp;
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-title">Systematic Altruism // 2025</div>
+    <p>An open project by <a href="https://jacobcole.net" target="_blank" rel="noopener">Jacob Cole</a> &amp; <a href="https://andrewtrattner.com" target="_blank" rel="noopener">Andrew Trattner</a></p>
+    <p style="font-size: 12px; opacity: 0.6; margin-top: 8px;">No paywalls. No gatekeeping. Just tools for human flourishing.</p>
+    <div class="footer-links">
+      <a href="https://systematicawesome.jacobcole.net" target="_blank" rel="noopener">Original Doc</a>
+      <a href="https://github.com/tmad4000" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </footer>
+
+  <script>
+    function toggleTheme() {
+      const html = document.documentElement;
+      const current = html.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      document.getElementById('theme-icon').textContent = next === 'dark' ? 'LIGHT' : 'DARK';
+      localStorage.setItem('sa-zine-theme', next);
+    }
+
+    // Restore saved theme
+    (function() {
+      const saved = localStorage.getItem('sa-zine-theme');
+      if (saved) {
+        document.documentElement.setAttribute('data-theme', saved);
+        const icon = document.getElementById('theme-icon');
+        if (icon) icon.textContent = saved === 'dark' ? 'LIGHT' : 'DARK';
+      }
+    })();
+  </script>
+
+</body>
+</html>
