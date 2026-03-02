@@ -51,6 +51,7 @@
             --highlight-bg: rgba(255, 220, 100, 0.06);
         }
 
+        html { scroll-behavior: smooth; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
@@ -132,6 +133,57 @@
 
         .divider { border: none; border-top: 1px solid var(--divider); margin: 2rem 0; }
 
+        .toc {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px var(--card-shadow);
+            border: 1px solid var(--card-border);
+        }
+        .toc h2 {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--section-title);
+            margin-bottom: 0.75rem;
+        }
+        .toc ol {
+            list-style: none;
+            counter-reset: toc;
+            padding: 0;
+        }
+        .toc li {
+            counter-increment: toc;
+            margin-bottom: 0.35rem;
+        }
+        .toc li::before {
+            content: counter(toc) ".";
+            color: var(--meta);
+            font-size: 0.8rem;
+            margin-right: 0.4rem;
+            font-variant-numeric: tabular-nums;
+        }
+        .toc a {
+            color: var(--text);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+        .toc a:hover { color: var(--link-color); }
+        .toc .toc-podcast {
+            font-weight: 600;
+            color: var(--heading);
+            font-size: 0.95rem;
+        }
+        .toc .toc-sub { margin-left: 1.5rem; }
+        .toc .toc-sub li::before {
+            content: none;
+        }
+        .toc .toc-sub li { margin-bottom: 0.2rem; }
+        .toc .toc-sub a { font-size: 0.85rem; color: var(--meta); }
+        .toc .toc-sub a:hover { color: var(--link-color); }
+
         .theme-toggle {
             position: fixed; top: 1.25rem; right: 1.25rem;
             background: none; border: none; font-size: 0.85rem;
@@ -156,8 +208,29 @@
         <h1>Podcast Highlights</h1>
         <p class="subtitle">Key ideas, quotes, and frameworks extracted from podcast appearances.</p>
 
+        <nav class="toc">
+            <h2>Contents</h2>
+            <ol>
+                <li><a href="#beyond" class="toc-podcast">The Beyond Podcast</a>
+                    <ul class="toc-sub">
+                        <li><a href="#beyond-quotes">Notable Quotes</a></li>
+                        <li><a href="#beyond-ai">AI & Cognition</a></li>
+                        <li><a href="#beyond-consciousness">Consciousness & Reality</a></li>
+                        <li><a href="#beyond-yoga">Yoga, Taoism & Inner Life</a></li>
+                        <li><a href="#beyond-frameworks">Frameworks & Mental Models</a></li>
+                        <li><a href="#beyond-highlights">Highlight Segments</a></li>
+                    </ul>
+                </li>
+                <li><a href="#simulation" class="toc-podcast">Simulation #264</a>
+                    <ul class="toc-sub">
+                        <li><a href="#simulation-ideas">Key Ideas</a></li>
+                    </ul>
+                </li>
+            </ol>
+        </nav>
+
         <!-- BEYOND PODCAST -->
-        <div class="podcast-header">
+        <div class="podcast-header" id="beyond">
             <h2>The Beyond Podcast</h2>
             <p class="meta">Host: Javier Ideami &middot; May 2021 &middot; 2hr 22min</p>
             <div class="links">
@@ -168,7 +241,7 @@
             </div>
         </div>
 
-        <p class="section-label">Notable Quotes</p>
+        <p class="section-label" id="beyond-quotes">Notable Quotes</p>
 
         <blockquote><span class="ts">[96:42]</span> "If you're finding it difficult to get motivated, maybe you're chasing somebody else's goals."</blockquote>
 
@@ -190,7 +263,7 @@
 
         <blockquote><span class="ts">[108:36]</span> "If I am not attached, what I consider my productivity may just be the universe itself moving me."</blockquote>
 
-        <p class="section-label">Key Ideas &mdash; AI & Cognition</p>
+        <p class="section-label" id="beyond-ai">Key Ideas &mdash; AI & Cognition</p>
 
         <div class="idea">
             <span class="ts">[01:48]</span> <span class="title">Deep Learning's Square Wave Problem</span>
@@ -212,7 +285,7 @@
             <div class="desc">Language evolved not for communication between people, but for specialized brain modules to communicate with each other. The Munduruku tribe has no words for numbers >4, and literally cannot count above 4 &mdash; language bridges the gap between the hardwired counting module and the estimation module.</div>
         </div>
 
-        <p class="section-label">Key Ideas &mdash; Consciousness & Reality</p>
+        <p class="section-label" id="beyond-consciousness">Key Ideas &mdash; Consciousness & Reality</p>
 
         <div class="idea">
             <span class="ts">[43:25]</span> <span class="title">All Reality as Ripples on a Cosmic Medium</span>
@@ -234,7 +307,7 @@
             <div class="desc">We may be conscious entities inside a virtual reality headset. The moon isn't "there" when we're not looking, just as a video game road isn't rendered when the camera faces elsewhere. Even so, there must be a "top level" &mdash; which is where ideas of the divine begin.</div>
         </div>
 
-        <p class="section-label">Key Ideas &mdash; Yoga, Taoism & Inner Life</p>
+        <p class="section-label" id="beyond-yoga">Key Ideas &mdash; Yoga, Taoism & Inner Life</p>
 
         <div class="idea">
             <span class="ts">[91:21]</span> <span class="title">Avidya: Beyond Sin and Temptation</span>
@@ -261,7 +334,7 @@
             <div class="desc">Taoism says: do nothing, be non-attached, and things will happen through you. When the fire alarm goes off, an unattached person naturally moves. "Your productivity may just be the universe itself moving you."</div>
         </div>
 
-        <p class="section-label">Frameworks & Mental Models</p>
+        <p class="section-label" id="beyond-frameworks">Frameworks & Mental Models</p>
 
         <table class="frameworks">
             <tr><th>Framework</th><th>Time</th><th>Description</th></tr>
@@ -276,7 +349,7 @@
             <tr><td>Homeodynamics</td><td>[115:26]</td><td>Not static homeostasis but dynamic balance with a constantly shifting center</td></tr>
         </table>
 
-        <p class="section-label">Highlight Segments</p>
+        <p class="section-label" id="beyond-highlights">Highlight Segments</p>
 
         <div class="idea" style="background: var(--highlight-bg);">
             <span class="ts">[01:18&ndash;12:30]</span> <span class="title">AI Architecture Deep Dive</span>
@@ -298,7 +371,7 @@
         <hr class="divider">
 
         <!-- SIMULATION PODCAST -->
-        <div class="podcast-header">
+        <div class="podcast-header" id="simulation">
             <h2>Simulation #264</h2>
             <p class="meta">Host: Allen Saakyan &middot; February 2019 &middot; With Monty Kosma & Jack Boffa</p>
             <div class="links">
@@ -307,7 +380,7 @@
             </div>
         </div>
 
-        <p class="section-label">Key Ideas</p>
+        <p class="section-label" id="simulation-ideas">Key Ideas</p>
 
         <div class="idea">
             <span class="ts">[02:41]</span> <span class="title">The Thoughtstream Method</span>
