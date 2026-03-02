@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Podcast Highlights - Jacob Cole</title>
+    <style>
+        :root {
+            --bg-start: #f5f7fa;
+            --bg-end: #e4e8ec;
+            --text: #333;
+            --heading: #111;
+            --tagline: #888;
+            --link-color: #2563eb;
+            --link-hover: #1d4ed8;
+            --card-bg: #fff;
+            --card-shadow: rgba(0, 0, 0, 0.08);
+            --card-border: rgba(0, 0, 0, 0.06);
+            --section-title: #999;
+            --quote-text: #555;
+            --quote-bg: rgba(255, 255, 255, 0.7);
+            --quote-border: #999;
+            --back-link: #aaa;
+            --back-link-hover: #666;
+            --divider: #e5e7eb;
+            --meta: #888;
+            --ts: #b07030;
+            --highlight-bg: rgba(255, 220, 100, 0.12);
+        }
+
+        [data-theme="dark"] {
+            --bg-start: #24272c;
+            --bg-end: #2e3238;
+            --text: #c8c8c8;
+            --heading: #e8e8e8;
+            --tagline: #8a8a8a;
+            --link-color: #60a5fa;
+            --link-hover: #93bbfd;
+            --card-bg: rgba(255, 255, 255, 0.06);
+            --card-shadow: rgba(0, 0, 0, 0.2);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --section-title: #6a6a6a;
+            --quote-text: #a0a0a0;
+            --quote-bg: rgba(255, 255, 255, 0.05);
+            --quote-border: #505050;
+            --back-link: #707070;
+            --back-link-hover: #a0a0a0;
+            --divider: #3a3e44;
+            --meta: #808080;
+            --ts: #d4a060;
+            --highlight-bg: rgba(255, 220, 100, 0.06);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 3rem 2rem;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .container { max-width: 700px; margin: 0 auto; }
+
+        .back {
+            display: inline-block;
+            color: var(--back-link);
+            text-decoration: none;
+            font-size: 0.85rem;
+            margin-bottom: 2rem;
+            transition: color 0.2s;
+        }
+        .back:hover { color: var(--back-link-hover); }
+
+        h1 { font-size: 1.75rem; font-weight: 700; color: var(--heading); margin-bottom: 0.5rem; }
+        .subtitle { color: var(--tagline); font-size: 0.85rem; margin-bottom: 2.5rem; line-height: 1.5; }
+
+        .podcast-header {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px var(--card-shadow);
+            border: 1px solid var(--card-border);
+        }
+        .podcast-header h2 { font-size: 1.15rem; font-weight: 600; color: var(--heading); margin-bottom: 0.25rem; }
+        .podcast-header .meta { font-size: 0.8rem; color: var(--meta); margin-bottom: 0.5rem; }
+        .podcast-header .meta a { color: var(--link-color); text-decoration: none; }
+        .podcast-header .meta a:hover { text-decoration: underline; }
+        .podcast-header .links { font-size: 0.8rem; display: flex; gap: 0.75rem; flex-wrap: wrap; }
+        .podcast-header .links a { color: var(--link-color); text-decoration: none; }
+        .podcast-header .links a:hover { text-decoration: underline; }
+
+        .section-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--section-title);
+            margin: 2rem 0 1rem;
+        }
+
+        .idea {
+            margin-bottom: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            line-height: 1.6;
+        }
+        .idea:hover { background: var(--highlight-bg); }
+
+        .idea .ts {
+            font-family: 'SF Mono', 'Menlo', 'Monaco', monospace;
+            font-size: 0.75rem;
+            color: var(--ts);
+            margin-right: 0.4rem;
+        }
+        .idea .title { font-weight: 600; color: var(--heading); }
+        .idea .desc { font-size: 0.9rem; color: var(--text); margin-top: 0.25rem; }
+
+        blockquote {
+            font-style: italic;
+            color: var(--quote-text);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            padding: 0.75rem 1rem;
+            background: var(--quote-bg);
+            border-left: 3px solid var(--quote-border);
+            border-radius: 0 8px 8px 0;
+            margin: 0.75rem 0;
+        }
+
+        .divider { border: none; border-top: 1px solid var(--divider); margin: 2rem 0; }
+
+        .theme-toggle {
+            position: fixed; top: 1.25rem; right: 1.25rem;
+            background: none; border: none; font-size: 0.85rem;
+            cursor: pointer; opacity: 0.3; transition: opacity 0.2s;
+            padding: 0.25rem; line-height: 1;
+        }
+        .theme-toggle:hover { opacity: 0.65; }
+
+        .frameworks { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.85rem; }
+        .frameworks th { text-align: left; color: var(--section-title); font-weight: 500; padding: 0.5rem; border-bottom: 1px solid var(--divider); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        .frameworks td { padding: 0.5rem; border-bottom: 1px solid var(--divider); vertical-align: top; }
+        .frameworks td:first-child { font-weight: 600; color: var(--heading); white-space: nowrap; }
+        .frameworks td:nth-child(2) { font-family: 'SF Mono', 'Menlo', monospace; font-size: 0.75rem; color: var(--ts); white-space: nowrap; }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme"></button>
+
+    <div class="container">
+        <a href="index.html" class="back">&larr; Home</a>
+
+        <h1>Podcast Highlights</h1>
+        <p class="subtitle">Key ideas, quotes, and frameworks extracted from podcast appearances.</p>
+
+        <!-- BEYOND PODCAST -->
+        <div class="podcast-header">
+            <h2>The Beyond Podcast</h2>
+            <p class="meta">Host: Javier Ideami &middot; May 2021 &middot; 2hr 22min</p>
+            <div class="links">
+                <a href="https://volandino.com/podcast/jacob-cole/" target="_blank" rel="noopener">Episode page</a>
+                <a href="https://volandino.com/wp-content/uploads/2021/05/jacob-audio-master.mp3" target="_blank" rel="noopener">Audio</a>
+                <a href="press/beyond-podcast-transcript.txt" target="_blank">Timestamped transcript</a>
+                <a href="press/beyond-podcast-ideas.md" target="_blank">Full idea extraction</a>
+            </div>
+        </div>
+
+        <p class="section-label">Notable Quotes</p>
+
+        <blockquote><span class="ts">[96:42]</span> "If you're finding it difficult to get motivated, maybe you're chasing somebody else's goals."</blockquote>
+
+        <blockquote><span class="ts">[79:07]</span> "No matter which way you slice it, tautologically, you are the universe speaking."</blockquote>
+
+        <blockquote><span class="ts">[42:51]</span> "The real self is right there in this conversation. And the atoms are along for the ride."</blockquote>
+
+        <blockquote><span class="ts">[47:01]</span> "In truth, we are that cosmic medium, and the pain is just a ripple on it."</blockquote>
+
+        <blockquote><span class="ts">[22:19]</span> "An attachment is like a rope holding down a hot air balloon. If you let go, you can achieve blast off."</blockquote>
+
+        <blockquote><span class="ts">[128:11]</span> "The only rule of yoga: no inner conflict."</blockquote>
+
+        <blockquote><span class="ts">[56:07]</span> "The mind is buoyant. It's always trying to float upwards like a beach ball."</blockquote>
+
+        <blockquote><span class="ts">[84:33]</span> "Is it a bot in your head speaking, or is it the original nature speaking?"</blockquote>
+
+        <blockquote><span class="ts">[114:24]</span> "Bruce Lee didn't say 'be like water.' His instruction was: BE water."</blockquote>
+
+        <blockquote><span class="ts">[108:36]</span> "If I am not attached, what I consider my productivity may just be the universe itself moving me."</blockquote>
+
+        <p class="section-label">Key Ideas &mdash; AI & Cognition</p>
+
+        <div class="idea">
+            <span class="ts">[01:48]</span> <span class="title">Deep Learning's Square Wave Problem</span>
+            <div class="desc">Chollet's theory that deep learning fails on discrete tasks the way Fourier transforms produce glitches at the corners of a square wave. The future of AI requires a hybrid of continuous (deep learning/System 1) and discrete (program synthesis/System 2).</div>
+        </div>
+
+        <div class="idea">
+            <span class="ts">[04:31]</span> <span class="title">English as a Programming Language</span>
+            <div class="desc">English can be treated as a weakly-typed programming language. "Jacob threw the ball to Linus" becomes <code>threw(Jacob, ball, Linus)</code>. This enables rigorous semantic comparison and the construction of an "IDE for English" &mdash; like PyCharm but for natural language.</div>
+        </div>
+
+        <div class="idea">
+            <span class="ts">[03:19]</span> <span class="title">Intelligence as Analogy-Finding</span>
+            <div class="desc">Intelligence is the ability to find analogies between concepts. We can extrapolate (unlike deep learning which interpolates) because the universe is composed of repeated patterns at different scales. Recognizing structural isomorphisms &mdash; like realizing Avatar is "Dances with Wolves with aliens" &mdash; is what advanced intelligence does.</div>
+        </div>
+
+        <div class="idea">
+            <span class="ts">[13:00]</span> <span class="title">The Inner Language Hypothesis</span>
+            <div class="desc">Language evolved not for communication between people, but for specialized brain modules to communicate with each other. The Munduruku tribe has no words for numbers >4, and literally cannot count above 4 &mdash; language bridges the gap between the hardwired counting module and the estimation module.</div>
+        </div>
+
+        <p class="section-label">Key Ideas &mdash; Consciousness & Reality</p>
+
+        <div class="idea">
+            <span class="ts">[43:25]</span> <span class="title">All Reality as Ripples on a Cosmic Medium</span>
+            <div class="desc">Everything &mdash; atoms, ocean waves, emotions &mdash; are ripples on a universal medium. Emotions are ripples on the brain, but the brain is continuous with the cosmos, so emotions are really ripples on the cosmic medium. No sensation, "no matter how bad or how good, is you."</div>
+        </div>
+
+        <div class="idea">
+            <span class="ts">[79:27]</span> <span class="title">Two Voices Inside You</span>
+            <div class="desc">At any moment, there are two forces: (1) your original curious, innocent, kind nature (the universe reflected through you), and (2) conditioning &mdash; "a bot in your head" formed by past experiences. The crucial skill is distinguishing which one is speaking.</div>
+        </div>
+
+        <div class="idea">
+            <span class="ts">[47:52]</span> <span class="title">Dreams as Simulated Annealing</span>
+            <div class="desc">Dreams shake up all the ingredients in your subconscious and let them settle into a more ordered configuration. Problems that seemed intractable can resolve overnight because dreaming is literally an optimization process.</div>
+        </div>
+
+        <div class="idea">
+            <span class="ts">[60:29]</span> <span class="title">Donald Hoffman's Case Against Reality</span>
+            <div class="desc">We may be conscious entities inside a virtual reality headset. The moon isn't "there" when we're not looking, just as a video game road isn't rendered when the camera faces elsewhere. Even so, there must be a "top level" &mdash; which is where ideas of the divine begin.</div>
+        </div>
+
+        <p class="section-label">Key Ideas &mdash; Yoga, Taoism & Inner Life</p>
+
+        <div class="idea">
+            <span class="ts">[91:21]</span> <span class="title">Avidya: Beyond Sin and Temptation</span>
+            <div class="desc">Yogis reject internal conflict entirely. Instead of fighting temptation, they use Vidya (right knowledge) and Avidya (that which is other than right knowledge). Laziness and impatience are not real &mdash; they're forms of Avidya. If you poke them with your brain, they dissolve.</div>
+        </div>
+
+        <div class="idea">
+            <span class="ts">[22:06]</span> <span class="title">Non-Attachment as Blast-Off</span>
+            <div class="desc">Awareness is like a hot air balloon wanting to fly free; attachments are ropes holding it down. A master of non-attachment can achieve "blast off" comparable to psychedelics at any moment &mdash; not by distracting from pain, but by transcending it.</div>
+        </div>
+
+        <div class="idea">
+            <span class="ts">[85:33]</span> <span class="title">The Most Important Question</span>
+            <div class="desc">"What do we have to do to stop living on autopilot?" We make ~30,000 decisions daily, 98% unconsciously. The yogic answer: adopt a zero-tolerance policy for unclear thinking.</div>
+        </div>
+
+        <div class="idea">
+            <span class="ts">[94:19]</span> <span class="title">A Constructed Language as Psychotherapy</span>
+            <div class="desc">Create a language that forces speakers to identify the SOURCE of every desire: "my physical self wants food" vs. "my emotional pain wants to eat to drown itself." The language would make "laziness" unsayable &mdash; replaced with "I am confused."</div>
+        </div>
+
+        <div class="idea">
+            <span class="ts">[107:09]</span> <span class="title">Wu Wei and Productivity</span>
+            <div class="desc">Taoism says: do nothing, be non-attached, and things will happen through you. When the fire alarm goes off, an unattached person naturally moves. "Your productivity may just be the universe itself moving you."</div>
+        </div>
+
+        <p class="section-label">Frameworks & Mental Models</p>
+
+        <table class="frameworks">
+            <tr><th>Framework</th><th>Time</th><th>Description</th></tr>
+            <tr><td>Hot Air Balloon</td><td>[22:06]</td><td>Soul = balloon wanting to fly; attachments = ropes; non-attachment = blast off</td></tr>
+            <tr><td>Ripples on Cosmic Medium</td><td>[43:25]</td><td>All reality = ripples; atoms, waves, emotions have same status as ripples on a medium</td></tr>
+            <tr><td>Two Voices</td><td>[79:27]</td><td>At any moment: original nature (universe) speaking OR conditioning (bot) speaking</td></tr>
+            <tr><td>Simulated Annealing</td><td>[47:52]</td><td>Dreams = shaking magnets then slowly cooling = optimizing mental configurations</td></tr>
+            <tr><td>Buoyant Mind</td><td>[56:05]</td><td>Mind floats up (alertness); pericardium pulls down (sleep); insomnia = drained pericardium</td></tr>
+            <tr><td>English as Bytecode</td><td>[09:54]</td><td>Written English is compiled output; understanding requires decompiling to semantic notation</td></tr>
+            <tr><td>Avidya/Vidya</td><td>[91:21]</td><td>Right knowledge vs. "other than right knowledge" &mdash; replaces sin with clarity/confusion</td></tr>
+            <tr><td>Grok vs. Know</td><td>[119:27]</td><td>Conceptual understanding vs. embodied knowing that becomes inextricable from being</td></tr>
+            <tr><td>Homeodynamics</td><td>[115:26]</td><td>Not static homeostasis but dynamic balance with a constantly shifting center</td></tr>
+        </table>
+
+        <p class="section-label">Highlight Segments</p>
+
+        <div class="idea" style="background: var(--highlight-bg);">
+            <span class="ts">[01:18&ndash;12:30]</span> <span class="title">AI Architecture Deep Dive</span>
+            <div class="desc">Dense with original ideas: discrete vs. continuous systems, English as a programming language, prefix notation for natural language, and the strange loop hypothesis.</div>
+        </div>
+        <div class="idea" style="background: var(--highlight-bg);">
+            <span class="ts">[43:00&ndash;47:15]</span> <span class="title">Ripples on the Cosmic Medium</span>
+            <div class="desc">The most philosophically original section. All reality is ripples, emotions and atoms have equal ontological status, witness consciousness is grounded in physics.</div>
+        </div>
+        <div class="idea" style="background: var(--highlight-bg);">
+            <span class="ts">[85:30&ndash;98:00]</span> <span class="title">Avidya, Autopilot & Language as Therapy</span>
+            <div class="desc">The densest practical wisdom section. 30,000 unconscious daily decisions, zero-tolerance for unclear thinking, constructed language as psychotherapy, the motivation quote.</div>
+        </div>
+        <div class="idea" style="background: var(--highlight-bg);">
+            <span class="ts">[119:00&ndash;131:00]</span> <span class="title">Grokking, Love & The Only Rule of Yoga</span>
+            <div class="desc">When people fall in love they ARE the same thing. "Be water" not "be like water." The only rule of yoga: no inner conflict. "Don't eat bad ice cream."</div>
+        </div>
+
+        <hr class="divider">
+
+        <!-- SIMULATION PODCAST -->
+        <div class="podcast-header">
+            <h2>Simulation #264</h2>
+            <p class="meta">Host: Allen Saakyan &middot; February 2019 &middot; With Monty Kosma & Jack Boffa</p>
+            <div class="links">
+                <a href="https://www.youtube.com/watch?v=S4hgdXvRlmA&t=1s" target="_blank" rel="noopener">YouTube</a>
+                <a href="https://simulationseries.com/264" target="_blank" rel="noopener">Transcript</a>
+            </div>
+        </div>
+
+        <p class="section-label">Key Ideas</p>
+
+        <div class="idea">
+            <span class="ts">[02:41]</span> <span class="title">The Thoughtstream Method</span>
+            <div class="desc">A single, massive, chronologically ordered text file where every thought is captured and tagged with hashtags and links to related people, creating a personal knowledge graph rather than isolated documents.</div>
+        </div>
+
+        <div class="idea">
+            <span class="ts">[06:10]</span> <span class="title">Software Should Mimic Minds, Not Paper</span>
+            <div class="desc">Modern computing interfaces still mimic the constraints of physical paper (files, folders, pages) rather than the human mind, which is associative, non-linear, and "deeply intertwingled."</div>
+        </div>
+
+        <div class="idea">
+            <span class="ts">[06:44]</span> <span class="title">Externalizing for Collective Cognition</span>
+            <div class="desc">Externalizing your cognition in a networked way converts individual intelligence into collective intelligence, enabling others to link into your mental lattice.</div>
+        </div>
+
+        <div class="idea">
+            <span class="ts">[08:28]</span> <span class="title">The Fog of War for Knowledge</span>
+            <div class="desc">We need a map of human knowledge that shows the dark areas we haven't explored yet, motivating us to uncover new intellectual territory &mdash; like the fog of war in StarCraft applied to real life.</div>
+        </div>
+
+        <div class="idea">
+            <span class="ts">[52:00]</span> <span class="title">The Social Knowledge Graph</span>
+            <div class="desc">A graph that links people not by employment history (LinkedIn), but by the specific ideas, books, and problems they are currently obsessed with.</div>
+        </div>
+
+        <div class="idea">
+            <span class="ts">[1:18:00]</span> <span class="title">Intelligence Amplification (IA) vs. AI</span>
+            <div class="desc">Doug Engelbart's distinction: AI makes machines smart, but IA (Intelligence Amplification) builds tools that radically boost human capability and problem-solving.</div>
+        </div>
+
+        <div class="idea">
+            <span class="ts">[1:24:45]</span> <span class="title">Labor-Creating vs. Labor-Saving Technology</span>
+            <div class="desc">Modern tools like Email and Slack act as "labor-creating devices" that fragment attention. We need to return to building "labor-saving devices" for the mind.</div>
+        </div>
+
+        <div class="idea">
+            <span class="ts">[1:25:35]</span> <span class="title">The Global Hackathon Strategy</span>
+            <div class="desc">An open database of the world's problems and ideas, enabling a "global hackathon" where people are systematically matched to problems they're best suited to solve.</div>
+        </div>
+
+        <div class="idea">
+            <span class="ts">[1:36:58]</span> <span class="title">Love as Unblocked Flow</span>
+            <div class="desc">Love and healing are the removal of unnecessary tension and blockages, allowing energy to flow freely through a system &mdash; whether that system is a body, a relationship, or a society.</div>
+        </div>
+
+        <blockquote><span class="ts">[1:53:30]</span> Doug Engelbart asked Marvin Minsky what AI would do for humans. Minsky replied: "If we're lucky, they'll keep us as pets."</blockquote>
+    </div>
+
+    <script>
+        (function() {
+            var btn = document.getElementById('theme-toggle');
+            var root = document.documentElement;
+            function getSystemTheme() { return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; }
+            function applyTheme() {
+                var saved = localStorage.getItem('theme');
+                root.setAttribute('data-theme', saved || getSystemTheme());
+                btn.textContent = root.getAttribute('data-theme') === 'dark' ? '\u2600\uFE0F' : '\uD83C\uDF19';
+            }
+            btn.addEventListener('click', function() {
+                var systemTheme = getSystemTheme();
+                if (!localStorage.getItem('theme')) localStorage.setItem('theme', systemTheme === 'dark' ? 'light' : 'dark');
+                else if (localStorage.getItem('theme') !== systemTheme) localStorage.removeItem('theme');
+                else localStorage.setItem('theme', root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+                applyTheme();
+            });
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() { if (!localStorage.getItem('theme')) applyTheme(); });
+            applyTheme();
+        })();
+    </script>
+</body>
+</html>
