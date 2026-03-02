@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A peek inside San Francisco's AI boom - Washington Post (Archive)</title>
+    <style>
+        :root {
+            --bg-start: #f5f7fa;
+            --bg-end: #e4e8ec;
+            --text: #333;
+            --heading: #111;
+            --caption: #555;
+            --meta: #888;
+            --link-color: #2563eb;
+            --back-link: #aaa;
+            --back-link-hover: #666;
+            --banner-bg: #fffbe6;
+            --banner-border: #e5d88c;
+            --banner-text: #7a6d1e;
+        }
+
+        [data-theme="dark"] {
+            --bg-start: #24272c;
+            --bg-end: #2e3238;
+            --text: #c8c8c8;
+            --heading: #e8e8e8;
+            --caption: #a0a0a0;
+            --meta: #808080;
+            --link-color: #60a5fa;
+            --back-link: #707070;
+            --back-link-hover: #a0a0a0;
+            --banner-bg: rgba(255, 251, 230, 0.08);
+            --banner-border: #5a5230;
+            --banner-text: #c8b84a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 3rem 2rem;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .container {
+            max-width: 760px;
+            margin: 0 auto;
+        }
+
+        .back {
+            display: inline-block;
+            color: var(--back-link);
+            text-decoration: none;
+            font-size: 0.85rem;
+            margin-bottom: 2rem;
+            transition: color 0.2s;
+        }
+
+        .back:hover { color: var(--back-link-hover); }
+
+        .archive-banner {
+            background: var(--banner-bg);
+            border: 1px solid var(--banner-border);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 2rem;
+            font-size: 0.8rem;
+            color: var(--banner-text);
+        }
+
+        .archive-banner a {
+            color: var(--link-color);
+            text-decoration: none;
+        }
+
+        .archive-banner a:hover { text-decoration: underline; }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--heading);
+            margin-bottom: 0.5rem;
+            line-height: 1.2;
+        }
+
+        h2.subtitle {
+            font-size: 1.1rem;
+            font-weight: 400;
+            color: var(--caption);
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .meta {
+            font-size: 0.85rem;
+            color: var(--meta);
+            margin-bottom: 2rem;
+        }
+
+        .article-body p {
+            font-size: 1rem;
+            line-height: 1.8;
+            margin-bottom: 1.25rem;
+        }
+
+        .photo-block {
+            margin: 2rem 0;
+        }
+
+        .photo-block img {
+            width: 100%;
+            border-radius: 4px;
+            display: block;
+        }
+
+        .photo-block .caption {
+            font-size: 0.85rem;
+            color: var(--caption);
+            line-height: 1.5;
+            margin-top: 0.5rem;
+            font-style: italic;
+        }
+
+        .highlight {
+            background: rgba(255, 220, 100, 0.15);
+            padding: 0.1rem 0.3rem;
+            border-radius: 3px;
+        }
+
+        .credits {
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(128, 128, 128, 0.2);
+            font-size: 0.8rem;
+            color: var(--meta);
+            line-height: 1.6;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 1.25rem;
+            right: 1.25rem;
+            background: none;
+            border: none;
+            font-size: 0.85rem;
+            cursor: pointer;
+            opacity: 0.3;
+            transition: opacity 0.2s;
+            padding: 0.25rem;
+            line-height: 1;
+        }
+
+        .theme-toggle:hover { opacity: 0.65; }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme"></button>
+
+    <div class="container">
+        <a href="../index.html" class="back">&larr; Home</a>
+
+        <div class="archive-banner">
+            Archived copy for personal reference. <a href="https://www.washingtonpost.com/technology/interactive/2024/ai-startups-boom-san-francisco/" target="_blank" rel="noopener">View original at washingtonpost.com</a>
+        </div>
+
+        <h1>A peek inside San Francisco's AI boom</h1>
+        <h2 class="subtitle">These photos offer an intimate look at the community powering the artificial-intelligence revolution.</h2>
+        <p class="meta">Photographs by Laura Morton &middot; The Washington Post &middot; June 22, 2024</p>
+
+        <div class="article-body">
+            <div class="photo-block">
+                <img src="https://img.washingtonpost.com/wp-apps/imrs.php?src=https://arc-anglerfish-washpost-prod-washpost.s3.amazonaws.com/public/26OAKUF3EMFOS4R6T4V6SQAL5E.jpg&high_res=true&w=1200" alt="Participants in the AGI House LLM Hackathon gather to watch demos at AGI House in Hillsborough, California, March 25, 2023." loading="lazy">
+                <p class="caption">Participants in the AGI House LLM Hackathon gather to watch the demos at the conclusion of coding during the event at the "AGI House," a hacker house in Hillsborough, California on March 25, 2023.</p>
+            </div>
+
+            <p>In an opulent ballroom on a Saturday night, the classic pump-up anthem "Eye of the Tiger" blared as artificial intelligence enthusiasts tapped away on their keyboards. This was a hackathon &mdash; an event where participants have a set amount of time to collaborate on a project they present to the crowd &mdash; at a sprawling mansion about 30 minutes south of San Francisco.</p>
+
+            <p>As a professional freelance photographer, I've spent the past decade documenting the people and culture of Silicon Valley. Ever since OpenAI's ChatGPT debuted in November 2022, countless entrepreneurs have been inspired to make their own generative AI tools. Now, nearly every new start-up has an AI element &mdash; technology that automates simple tasks, for example, or a chatbot that provides mental health tips.</p>
+
+            <p>In the past year and a half, entrepreneurs from around the world have flocked to San Francisco to be part of this AI revolution. Many start-up founders and their teams live and work together so they can focus intently on building their companies. And evenings like the AI hackathon I visited in March 2023 have become Silicon Valley's idea of fun.</p>
+
+            <p>Here's a peek inside that world.</p>
+
+            <div class="photo-block">
+                <img src="https://img.washingtonpost.com/wp-apps/imrs.php?src=https://arc-anglerfish-washpost-prod-washpost.s3.amazonaws.com/public/ZMP2QKT4BEIBGHYRSB2VEBFP44.JPG&high_res=true&w=1200" alt="Founders Inc. incubator in San Francisco, March 2023." loading="lazy">
+                <p class="caption">Apoorva Mahajan, center, and Mo Mahmood, right, take a break for a lightsaber battle in the hardware lab at Founders Inc., a start-up incubator in San Francisco in March 2023.</p>
+            </div>
+
+            <div class="photo-block">
+                <img src="https://img.washingtonpost.com/wp-apps/imrs.php?src=https://arc-anglerfish-washpost-prod-washpost.s3.amazonaws.com/public/ZIIY62ZEB6VMCTE37DGK2XM57Y.jpg&high_res=true&w=1200" alt="Hacker Fellowship Zero demo day, April 2023." loading="lazy">
+                <p class="caption">Michaela Carmein, second from right, dressed as an AI robot named "Guinevere," watches entrepreneurs' presentations from an overflow room at an April 2023 demo day for start-up founders who have completed the selective 12-week residency Hacker Fellowship Zero.</p>
+            </div>
+
+            <div class="photo-block">
+                <img src="https://img.washingtonpost.com/wp-apps/imrs.php?src=https://arc-anglerfish-washpost-prod-washpost.s3.amazonaws.com/public/NTLCQQTVTTL277TUMWJLV2AD4E.jpg&high_res=true&w=1200" alt="Cerebral Valley co-working event at Blumberg Capital, March 2023." loading="lazy">
+                <p class="caption">AI entrepreneurs, including Taylor Schmidt, second from right, plug away on their laptops while attending a co-working event at the San Francisco office of a venture capital firm in March 2023.</p>
+            </div>
+
+            <div class="photo-block">
+                <img src="https://img.washingtonpost.com/wp-apps/imrs.php?src=https://arc-anglerfish-washpost-prod-washpost.s3.amazonaws.com/public/IBNW4W3S5F7XZSFIWN4YT6BZ7Y.jpg&high_res=true&w=1200" alt="Jacob Cole leads Qigong at AGI House hackathon, March 2023." loading="lazy">
+                <p class="caption"><span class="highlight">Jacob Cole, center, leads others in Qigong, an ancient Chinese practice of optimizing energy within the body, mind and spirit, in the AGI House backyard during a March 2023 hackathon in Hillsborough, Calif. Through Qigong, Cole, a hackathon competitor, wanted to share "the incredible feeling of not letting the energy escape, not letting the information escape."</span></p>
+            </div>
+
+            <div class="photo-block">
+                <img src="https://img.washingtonpost.com/wp-apps/imrs.php?src=https://arc-anglerfish-washpost-prod-washpost.s3.amazonaws.com/public/KGCFKICLNZFTHYEK7MTJUKL66A.JPG&high_res=true&w=1200" alt="GAI Collective Summit, June 2023." loading="lazy">
+                <p class="caption">A volunteer at an AI meetup at a San Francisco co-working space in June 2023 holds up a number so his fellow discussion-group members know where to assemble. Attendees debated such questions as "What will humans always be better at than AI?" and "What fundamentally gives us, as individuals, meaning and purpose?"</p>
+            </div>
+
+            <div class="photo-block">
+                <img src="https://img.washingtonpost.com/wp-apps/imrs.php?src=https://arc-anglerfish-washpost-prod-washpost.s3.amazonaws.com/public/7NTNULT3XRZ5XANSCWCO5TW6QM.jpg&high_res=true&w=1200" alt="Women in AI Lunch, February 2023." loading="lazy">
+                <p class="caption">Tammie Siew, left, a partner at the venture capital firm Pebblebed, stands to play an icebreaker game at a February 2023 networking lunch for women in AI at Pebblebed's office in San Francisco's Mission District.</p>
+            </div>
+
+            <div class="photo-block">
+                <img src="https://img.washingtonpost.com/wp-apps/imrs.php?src=https://arc-anglerfish-washpost-prod-washpost.s3.amazonaws.com/public/NT25HBH26FQLHC23IH5JNP57KM.JPG&high_res=true&w=1200" alt="AI prompt battle at AI World's Fair, June 2023." loading="lazy">
+                <p class="caption">Alex Reibman, left, and Jesse Hu, right, face off in a prompt battle with venture capitalist Alessio Fanelli, center, refereeing at an AI networking event in June 2023.</p>
+            </div>
+
+            <div class="photo-block">
+                <img src="https://img.washingtonpost.com/wp-apps/imrs.php?src=https://arc-anglerfish-washpost-prod-washpost.s3.amazonaws.com/public/Q4FQAZZUUVQIVNFI7JA6UYSRNY.jpg&high_res=true&w=1200" alt="AI Woodstock at the Exploratorium, March 2023." loading="lazy">
+                <p class="caption">An individual dressed as the "hugging face" emoji dances at an event billed as the "Woodstock of AI," where thousands of people gathered at the Exploratorium science museum in San Francisco in March 2023.</p>
+            </div>
+        </div>
+
+        <div class="credits">
+            <p>To capture these photos, Laura Morton was invited into events hosted by the AGI House, Hacker Fellowship Zero, Cerebral Valley, Internet Activism, Decibel, Latent Space, the GAI Collective; the live-work offices of Exa and Brev.Dev; the offices of Blumberg Capital, Pebblebed and Founders Inc.; the co-working spaces Werqwise and SHACK15.</p>
+            <p style="margin-top: 0.5rem;">The photography for this article was supported by a grant from the Pierre and Alexandra Boulat Association.</p>
+            <p style="margin-top: 0.5rem;">Design and development by Michael Domine. Photo Editing by Monique Woo. Editing by Lisa Bonos and Karly Domb Sadof. Design editing by Betty Chavarria.</p>
+            <p style="margin-top: 1rem;">&copy; The Washington Post, 2024. Archived for personal reference.</p>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            var btn = document.getElementById('theme-toggle');
+            var root = document.documentElement;
+            function getSystemTheme() {
+                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            }
+            function applyTheme() {
+                var saved = localStorage.getItem('theme');
+                if (saved) { root.setAttribute('data-theme', saved); }
+                else { root.setAttribute('data-theme', getSystemTheme()); }
+                updateButton();
+            }
+            function updateButton() {
+                var current = root.getAttribute('data-theme');
+                btn.textContent = current === 'dark' ? '\u2600\uFE0F' : '\uD83C\uDF19';
+            }
+            btn.addEventListener('click', function() {
+                var systemTheme = getSystemTheme();
+                if (!localStorage.getItem('theme')) {
+                    localStorage.setItem('theme', systemTheme === 'dark' ? 'light' : 'dark');
+                } else if (localStorage.getItem('theme') !== systemTheme) {
+                    localStorage.removeItem('theme');
+                } else {
+                    var current = root.getAttribute('data-theme');
+                    localStorage.setItem('theme', current === 'dark' ? 'light' : 'dark');
+                }
+                applyTheme();
+            });
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() {
+                if (!localStorage.getItem('theme')) applyTheme();
+            });
+            applyTheme();
+        })();
+    </script>
+</body>
+</html>
