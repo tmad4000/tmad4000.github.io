@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recommended Readings - Jacob Cole</title>
+    <style>
+        :root {
+            --bg-start: #f5f7fa;
+            --bg-end: #e4e8ec;
+            --text: #333;
+            --heading: #111;
+            --tagline: #888;
+            --link-color: #2563eb;
+            --link-hover: #1d4ed8;
+            --card-bg: #fff;
+            --card-shadow: rgba(0, 0, 0, 0.08);
+            --card-border: rgba(0, 0, 0, 0.06);
+            --section-title: #999;
+            --quote-text: #555;
+            --quote-bg: rgba(255, 255, 255, 0.7);
+            --quote-border: #999;
+            --back-link: #aaa;
+            --back-link-hover: #666;
+            --divider: #e5e7eb;
+            --meta: #888;
+        }
+
+        [data-theme="dark"] {
+            --bg-start: #24272c;
+            --bg-end: #2e3238;
+            --text: #c8c8c8;
+            --heading: #e8e8e8;
+            --tagline: #8a8a8a;
+            --link-color: #60a5fa;
+            --link-hover: #93bbfd;
+            --card-bg: rgba(255, 255, 255, 0.06);
+            --card-shadow: rgba(0, 0, 0, 0.2);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --section-title: #6a6a6a;
+            --quote-text: #a0a0a0;
+            --quote-bg: rgba(255, 255, 255, 0.05);
+            --quote-border: #505050;
+            --back-link: #707070;
+            --back-link-hover: #a0a0a0;
+            --divider: #3a3e44;
+            --meta: #808080;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 3rem 2rem;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .container {
+            max-width: 680px;
+            margin: 0 auto;
+        }
+
+        .back {
+            display: inline-block;
+            color: var(--back-link);
+            text-decoration: none;
+            font-size: 0.85rem;
+            margin-bottom: 2rem;
+            transition: color 0.2s;
+        }
+
+        .back:hover { color: var(--back-link-hover); }
+
+        h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--heading);
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--tagline);
+            font-size: 0.85rem;
+            margin-bottom: 2.5rem;
+            line-height: 1.5;
+        }
+
+        .reading-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px var(--card-shadow);
+            border: 1px solid var(--card-border);
+        }
+
+        .reading-card h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--heading);
+            margin-bottom: 0.35rem;
+        }
+
+        .reading-meta {
+            font-size: 0.8rem;
+            color: var(--meta);
+            margin-bottom: 1rem;
+        }
+
+        .reading-card p {
+            font-size: 0.95rem;
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+
+        .reading-card p:last-child {
+            margin-bottom: 0;
+        }
+
+        .reading-card blockquote {
+            font-style: italic;
+            color: var(--quote-text);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            padding: 0.75rem 1rem;
+            background: var(--quote-bg);
+            border-left: 3px solid var(--quote-border);
+            border-radius: 0 8px 8px 0;
+            margin: 1rem 0;
+        }
+
+        .reading-card h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--heading);
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .reading-card a {
+            color: var(--link-color);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .reading-card a:hover {
+            color: var(--link-hover);
+            text-decoration: underline;
+        }
+
+        .divider {
+            border: none;
+            border-top: 1px solid var(--divider);
+            margin: 1.25rem 0;
+        }
+
+        .section-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--section-title);
+            margin-bottom: 1rem;
+        }
+
+        .step {
+            margin-bottom: 0.75rem;
+        }
+
+        .step strong {
+            color: var(--heading);
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 1.25rem;
+            right: 1.25rem;
+            background: none;
+            border: none;
+            font-size: 0.85rem;
+            cursor: pointer;
+            opacity: 0.3;
+            transition: opacity 0.2s;
+            padding: 0.25rem;
+            line-height: 1;
+        }
+
+        .theme-toggle:hover { opacity: 0.65; }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme"></button>
+
+    <div class="container">
+        <a href="index.html" class="back">&larr; Home</a>
+
+        <h1>Recommended Readings</h1>
+        <p class="subtitle">Essays on yoga, meditation, and the inner life.</p>
+
+        <p class="section-label">Yoga Philosophy</p>
+
+        <div class="reading-card">
+            <h2>The Meaning and Purpose of Yoga</h2>
+            <p class="reading-meta">T.K.V. Desikachar &middot; <a href="http://yoga.jacobcole.net/" target="_blank" rel="noopener">PDF</a></p>
+
+            <p>Yoga is one of the six principle systems of Indian thinking known as dar&#347;ana. The word dar&#347;ana is derived from the Sanskrit root <em>d&#7771;&#347;</em>, meaning "to see." Fundamentally, dar&#347;ana means "view" or "a particular way of viewing." Yoga, as one of the six dar&#347;ana, has its source in the Vedas. The word <em>veda</em> comes from the Sanskrit root <em>vid</em>, "to know." It means "that which tells us everything we would like to know."</p>
+
+            <p>While the source of yoga was the Vedas, this particular dar&#347;ana was formalized by Pata&ntilde;jali, one of the great Indian sages. His classic text is the <em>Yoga S&#363;tra</em>. Although there are many other major treatises on yoga that postdate Pata&ntilde;jali's <em>Yoga S&#363;tra</em>, his work is the most authoritative.</p>
+
+            <p>The word "yoga" is also a Sanskrit word derived from the root <em>yuj</em>. Yuj has developed two traditional meanings. One is "to bring two things together, to meet, to unite." The other meaning is similar to that of <em>sam&#257;dhi</em>, that is, "to converge the movement of the mind."</p>
+
+            <blockquote>"To reach a point we have not reached before." If there is something that is impossible for us to do today and we find a means by which it becomes possible, that movement is yoga.</blockquote>
+
+            <p>Another important aspect of yoga has to do with action. Yoga also means "to act in a particular way with all of our attention focused upon that action." As Desikachar explains, suppose that while speaking about yoga one part of the mind is thinking about something else &mdash; that divided attention is the opposite of yoga. Yoga tries to create a condition in which we are always present in every action, at every moment.</p>
+
+            <h3>Who Should Practice Yoga?</h3>
+
+            <p>The practice of yoga only requires that we act and at the same time, pay attention to our actions. We do not have to endorse any particular concept of the Lord, but we must have respect for such concepts. Although yoga has its source in Indian thought, it neither dictates that a Hindu must practice it nor that a non-Hindu is prohibited from such practice. Yoga is universal in that it is the means to attain a desired new condition.</p>
+
+            <h3>Avidy&#257;: The Root of Our Problems</h3>
+
+            <p>Desikachar explores the concept of <em>avidy&#257;</em> from Pata&ntilde;jali's <em>Yoga S&#363;tra</em> &mdash; a concept which, if understood properly, explains why we have problems in life. Avidy&#257; means literally "knowledge other than right knowledge." It is not to be confused with <em>vidy&#257;</em> which means "right knowledge." Avidy&#257; is a false state of understanding: we think we are right and act accordingly but eventually find ourselves on the wrong track.</p>
+
+            <p>Avidy&#257; is the accumulation of many thoughtless actions repeated mechanically, almost blindly, over the years. Our minds become conditioned &mdash; such conditioning is called <em>sa&#7747;sk&#257;ra</em>. Because of this conditioning our minds become covered, as it were, with a film of avidy&#257;.</p>
+
+            <p>Avidy&#257; expresses itself through four "children":</p>
+
+            <div class="step"><strong>1. Asmit&#257;</strong> &mdash; the "I thing" which is always pushing us. "I should beat him." "I am the greatest." "I know I am right."</div>
+            <div class="step"><strong>2. R&#257;ga</strong> &mdash; attachment or desire. We want something today because it was pleasurable yesterday, not because we need it.</div>
+            <div class="step"><strong>3. Dve&#7779;a</strong> &mdash; the opposite of r&#257;ga. If we don't get what we want, we tend to hate it or we have a bad experience and we don't want it to happen again.</div>
+            <div class="step"><strong>4. Abhinive&#347;a</strong> &mdash; the source of fear. This is the most mysterious aspect of avidy&#257;. We feel insecure, we dread how others judge us, we feel disturbed when our way of life is threatened.</div>
+
+            <p>The goal of yoga is to reduce the film of avidy&#257; in order that we can act correctly. At places of silence and solitude, it is easier for avidy&#257; to subside and truth to be revealed. Little by little, we see clearly how we should act.</p>
+        </div>
+
+        <p class="section-label">Buddhist Practice</p>
+
+        <div class="reading-card">
+            <h2>Transforming the Green-Ey'd Monster</h2>
+            <p class="reading-meta">Judith Simmer-Brown &middot; Tricycle, Fall 2015 &middot; <a href="https://tricycle.org/magazine/transforming-green-eyd-monster/" target="_blank" rel="noopener">Original article</a></p>
+
+            <p>The ancient Greeks thought that an overproduction of bile, which turned the skin a pale, putrid green, caused such emotions as jealousy. Green is the color of jealousy still &mdash; and of poison. This is what jealousy does: it poisons our hearts and minds, often toward those closest to us.</p>
+
+            <p>When we're jealous, say the Buddhist teachings from Asanga's <em>Abhidharmasamuccaya</em>, contradictory emotions of hatred and desire seize the mind, creating a kind of twisted logic about everything. We desperately want what we don't have, while hating the one who has it.</p>
+
+            <blockquote>O, beware, my lord, of jealousy;<br>It is the green-ey'd monster, which doth mock<br>The meat it feeds on.<br>&mdash; Shakespeare, <em>Othello</em></blockquote>
+
+            <p>Tibetan Buddhism teaches that we find the antidotes to our most painful states of mind by leaning directly into the emotion itself. Our emotions are full of wisdom. They are the keys for deepening our practice and our relationships with our world. The antidote to jealousy is found at the heart of jealousy itself.</p>
+
+            <h3>Five Steps to Transform Jealousy</h3>
+
+            <div class="step"><strong>1. Mindfulness.</strong> When seized by jealousy, mindfully tune into the feelings. There may be conflicting qualities of hatred and desire, humiliation and self-judgment. Simply acknowledge them and let them go.</div>
+
+            <div class="step"><strong>2. Discernment.</strong> Put aside the plotline or narrative that accompanies jealousy. These plots fuel jealousy to the point where we are carried away by it. Step back and ask: <em>What is jealousy? How does it feel?</em> Journal the bodily sensations, images, and emotional flavors &mdash; omitting the narrative.</div>
+
+            <div class="step"><strong>3. Liberating pain.</strong> Rather than being dragged by the plotline of jealousy, feel the pain directly. The Buddhist teachings say that when we can actually feel pain directly, we spontaneously let go, just as feeling the hot handle of a cast-iron skillet makes us let go.</div>
+
+            <div class="step"><strong>4. Joy.</strong> When we let go, the coarsest layer &mdash; anger &mdash; goes first. Then the attachment of desire. In the liberated space of freedom, there is a glimpse of <em>mudita</em>: the unselfish joy that applauds the happiness and good fortune of others. The fundamental desire at the heart of jealousy has genuine love and care as its basic energy. When the self-centered qualities are liberated by the recognition of suffering, love and care are freed to become generously joyful.</div>
+
+            <div class="step"><strong>5. Cultivation.</strong> Practice daily to stabilize and deepen joy in the happiness of others. Bring to mind someone who is naturally joyous. Visualize this person exuding joy and regard it with appreciation. Practice joining their joyfulness. Eventually, turn to the person or situation that triggered jealousy. Can you continue to feel joyfulness in their success and happiness?</div>
+
+            <hr class="divider">
+
+            <h3>Tibetan Buddhism's Take on Jealousy</h3>
+            <p class="reading-meta">Alexander Berzin</p>
+
+            <p>The Buddhist term (Sanskrit <em>irshya</em>; Tibetan <em>phrag-dog</em>) refers to an agitated state of mind classified as part of hostility. It is defined as "a disturbing emotion that focuses on other people's accomplishments; it is the inability to bear them, due to excessive attachment to one's own gain." Underlying this disturbing emotion is the dualistic thinking of "you" as a winner and "me" as a loser.</p>
+
+            <p>The strategy Tibetan Buddhism teaches for overcoming envy is to stop thinking dualistically and instead work hard to achieve what others have done. With this approach, the Tibetan refugees have avoided self-pity and have instead turned into one of the most industrious and successful exile communities, both economically and culturally.</p>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            var btn = document.getElementById('theme-toggle');
+            var root = document.documentElement;
+            function getSystemTheme() {
+                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            }
+            function applyTheme() {
+                var saved = localStorage.getItem('theme');
+                if (saved) {
+                    root.setAttribute('data-theme', saved);
+                } else {
+                    root.setAttribute('data-theme', getSystemTheme());
+                }
+                updateButton();
+            }
+            function updateButton() {
+                var current = root.getAttribute('data-theme');
+                btn.textContent = current === 'dark' ? '\u2600\uFE0F' : '\uD83C\uDF19';
+            }
+            btn.addEventListener('click', function() {
+                var current = root.getAttribute('data-theme');
+                var systemTheme = getSystemTheme();
+                if (!localStorage.getItem('theme')) {
+                    var next = systemTheme === 'dark' ? 'light' : 'dark';
+                    localStorage.setItem('theme', next);
+                } else if (localStorage.getItem('theme') !== systemTheme) {
+                    localStorage.removeItem('theme');
+                } else {
+                    var next = current === 'dark' ? 'light' : 'dark';
+                    localStorage.setItem('theme', next);
+                }
+                applyTheme();
+            });
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() {
+                if (!localStorage.getItem('theme')) applyTheme();
+            });
+            applyTheme();
+        })();
+    </script>
+</body>
+</html>
