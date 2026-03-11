@@ -99,6 +99,11 @@
 
         <div class="summary">
             <p>Paper2Graph (P2G) uses GPT-derived knowledge graphs to extract, represent, and discover knowledge from scientific papers. This pilot analysis explored pharmacological use cases, comparing GPT-extracted drug pathways against gold-standard manually curated knowledge bases.</p>
+            <p style="margin-top: 0.75rem; font-size: 0.85rem;">
+                <a href="paper2graph-pilot-analysis.docx" style="color: var(--accent); text-decoration: none;">Original Document (.docx)</a>
+                &nbsp;&middot;&nbsp;
+                <a href="https://stanford.zoom.us/rec/play/5hTRQlwPF59qW0dooT4GnfEMXdCHPUY6xReFNvA8vEWp1T2pDjUmU25Y0GyzISr7TG0L0bhCfrB8wrHq.2dLgd5di17XyG3QN?canPlayFromShare=true&from=share_recording_detail&continueMode=true&componentName=rec-play&originRequestUrl=https%3A%2F%2Fstanford.zoom.us%2Frec%2Fshare%2FJV-2Qbu9_iOSPGqKPw76JUL2q0GueJLqhtm9BdJ2LuD3mD1NmnOi6yleW8bVAuf_.3pbdHggfuXQb5Gic" target="_blank" rel="noopener" style="color: var(--accent); text-decoration: none;">Zoom Recording</a>
+            </p>
         </div>
 
         <h2>Objectives</h2>
@@ -116,10 +121,10 @@
         <h2>Objective 1 &ndash; Recapitulating Gold-Standard Knowledge</h2>
 
         <h3>Methods</h3>
-        <p><strong>PharmGKB</strong>, an authoritative manually-curated knowledge base of personalized drug response, was referenced for drug pathways. Two drug pathways were studied:</p>
+        <p><a href="https://www.pharmgkb.org/" target="_blank" rel="noopener" style="color: var(--accent); text-decoration: none; font-weight: 600;">PharmGKB</a>, an authoritative manually-curated knowledge base of personalized drug response, was referenced for drug pathways. Two drug pathways were studied:</p>
         <ul>
-            <li><strong>Lansoprazole</strong> (simple pathway) &ndash; P1: pharmacokinetics &amp; pharmacodynamics; P2: PD in children</li>
-            <li><strong>Abacavir</strong> (complex, multiple sub-pathways) &ndash; P1: genetic associations/adverse reactions; P2: pharmacokinetics; P3: pharmacodynamics</li>
+            <li><strong><a href="https://www.pharmgkb.org/pathway/PA166241421" target="_blank" rel="noopener" style="color: var(--accent); text-decoration: none;">Lansoprazole</a></strong> (simple pathway) &ndash; <a href="https://pubmed.ncbi.nlm.nih.gov/31846760/" target="_blank" rel="noopener" style="color: var(--accent); text-decoration: none;">P1</a>: pharmacokinetics &amp; pharmacodynamics; <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3616221/" target="_blank" rel="noopener" style="color: var(--accent); text-decoration: none;">P2</a>: PD in children</li>
+            <li><strong><a href="https://www.pharmgkb.org/pathway/PA166104634/overview" target="_blank" rel="noopener" style="color: var(--accent); text-decoration: none;">Abacavir</a></strong> (complex, multiple sub-pathways) &ndash; <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3382472/" target="_blank" rel="noopener" style="color: var(--accent); text-decoration: none;">P1</a>: genetic associations/adverse reactions; <a href="https://link.springer.com/article/10.2165/00003088-200847060-00001" target="_blank" rel="noopener" style="color: var(--accent); text-decoration: none;">P2</a>: pharmacokinetics; <a href="https://www.sciencedirect.com/science/article/pii/S1369527498800866" target="_blank" rel="noopener" style="color: var(--accent); text-decoration: none;">P3</a>: pharmacodynamics</li>
         </ul>
         <p>Text from source papers was fed into Paper2Graph. GPT-4 was used in all cases, with duplicate runs to assess non-deterministic behavior.</p>
 
