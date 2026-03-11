@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paper2Graph: Pharmacological Pilot Analysis</title>
+    <style>
+        :root {
+            --bg: #fafafa;
+            --text: #333;
+            --heading: #111;
+            --muted: #666;
+            --border: #e0e0e0;
+            --code-bg: #f5f5f5;
+            --accent: #2563eb;
+            --card-bg: #fff;
+            --card-shadow: rgba(0,0,0,0.06);
+            --good: #16a34a;
+            --warn: #d97706;
+        }
+        [data-theme="dark"] {
+            --bg: #1a1a2e;
+            --text: #c8c8c8;
+            --heading: #e8e8e8;
+            --muted: #888;
+            --border: #333;
+            --code-bg: #252540;
+            --accent: #60a5fa;
+            --card-bg: #22223a;
+            --card-shadow: rgba(0,0,0,0.3);
+            --good: #4ade80;
+            --warn: #fbbf24;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            padding: 3rem 1.5rem;
+            transition: background 0.3s, color 0.3s;
+        }
+        .container { max-width: 700px; margin: 0 auto; }
+        .back { display: inline-block; color: var(--muted); text-decoration: none; font-size: 0.85rem; margin-bottom: 2rem; }
+        .back:hover { color: var(--accent); }
+        h1 { font-size: 1.75rem; color: var(--heading); margin-bottom: 0.25rem; }
+        .meta { color: var(--muted); font-size: 0.85rem; margin-bottom: 2rem; }
+        .summary {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px var(--card-shadow);
+        }
+        .summary p { font-size: 0.95rem; }
+        h2 { font-size: 1.25rem; color: var(--heading); margin: 2rem 0 0.75rem; padding-bottom: 0.35rem; border-bottom: 1px solid var(--border); }
+        h3 { font-size: 1.05rem; color: var(--heading); margin: 1.5rem 0 0.5rem; }
+        p { margin-bottom: 0.75rem; }
+        ul, ol { margin: 0.5rem 0 1rem 1.5rem; }
+        li { margin-bottom: 0.4rem; }
+        .observation-good { border-left: 3px solid var(--good); padding-left: 0.75rem; margin: 0.75rem 0; }
+        .observation-warn { border-left: 3px solid var(--warn); padding-left: 0.75rem; margin: 0.75rem 0; }
+        code {
+            background: var(--code-bg);
+            padding: 0.15rem 0.4rem;
+            border-radius: 3px;
+            font-size: 0.85em;
+        }
+        .objectives {
+            display: grid;
+            gap: 0.75rem;
+            margin: 1rem 0;
+        }
+        .objective-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+        .objective-card strong { color: var(--heading); }
+        .questions { background: var(--code-bg); border-radius: 8px; padding: 1rem 1rem 1rem 2.5rem; margin: 1rem 0; }
+        .questions li { font-style: italic; }
+        .theme-toggle {
+            position: fixed; top: 1.25rem; right: 1.25rem;
+            background: none; border: none; font-size: 0.85rem;
+            cursor: pointer; opacity: 0.3; transition: opacity 0.2s;
+        }
+        .theme-toggle:hover { opacity: 0.65; }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" id="theme-toggle"></button>
+    <div class="container">
+        <a href="index.html" class="back">&larr; Back to home</a>
+
+        <h1>Paper2Graph</h1>
+        <p class="meta">Pharmacological Pilot Exploration of GPT-KG &middot; Dan Sosa &middot; June 2023 &middot; IdeaFlow</p>
+
+        <div class="summary">
+            <p>Paper2Graph (P2G) uses GPT-derived knowledge graphs to extract, represent, and discover knowledge from scientific papers. This pilot analysis explored pharmacological use cases, comparing GPT-extracted drug pathways against gold-standard manually curated knowledge bases.</p>
+        </div>
+
+        <h2>Objectives</h2>
+        <div class="objectives">
+            <div class="objective-card">
+                <strong>1. Recapitulate Gold-Standard Knowledge</strong>
+                <p>Recreate existing manually curated drug pathways and qualitatively assess knowledge extraction quality, focusing on hallucinations and mapping to biomedical ontologies.</p>
+            </div>
+            <div class="objective-card">
+                <strong>2. Explore Drug Mechanism Paths</strong>
+                <p>Explore metapaths in Neo4j for recapitulating known drug mechanisms via Cypher queries.</p>
+            </div>
+        </div>
+
+        <h2>Objective 1 &ndash; Recapitulating Gold-Standard Knowledge</h2>
+
+        <h3>Methods</h3>
+        <p><strong>PharmGKB</strong>, an authoritative manually-curated knowledge base of personalized drug response, was referenced for drug pathways. Two drug pathways were studied:</p>
+        <ul>
+            <li><strong>Lansoprazole</strong> (simple pathway) &ndash; P1: pharmacokinetics &amp; pharmacodynamics; P2: PD in children</li>
+            <li><strong>Abacavir</strong> (complex, multiple sub-pathways) &ndash; P1: genetic associations/adverse reactions; P2: pharmacokinetics; P3: pharmacodynamics</li>
+        </ul>
+        <p>Text from source papers was fed into Paper2Graph. GPT-4 was used in all cases, with duplicate runs to assess non-deterministic behavior.</p>
+
+        <h3>Observations: Strengths</h3>
+        <div class="observation-good">
+            <ul>
+                <li>Knowledge captured with high fidelity &ndash; good sentence syntax parsing and entity identification</li>
+                <li>Accurate extraction of quantitative data (e.g., "20mg in Japan, 40mg in US")</li>
+                <li>Accurate extraction of biological relations: "binds to", "associated with"</li>
+                <li>NER picks up fine-grained details like study design identifiers ("AZ0001")</li>
+            </ul>
+        </div>
+
+        <h3>Observations: Challenges</h3>
+        <div class="observation-warn">
+            <ul>
+                <li><strong>Normalization:</strong> Equivalent entities not mapped together; singleton nodes; ambiguous acronyms (e.g., "PPIs" = Protein-Protein Interaction vs. Proton Pump Inhibitor)</li>
+                <li><strong>Over-broad entities:</strong> Some text spans too large to be biologically meaningful (e.g., <code>CYP2C19, gastric H+,K+-ATPase genotype</code>)</li>
+                <li><strong>Non-determinism:</strong> Two runs on same input yield ~80% overlap &ndash; 20% variation</li>
+                <li><strong>Hallucination:</strong> Some fabricated triples present</li>
+                <li><strong>Lost context:</strong> <code>(Abacavir, causes, severe adverse reactions)</code> &ndash; dangerous without the genetic variant qualifier</li>
+                <li><strong>Inaccurate semantics:</strong> <code>(Drug X, associated with, genetic variant Y)</code> &ndash; semantically close but wrong</li>
+            </ul>
+        </div>
+
+        <h2>Objective 2 &ndash; Exploring Drug Mechanism Paths</h2>
+
+        <h3>Methods</h3>
+        <p>The KGs from Objective 1 were interrogated via Cypher queries to generate mechanistic understanding of drug function. Questions posed:</p>
+        <ol class="questions">
+            <li>By what mechanism does abacavir lead to a hypersensitivity adverse reaction?</li>
+            <li>How does abacavir inhibit HIV?</li>
+            <li>What is known about lansoprazole's effect on PPIs?</li>
+            <li>What adverse reaction is this drug known to cause?</li>
+            <li>At what dosage is this drug effective?</li>
+            <li>Why might a new drug X be effective in this disease context? (repurposing)</li>
+            <li>What normal function can be inhibited by a drug with no major harmful downstream consequences? (toxicology)</li>
+        </ol>
+
+        <h3>Observations</h3>
+        <div class="observation-warn">
+            <ul>
+                <li>Entity normalization is key for retrieving mechanistic knowledge paths &ndash; unconstrained GPT yields disconnected components</li>
+                <li>Manual curation and knowledge updating tools are essential when using noisy GPT ingestion</li>
+                <li>Natural language &rarr; Cypher queries is promising but challenging to interpret correctly</li>
+            </ul>
+        </div>
+
+        <h2>Conclusions</h2>
+        <p>GPT-derived knowledge bases present a great opportunity to extract knowledge and rich semantics at scale. GPT-4 does well at sentence parsing, entity identification, and capturing quantitative information. Key remaining work includes ensuring high quality, reducing noise, preserving context, and tailoring output to specific end users.</p>
+        <p>Design considerations around noise tolerance, KG detail level, and pre-processing depend heavily on the end user &ndash; a toxicologist at Merck has very different needs from an academic computational pharmacologist. These tools will undoubtedly augment humans' ability to understand and contribute to science.</p>
+    </div>
+
+    <script>
+        (function() {
+            var btn = document.getElementById('theme-toggle');
+            var root = document.documentElement;
+            function getSystemTheme() { return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; }
+            function applyTheme() {
+                var saved = localStorage.getItem('theme');
+                root.setAttribute('data-theme', saved || getSystemTheme());
+                btn.textContent = root.getAttribute('data-theme') === 'dark' ? '\u2600\uFE0F' : '\uD83C\uDF19';
+            }
+            btn.addEventListener('click', function() {
+                var current = root.getAttribute('data-theme');
+                var next = current === 'dark' ? 'light' : 'dark';
+                localStorage.setItem('theme', next);
+                applyTheme();
+            });
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() { if (!localStorage.getItem('theme')) applyTheme(); });
+            applyTheme();
+        })();
+    </script>
+</body>
+</html>
