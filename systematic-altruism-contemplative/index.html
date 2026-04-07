@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Systematic Altruism — A Quiet Directory</title>
+    <meta name="description" content="A quiet directory of offerings. Free, contemplative resources for the body, the mind, the heart, and the world we share.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300;1,9..144,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --paper: #faf6ed;
+            --paper-warm: #f3ecd9;
+            --ink: #1c1814;
+            --ink-muted: #6e6456;
+            --ink-faint: #a69a87;
+            --hairline: #dcd3bf;
+            --cedar: #6b3b1d;
+            --moss: #355041;
+            --persimmon: #9b3f2a;
+            --highlight: rgba(155, 63, 42, 0.08);
+
+            --prose: 680px;
+            --wide: 780px;
+
+            --serif: "EB Garamond", Georgia, serif;
+            --display: "Fraunces", "EB Garamond", Georgia, serif;
+        }
+
+        [data-theme="dark"] {
+            --paper: #0f0d0a;
+            --paper-warm: #1a1713;
+            --ink: #e8ddc9;
+            --ink-muted: #9b8f7c;
+            --ink-faint: #5c5447;
+            --hairline: #2a251d;
+            --cedar: #c2916b;
+            --moss: #8ab59b;
+            --persimmon: #d68b6e;
+            --highlight: rgba(214, 139, 110, 0.1);
+        }
+
+        html {
+            scroll-behavior: smooth;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+        }
+
+        body {
+            font-family: var(--serif);
+            font-size: 19px;
+            line-height: 1.8;
+            color: var(--ink);
+            background: var(--paper);
+            transition: background 0.8s ease, color 0.8s ease;
+            background-image:
+                radial-gradient(ellipse 1400px 900px at 15% 5%, rgba(107, 59, 29, 0.035), transparent 60%),
+                radial-gradient(ellipse 1000px 800px at 85% 95%, rgba(53, 80, 65, 0.035), transparent 60%);
+            background-attachment: fixed;
+            overflow-x: hidden;
+        }
+
+        [data-theme="dark"] body {
+            background-image:
+                radial-gradient(ellipse 1400px 900px at 15% 5%, rgba(194, 145, 107, 0.05), transparent 60%),
+                radial-gradient(ellipse 1000px 800px at 85% 95%, rgba(138, 181, 155, 0.04), transparent 60%);
+        }
+
+        ::selection {
+            background: var(--highlight);
+            color: var(--ink);
+        }
+
+        a {
+            color: var(--ink);
+            text-decoration: none;
+            border-bottom: 1px solid var(--hairline);
+            transition: border-color 0.4s ease, color 0.4s ease;
+        }
+
+        a:hover {
+            color: var(--cedar);
+            border-bottom-color: var(--cedar);
+        }
+
+        /* ── Theme toggle ── */
+        .theme-toggle {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: transparent;
+            border: 1px solid var(--hairline);
+            color: var(--ink-muted);
+            width: 2.75rem;
+            height: 2.75rem;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.5s ease;
+            z-index: 100;
+            font-family: var(--serif);
+            backdrop-filter: blur(4px);
+        }
+        .theme-toggle:hover {
+            border-color: var(--cedar);
+            color: var(--cedar);
+            transform: scale(1.06);
+        }
+
+        /* ── Containers ── */
+        main, .opening, .closing {
+            max-width: var(--wide);
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* ── Opening ── */
+        .opening {
+            min-height: 92vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding-top: 4rem;
+            padding-bottom: 6rem;
+        }
+
+        .enso-wrap {
+            width: 170px;
+            height: 170px;
+            margin-bottom: 3.5rem;
+            color: var(--ink);
+            opacity: 0;
+            animation: fade-in 1.2s ease 0.1s forwards;
+        }
+
+        .enso {
+            width: 100%;
+            height: 100%;
+        }
+
+        .enso-path {
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 5;
+            stroke-linecap: round;
+            stroke-dasharray: 560;
+            stroke-dashoffset: 560;
+            animation: draw-enso 3.2s cubic-bezier(0.4, 0, 0.2, 1) 0.5s forwards;
+        }
+
+        .enso-dot {
+            fill: currentColor;
+            opacity: 0;
+            animation: fade-in 0.8s ease 3.5s forwards;
+        }
+
+        @keyframes draw-enso {
+            to { stroke-dashoffset: 0; }
+        }
+
+        @keyframes fade-in {
+            to { opacity: 1; }
+        }
+
+        @keyframes rise-in {
+            from { opacity: 0; transform: translateY(14px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .eyebrow {
+            font-family: var(--display);
+            font-size: 0.78rem;
+            letter-spacing: 0.32em;
+            text-transform: uppercase;
+            color: var(--ink-muted);
+            margin-bottom: 1.75rem;
+            opacity: 0;
+            animation: rise-in 1.4s ease 2.1s forwards;
+        }
+
+        .opening h1 {
+            font-family: var(--display);
+            font-weight: 300;
+            font-size: clamp(2.4rem, 6.2vw, 4.1rem);
+            line-height: 1.08;
+            letter-spacing: -0.018em;
+            margin-bottom: 2.75rem;
+            opacity: 0;
+            animation: rise-in 1.4s ease 2.3s forwards;
+        }
+
+        .opening h1 em {
+            font-style: italic;
+            color: var(--cedar);
+            font-weight: 400;
+        }
+
+        .haiku {
+            font-family: var(--display);
+            font-style: italic;
+            font-weight: 300;
+            font-size: 1.15rem;
+            line-height: 2;
+            color: var(--ink-muted);
+            margin-bottom: 3rem;
+            opacity: 0;
+            animation: rise-in 1.4s ease 2.7s forwards;
+        }
+
+        .meta {
+            font-size: 0.85rem;
+            color: var(--ink-faint);
+            font-style: italic;
+            opacity: 0;
+            animation: fade-in 1.4s ease 3.1s forwards;
+        }
+
+        /* ── Breath indicator ── */
+        .breath {
+            margin-top: 4rem;
+            display: flex;
+            align-items: center;
+            gap: 0.9rem;
+            color: var(--ink-faint);
+            font-family: var(--display);
+            font-size: 0.7rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            opacity: 0;
+            animation: fade-in 1.4s ease 3.5s forwards;
+        }
+
+        .breath-dot {
+            width: 0.5rem;
+            height: 0.5rem;
+            border-radius: 50%;
+            background: var(--cedar);
+            animation: breathe 8s ease-in-out infinite;
+        }
+
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); opacity: 0.35; }
+            50% { transform: scale(2.4); opacity: 0.9; }
+        }
+
+        /* ── Main / chapters ── */
+        main {
+            padding-top: 3rem;
+            padding-bottom: 5rem;
+        }
+
+        .chapter {
+            max-width: var(--prose);
+            margin: 0 auto;
+            padding: 5rem 0;
+            border-top: 1px solid var(--hairline);
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 1.3s ease, transform 1.3s ease;
+        }
+
+        .chapter.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .chapter:first-of-type {
+            border-top: none;
+            padding-top: 2rem;
+        }
+
+        .roman {
+            font-family: var(--display);
+            font-style: italic;
+            font-size: 0.82rem;
+            letter-spacing: 0.26em;
+            text-transform: lowercase;
+            color: var(--ink-faint);
+            margin-bottom: 1.5rem;
+        }
+
+        .chapter-title {
+            font-family: var(--display);
+            font-weight: 300;
+            font-style: italic;
+            font-size: clamp(1.8rem, 4.2vw, 2.7rem);
+            line-height: 1.18;
+            color: var(--ink);
+            margin-bottom: 1.75rem;
+            letter-spacing: -0.012em;
+        }
+
+        .epigraph {
+            font-family: var(--display);
+            font-style: italic;
+            font-weight: 300;
+            font-size: 1.05rem;
+            color: var(--ink-muted);
+            padding-left: 1.5rem;
+            border-left: 2px solid var(--hairline);
+            margin-bottom: 3rem;
+            max-width: 540px;
+            line-height: 1.7;
+        }
+
+        .note-text {
+            font-size: 1.12rem;
+            line-height: 1.9;
+            margin-bottom: 1.5rem;
+            max-width: 600px;
+            color: var(--ink);
+        }
+
+        .note-text:first-of-type::first-letter {
+            font-family: var(--display);
+            font-weight: 300;
+            font-size: 3.8rem;
+            float: left;
+            line-height: 0.88;
+            padding: 0.45rem 0.55rem 0 0;
+            color: var(--cedar);
+        }
+
+        /* ── Eight offerings ── */
+        .offerings {
+            list-style: none;
+            margin-top: 1rem;
+        }
+
+        .offering {
+            display: grid;
+            grid-template-columns: 3.5rem 1fr;
+            gap: 1.5rem;
+            padding: 1.9rem 0;
+            border-top: 1px dashed var(--hairline);
+        }
+        .offering:first-child {
+            border-top: none;
+            padding-top: 0.5rem;
+        }
+
+        .offering-num {
+            font-family: var(--display);
+            font-size: 1.05rem;
+            color: var(--ink-faint);
+            font-style: italic;
+            font-weight: 400;
+            letter-spacing: 0.08em;
+            padding-top: 0.35rem;
+        }
+
+        .offering-title {
+            font-family: var(--display);
+            font-size: 1.35rem;
+            font-weight: 400;
+            color: var(--ink);
+            border-bottom: none;
+            display: inline-block;
+            line-height: 1.3;
+        }
+
+        .offering-title:hover {
+            color: var(--cedar);
+        }
+
+        .offering-body {
+            color: var(--ink-muted);
+            font-size: 1rem;
+            line-height: 1.75;
+            margin: 0.5rem 0 0.6rem;
+            font-family: var(--serif);
+        }
+
+        .offering-url {
+            font-family: var(--display);
+            font-size: 0.76rem;
+            color: var(--ink-faint);
+            letter-spacing: 0.08em;
+            font-style: italic;
+        }
+
+        /* ── Entries (regular items) ── */
+        .entries {
+            list-style: none;
+        }
+
+        .entry {
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--hairline);
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 1.5rem;
+            align-items: baseline;
+            transition: padding 0.4s ease;
+        }
+
+        .entry:last-child {
+            border-bottom: none;
+        }
+
+        .entry:hover {
+            padding-left: 0.75rem;
+            padding-right: 0;
+        }
+
+        .entry a {
+            border: none;
+            display: block;
+        }
+
+        .entry-name {
+            font-family: var(--display);
+            font-size: 1.08rem;
+            color: var(--ink);
+            font-weight: 400;
+            line-height: 1.35;
+        }
+
+        .entry a:hover .entry-name {
+            color: var(--cedar);
+        }
+
+        .entry-note {
+            display: block;
+            font-size: 0.92rem;
+            color: var(--ink-muted);
+            font-style: italic;
+            margin-top: 0.25rem;
+            font-family: var(--serif);
+            line-height: 1.55;
+        }
+
+        .entry-domain {
+            font-family: var(--display);
+            font-size: 0.72rem;
+            color: var(--ink-faint);
+            letter-spacing: 0.06em;
+            font-style: italic;
+            white-space: nowrap;
+        }
+
+        /* ── Closing ── */
+        .closing {
+            max-width: var(--prose);
+            padding-top: 6rem;
+            padding-bottom: 6rem;
+            text-align: center;
+            border-top: 1px solid var(--hairline);
+            margin-top: 3rem;
+        }
+
+        .closing-glyph {
+            font-family: var(--display);
+            font-style: italic;
+            font-size: 1.6rem;
+            color: var(--ink-faint);
+            margin-bottom: 2.5rem;
+            letter-spacing: 0.4em;
+        }
+
+        .closing-text {
+            font-family: var(--display);
+            font-style: italic;
+            font-weight: 300;
+            font-size: 1.2rem;
+            line-height: 1.85;
+            color: var(--ink-muted);
+            max-width: 520px;
+            margin: 0 auto 3rem;
+        }
+
+        .closing-sig {
+            margin-bottom: 3rem;
+            color: var(--ink-muted);
+            font-size: 0.95rem;
+            line-height: 1.8;
+            font-family: var(--serif);
+        }
+
+        .closing-sig a {
+            color: var(--ink);
+        }
+
+        .colophon {
+            font-family: var(--display);
+            font-size: 0.75rem;
+            color: var(--ink-faint);
+            font-style: italic;
+            letter-spacing: 0.06em;
+            line-height: 1.8;
+        }
+
+        .colophon a {
+            color: var(--ink-faint);
+            border-bottom: 1px solid var(--hairline);
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 720px) {
+            body { font-size: 17px; }
+            .theme-toggle {
+                top: 1rem;
+                right: 1rem;
+                width: 2.25rem;
+                height: 2.25rem;
+                font-size: 1rem;
+            }
+            main, .opening, .closing {
+                padding-left: 1.4rem;
+                padding-right: 1.4rem;
+            }
+            .enso-wrap { width: 130px; height: 130px; margin-bottom: 2.5rem; }
+            .opening { min-height: 85vh; padding-top: 3rem; padding-bottom: 4rem; }
+            .chapter { padding: 3.5rem 0; }
+            .chapter:first-of-type { padding-top: 1rem; }
+            .offering {
+                grid-template-columns: 2.5rem 1fr;
+                gap: 0.8rem;
+                padding: 1.5rem 0;
+            }
+            .entry {
+                grid-template-columns: 1fr;
+                padding: 0.9rem 0;
+            }
+            .entry-domain { display: none; }
+            .closing { padding-top: 4rem; padding-bottom: 4rem; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .enso-path { animation-duration: 0.1s; stroke-dashoffset: 0; }
+            .enso-dot { animation-duration: 0.1s; opacity: 1; }
+            .eyebrow, .opening h1, .haiku, .meta, .breath { animation: none; opacity: 1; }
+            .breath-dot { animation: none; }
+            .chapter { transition: none; opacity: 1; transform: none; }
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">☾</button>
+
+    <!-- ── Opening ─────────────────────────────── -->
+    <header class="opening">
+        <div class="enso-wrap">
+            <svg class="enso" viewBox="0 0 220 220" aria-hidden="true">
+                <path class="enso-path"
+                      d="M 190 73 A 88 88 0 1 1 182 60"/>
+                <circle class="enso-dot" cx="190" cy="73" r="5.5"/>
+            </svg>
+        </div>
+
+        <p class="eyebrow">Systematic Altruism</p>
+
+        <h1>A quiet directory<br><em>of offerings</em></h1>
+
+        <p class="haiku">
+            Works meant to help,<br>
+            left out in the open air<br>
+            where they might be found.
+        </p>
+
+        <p class="meta">A living document &middot; curated with care</p>
+
+        <div class="breath" aria-hidden="true">
+            <span class="breath-dot"></span>
+            <span>breathe</span>
+        </div>
+    </header>
+
+    <!-- ── Main ────────────────────────────────── -->
+    <main>
+
+        <!-- i. A note -->
+        <section class="chapter">
+            <p class="roman">i. a note before</p>
+            <p class="note-text">This is a directory of free, careful work &mdash; resources for the body, the mind, the heart, and the world we share. Nothing here is being sold. Most of it was made because someone needed it, and then left out where others could find it.</p>
+            <p class="note-text">There is no order you must read this in. Move slowly. Take what is useful. Leave the rest for someone else.</p>
+        </section>
+
+        <!-- ii. Eight offerings -->
+        <section class="chapter">
+            <p class="roman">ii. where to begin</p>
+            <h2 class="chapter-title">Eight offerings</h2>
+            <p class="epigraph">If you have only a few minutes, these are the ones I would press quietly into your hand.</p>
+            <ol class="offerings">
+                <li class="offering">
+                    <span class="offering-num">one</span>
+                    <div>
+                        <a class="offering-title" href="https://nvctranslator.com/" target="_blank" rel="noopener">NVC Translator</a>
+                        <p class="offering-body">Translate any message into nonviolent communication. For the moments before a conversation turns heavy &mdash; a small act of de&#8209;escalation, made available to anyone.</p>
+                        <span class="offering-url">nvctranslator.com</span>
+                    </div>
+                </li>
+                <li class="offering">
+                    <span class="offering-num">two</span>
+                    <div>
+                        <a class="offering-title" href="https://easilysolvableworldproblems.jacobcole.net/" target="_blank" rel="noopener">Easily Solvable World Problems</a>
+                        <p class="offering-body">High&#8209;impact troubles that happen to be tractable. They are waiting for someone to pick them up. Perhaps you.</p>
+                        <span class="offering-url">easilysolvableworldproblems.jacobcole.net</span>
+                    </div>
+                </li>
+                <li class="offering">
+                    <span class="offering-num">three</span>
+                    <div>
+                        <a class="offering-title" href="https://chronicpain.jacobcole.net/" target="_blank" rel="noopener">Chronic Pain Resource Hub</a>
+                        <p class="offering-body">Evidence&#8209;based tools for the millions living with chronic pain. A shelter of what has actually helped.</p>
+                        <span class="offering-url">chronicpain.jacobcole.net</span>
+                    </div>
+                </li>
+                <li class="offering">
+                    <span class="offering-num">four</span>
+                    <div>
+                        <a class="offering-title" href="https://existentialcrisis.jacobcole.net/" target="_blank" rel="noopener">Existential Crisis &rarr; Transformation</a>
+                        <p class="offering-body">For when meaning collapses. A small map through the dark, toward something that was not there before.</p>
+                        <span class="offering-url">existentialcrisis.jacobcole.net</span>
+                    </div>
+                </li>
+                <li class="offering">
+                    <span class="offering-num">five</span>
+                    <div>
+                        <a class="offering-title" href="https://healingartsgrant.jacobcole.net/" target="_blank" rel="noopener">Healing Arts Grant</a>
+                        <p class="offering-body">A fund for bodywork, acupuncture, and the healing arts &mdash; making alternative care reachable for those who need it.</p>
+                        <span class="offering-url">healingartsgrant.jacobcole.net</span>
+                    </div>
+                </li>
+                <li class="offering">
+                    <span class="offering-num">six</span>
+                    <div>
+                        <a class="offering-title" href="https://issuetracker.world/" target="_blank" rel="noopener">IssueTracker.world</a>
+                        <p class="offering-body">A universal issue tracker for civilization. File a bug report for the world, and invite others to fix it with you.</p>
+                        <span class="offering-url">issuetracker.world</span>
+                    </div>
+                </li>
+                <li class="offering">
+                    <span class="offering-num">seven</span>
+                    <div>
+                        <a class="offering-title" href="https://pureland.jacobcole.net/" target="_blank" rel="noopener">Pureland</a>
+                        <p class="offering-body">A refuge and resource hub for highly sensitive people, in a world not quite designed for them.</p>
+                        <span class="offering-url">pureland.jacobcole.net</span>
+                    </div>
+                </li>
+                <li class="offering">
+                    <span class="offering-num">eight</span>
+                    <div>
+                        <a class="offering-title" href="https://worldproblems.jacobcole.net/" target="_blank" rel="noopener">World Problems</a>
+                        <p class="offering-body">An open directory of global troubles. Naming a thing clearly is the first and quietest step toward its solving.</p>
+                        <span class="offering-url">worldproblems.jacobcole.net</span>
+                    </div>
+                </li>
+            </ol>
+        </section>
+
+        <!-- iii. Body -->
+        <section class="chapter">
+            <p class="roman">iii.</p>
+            <h2 class="chapter-title">The body as home</h2>
+            <p class="epigraph">The body is the first shelter. Tend it kindly, and it will slowly open its rooms to you.</p>
+            <ul class="entries">
+                <li class="entry">
+                    <a href="https://qigong.garden/" target="_blank" rel="noopener">
+                        <span class="entry-name">Qigong Garden</span>
+                        <span class="entry-note">Exercises, research, and quiet practice.</span>
+                    </a>
+                    <span class="entry-domain">qigong.garden</span>
+                </li>
+                <li class="entry">
+                    <a href="https://meditation.jacobcole.net/" target="_blank" rel="noopener">
+                        <span class="entry-name">Meditation</span>
+                        <span class="entry-note">Practices and guides, gathered over many years.</span>
+                    </a>
+                    <span class="entry-domain">meditation.jacobcole.net</span>
+                </li>
+                <li class="entry">
+                    <a href="https://sleep.jacobcole.net/" target="_blank" rel="noopener">
+                        <span class="entry-name">Sleep</span>
+                        <span class="entry-note">Sleep science, and what it asks of us.</span>
+                    </a>
+                    <span class="entry-domain">sleep.jacobcole.net</span>
+                </li>
+                <li class="entry">
+                    <a href="https://chronicpain.jacobcole.net/" target="_blank" rel="noopener">
+                        <span class="entry-name">Chronic Pain Hub</span>
+                        <span class="entry-note">Evidence&#8209;based tools for living with pain.</span>
+                    </a>
+                    <span class="entry-domain">chronicpain.jacobcole.net</span>
+                </li>
+                <li class="entry">
+                    <a href="https://energymedicine.jacobcole.net/" target="_blank" rel="noopener">
+                        <span class="entry-name">Energy Medicine</span>
+                        <span class="entry-note">Alternative modalities, kept in one place.</span>
+                    </a>
+                    <span class="entry-domain">energymedicine.jacobcole.net</span>
+                </li>
+                <li class="entry">
+                    <a href="https://rsiwiki.jacobcole.net/" target="_blank" rel="noopener">
+                        <span class="entry-name">RSI Wiki</span>
+                        <span class="entry-note">Recovery from repetitive strain; for hands that have forgotten rest.</span>
+                    </a>
+                    <span class="entry-domain">rsiwiki.jacobcole.net</span>
+                </li>
+                <li class="entry">
+                    <a href="https://adhd.jacobcole.net/" target="_blank" rel="noopener">
+                        <span class="entry-name">ADHD Strategies</span>
+                        <span class="entry-note">Focus tools for minds that wander beautifully.</span>
+                    </a>
+                    <span class="entry-domain">adhd.jacobcole.net</span>
+                </li>
+                <li class="entry">
+                    <a href="https://buoyantfitness.jacobcole.net/" target="_blank" rel="noopener">
+                        <span class="entry-name">Buoyant Fitness</span>
+                        <span class="entry-note">Fitness that feels like play.</span>
+                    </a>
+                    <span class="entry-domain">buoyantfitness.jacobcole.net</span>
+                </li>
+            </ul>
+        </section>
+
+        <!-- iv. Mind -->
+        <section class="chapter">
+            <p class="roman">iv.</p>
+            <h2 class="chapter-title">Tending the mind</h2>
+            <p class="epigraph">To learn slowly is still to learn. A single line, well read, is enough for an afternoon.</p>
+            <ul class="entries">
+                <li class="entry">
+                    <a href="https://knowledgebase.world/" target="_blank" rel="noopener">
+                        <span class="entry-name">KnowledgeBase.world</span>
+                        <span class="entry-note">A central repository of what's worth knowing.</span>
+                    </a>
+                    <span class="entry-domain">knowledgebase.world</span>
+                </li>
+                <li class="entry">
+                    <a href="https://manifestos.world/" target="_blank" rel="noopener">
+                        <span class="entry-name">Manifestos.world</span>
+                        <span class="entry-note">Crowdsourced personal visions.</span>
+                    </a>
+                    <span class="entry-domain">manifestos.world</span>
+                </li>
+                <li class="entry">
+                    <a href="https://ideabank.global/" target="_blank" rel="noopener">
+                        <span class="entry-name">IdeaBank.global</span>
+                        <span class="entry-note">A database of strategic ideas, free to borrow.</span>
+                    </a>
+                    <span class="entry-domain">ideabank.global</span>
+                </li>
+                <li class="entry">
+                    <a href="https://purplepill.wiki/" target="_blank" rel="noopener">
+                        <span class="entry-name">PurplePill.wiki</span>
+                        <span class="entry-note">Transformative texts, for after the red and blue.</span>
+                    </a>
+                    <span class="entry-domain">purplepill.wiki</span>
+                </li>
+                <li class="entry">
+                    <a href="https://salon.jacobcole.net/" target="_blank" rel="noopener">
+                        <span class="entry-name">Salon</span>
+                        <span class="entry-note">Notes from an intellectual salon.</span>
+                    </a>
+                    <span class="entry-domain">salon.jacobcole.net</span>
+                </li>
+                <li class="entry">
+                    <a href="https://thoughtfulweb.jacobcole.net/" target="_blank" rel="noopener">
+                        <span class="entry-name">Thoughtful Web</span>
+                        <span class="entry-note">Corners of the internet still worth reading.</span>
+                    </a>
+                    <span class="entry-domain">thoughtfulweb.jacobcole.net</span>
+                </li>
+            </ul>
+        </section>
+
+        <!-- v. Dark -->
+        <section class="chapter">
+            <p class="roman">v.</p>
+            <h2 class="chapter-title">When the dark comes</h2>
+            <p class="epigraph">There is a light in the dark that is only visible from inside it. Wait for your eyes to adjust.</p>
+            <ul class="entries">
+                <li class="entry">
+                    <a href="https://existentialcrisis.jacobcole.net/" target="_blank" rel="noopener">
+                        <span class="entry-name">Existential Crisis &rarr; Transformation</span>
+                        <span class="entry-note">When meaning collapses, and something asks to be born.</span>
+                    </a>
+                    <span class="entry-domain">existentialcrisis.jacobcole.net</span>
+                </li>
+                <li class="entry">
+                    <a href="https://pureland.jacobcole.net/" target="_blank" rel="noopener">
+                        <span class="entry-name">Pureland</span>
+                        <span class="entry-note">A refuge for the highly sensitive.</span>
+                    </a>
+                    <span class="entry-domain">pureland.jacobcole.net</span>
+                </li>
+                <li class="entry">
+                    <a href="https://mentalstatehacks.jacobcole.net/" target="_blank" rel="noopener">
+                        <span class="entry-name">Mental State Hacks</span>
+                        <span class="entry-note">Gentle techniques for the inner weather.</span>
+                    </a>
+                    <span class="entry-domain">mentalstatehacks.jacobcole.net</span>
+                </li>
+                <li class="entry">
+                    <a href="https://lifechangingthings.jacobcole.net/" target="_blank" rel="noopener">
+                        <span class="entry-name">Life&#8209;Changing Things</span>
+                        <span class="entry-note">Experiences that quietly rearrange a life.</span>
+                    </a>
+                    <span class="entry-domain">lifechangingthings.jacobcole.net</span>
+                </li>
+            </ul>
+        </section>
+
+        <!-- vi. World -->
+        <section class="chapter">
+            <p class="roman">vi.</p>
+            <h2 class="chapter-title">What the world asks</h2>
+            <p class="epigraph">Name the trouble plainly, and already you have begun. Naming is half of care.</p>
+            <ul class="entries">
+                <li class="entry">
+                    <a href="https://worldproblems.jacobcole.net/" target="_blank" rel="noopener">
+                        <span class="entry-name">World Problems</span>
+                        <span class="entry-note">An open directory of global troubles.</span>
+                    </a>
+                    <span class="entry-domain">worldproblems.jacobcole.net</span>
+                </li>
+                <li class="entry">
+                    <a href="https://easilysolvableworldproblems.jacobcole.net/" target="_blank" rel="noopener">
+                        <span class="entry-name">Easily Solvable World Problems</span>
+                        <span class="entry-note">Tractable, high&#8209;impact problems waiting for hands.</span>
+                    </a>
+                    <span class="entry-domain">easilysolvableworldproblems.jacobcole.net</span>
+                </li>
+                <li class="entry">
+                    <a href="https://issuetracker.world/" target="_blank" rel="noopener">
+                        <span class="entry-name">IssueTracker.world</span>
+                        <span class="entry-note">Bug reports for civilization.</span>
+                    </a>
+                    <span class="entry-domain">issuetracker.world</span>
+                </li>
+                <li class="entry">
+                    <a href="https://climatechange.jacobcole.net/" target="_blank" rel="noopener">
+                        <span class="entry-name">Climate Change</span>
+                        <span class="entry-note">Actions large and small, for a warming sky.</span>
+                    </a>
+                    <span class="entry-domain">climatechange.jacobcole.net</span>
+                </li>
+                <li class="entry">
+                    <a href="https://covid19hackideas.jacobcole.net/" target="_blank" rel="noopener">
+                        <span class="entry-name">COVID&#8209;19 Hack Ideas</span>
+                        <span class="entry-note">Pandemic solutions, kept on file for the next one.</span>
+                    </a>
+                    <span class="entry-domain">covid19hackideas.jacobcole.net</span>
+                </li>
+            </ul>
+        </section>
+
+        <!-- vii. Community -->
+        <section class="chapter">
+            <p class="roman">vii.</p>
+            <h2 class="chapter-title">Hands that meet</h2>
+            <p class="epigraph">Connection is not a resource; it is the medium. It thickens where attention is paid.</p>
+            <ul class="entries">
+                <li class="entry">
+                    <a href="https://jcombinator.network/" target="_blank" rel="noopener">
+                        <span class="entry-name">J&#8209;Combinator</span>
+                        <span class="entry-note">Founder and investor matching, done carefully.</span>
+                    </a>
+                    <span class="entry-domain">jcombinator.network</span>
+                </li>
+                <li class="entry">
+                    <a href="https://intronet.network/" target="_blank" rel="noopener">
+                        <span class="entry-name">Intronet</span>
+                        <span class="entry-note">A quieter way to ask for an introduction.</span>
+                    </a>
+                    <span class="entry-domain">intronet.network</span>
+                </li>
+                <li class="entry">
+                    <a href="https://favorverse.jacobcole.net/" target="_blank" rel="noopener">
+                        <span class="entry-name">Favorverse</span>
+                        <span class="entry-note">A favor&#8209;exchange network, small and mutual.</span>
+                    </a>
+                    <span class="entry-domain">favorverse.jacobcole.net</span>
+                </li>
+                <li class="entry">
+                    <a href="https://housinglist.jacobcole.net/" target="_blank" rel="noopener">
+                        <span class="entry-name">Housing List</span>
+                        <span class="entry-note">Community housing, shared generously.</span>
+                    </a>
+                    <span class="entry-domain">housinglist.jacobcole.net</span>
+                </li>
+                <li class="entry">
+                    <a href="https://worldquestguild.connectr.site/" target="_blank" rel="noopener">
+                        <span class="entry-name">World Quest Guild</span>
+                        <span class="entry-note">A community built around quests worth doing.</span>
+                    </a>
+                    <span class="entry-domain">worldquestguild</span>
+                </li>
+            </ul>
+        </section>
+
+        <!-- viii. Career -->
+        <section class="chapter">
+            <p class="roman">viii.</p>
+            <h2 class="chapter-title">The work of days</h2>
+            <p class="epigraph">Make something useful. Give it away. Then begin again tomorrow.</p>
+            <ul class="entries">
+                <li class="entry">
+                    <a href="https://startupideas.jacobcole.net/" target="_blank" rel="noopener">
+                        <span class="entry-name">Startup Ideas</span>
+                        <span class="entry-note">Well&#8209;specified concepts, free to take and build.</span>
+                    </a>
+                    <span class="entry-domain">startupideas.jacobcole.net</span>
+                </li>
+                <li class="entry">
+                    <a href="https://startuptrickswiki.jacobcole.net/" target="_blank" rel="noopener">
+                        <span class="entry-name">Startup Tricks Wiki</span>
+                        <span class="entry-note">Founding playbooks, gathered from the field.</span>
+                    </a>
+                    <span class="entry-domain">startuptrickswiki.jacobcole.net</span>
+                </li>
+                <li class="entry">
+                    <a href="https://hiringlist.jacobcole.net/" target="_blank" rel="noopener">
+                        <span class="entry-name">Hiring List</span>
+                        <span class="entry-note">Opportunities at startups worth your time.</span>
+                    </a>
+                    <span class="entry-domain">hiringlist.jacobcole.net</span>
+                </li>
+            </ul>
+        </section>
+
+        <!-- ix. Learning -->
+        <section class="chapter">
+            <p class="roman">ix.</p>
+            <h2 class="chapter-title">Ways of learning</h2>
+            <p class="epigraph">The school is wherever the attention is.</p>
+            <ul class="entries">
+                <li class="entry">
+                    <a href="https://admitsphere.jacobcole.net/" target="_blank" rel="noopener">
+                        <span class="entry-name">Admitsphere</span>
+                        <span class="entry-note">College essays and admissions, for students without coaches.</span>
+                    </a>
+                    <span class="entry-domain">admitsphere.jacobcole.net</span>
+                </li>
+                <li class="entry">
+                    <a href="https://stanfordclasses.jacobcole.net/" target="_blank" rel="noopener">
+                        <span class="entry-name">Stanford Classes</span>
+                        <span class="entry-note">Course recommendations from the quarter system.</span>
+                    </a>
+                    <span class="entry-domain">stanfordclasses.jacobcole.net</span>
+                </li>
+            </ul>
+        </section>
+
+        <!-- x. Commonplace book -->
+        <section class="chapter">
+            <p class="roman">x.</p>
+            <h2 class="chapter-title">A commonplace book</h2>
+            <p class="epigraph">The small notebooks kept open on the desk. Things worth returning to.</p>
+            <ul class="entries">
+                <li class="entry">
+                    <a href="https://books.jacobcole.net/" target="_blank" rel="noopener">
+                        <span class="entry-name">Books</span>
+                        <span class="entry-note">Recommendations, kept alive.</span>
+                    </a>
+                    <span class="entry-domain">books.jacobcole.net</span>
+                </li>
+                <li class="entry">
+                    <a href="https://foodslist.jacobcole.net/" target="_blank" rel="noopener">
+                        <span class="entry-name">Foods List</span>
+                        <span class="entry-note">Recipes, cheese, chocolate, tea &mdash; the small pleasures.</span>
+                    </a>
+                    <span class="entry-domain">foodslist.jacobcole.net</span>
+                </li>
+                <li class="entry">
+                    <a href="https://philosophy.jacobcole.net/" target="_blank" rel="noopener">
+                        <span class="entry-name">Philosophy</span>
+                        <span class="entry-note">Materials, readings, wanderings.</span>
+                    </a>
+                    <span class="entry-domain">philosophy.jacobcole.net</span>
+                </li>
+                <li class="entry">
+                    <a href="https://yogalist.jacobcole.net/" target="_blank" rel="noopener">
+                        <span class="entry-name">Yoga List</span>
+                        <span class="entry-note">Studios, teachers, resources.</span>
+                    </a>
+                    <span class="entry-domain">yogalist.jacobcole.net</span>
+                </li>
+                <li class="entry">
+                    <a href="https://quoteslist.jacobcole.net/" target="_blank" rel="noopener">
+                        <span class="entry-name">Quotes</span>
+                        <span class="entry-note">Lines worth keeping.</span>
+                    </a>
+                    <span class="entry-domain">quoteslist.jacobcole.net</span>
+                </li>
+                <li class="entry">
+                    <a href="https://kidactivities.jacobcole.net/" target="_blank" rel="noopener">
+                        <span class="entry-name">Kid Activities</span>
+                        <span class="entry-note">Projects for small hands.</span>
+                    </a>
+                    <span class="entry-domain">kidactivities.jacobcole.net</span>
+                </li>
+                <li class="entry">
+                    <a href="https://culturalendangeredspecies.jacobcole.net/" target="_blank" rel="noopener">
+                        <span class="entry-name">Cultural Endangered Species</span>
+                        <span class="entry-note">Ways of life that are quietly fading.</span>
+                    </a>
+                    <span class="entry-domain">culturalendangeredspecies</span>
+                </li>
+            </ul>
+        </section>
+
+        <!-- xi. Trusted Services -->
+        <section class="chapter">
+            <p class="roman">xi.</p>
+            <h2 class="chapter-title">People who can help</h2>
+            <p class="epigraph">Tried, trusted, not advertised. The old way of knowing who to call.</p>
+            <ul class="entries">
+                <li class="entry">
+                    <a href="https://bodymasters.jacobcole.net/" target="_blank" rel="noopener">
+                        <span class="entry-name">Body Masters</span>
+                        <span class="entry-note">Vetted bodyworkers.</span>
+                    </a>
+                    <span class="entry-domain">bodymasters.jacobcole.net</span>
+                </li>
+                <li class="entry">
+                    <a href="https://greataccountants.jacobcole.net/" target="_blank" rel="noopener">
+                        <span class="entry-name">Great Accountants</span>
+                        <span class="entry-note">Recommended, not advertised.</span>
+                    </a>
+                    <span class="entry-domain">greataccountants.jacobcole.net</span>
+                </li>
+                <li class="entry">
+                    <a href="https://greatlawyers.jacobcole.net/" target="_blank" rel="noopener">
+                        <span class="entry-name">Great Lawyers</span>
+                        <span class="entry-note">Tried, and trusted.</span>
+                    </a>
+                    <span class="entry-domain">greatlawyers.jacobcole.net</span>
+                </li>
+            </ul>
+        </section>
+
+        <!-- xii. Hidden rooms -->
+        <section class="chapter">
+            <p class="roman">xii.</p>
+            <h2 class="chapter-title">Maps to hidden rooms</h2>
+            <p class="epigraph">Every city has rooms the guides forget. Half the art is learning where to look.</p>
+            <ul class="entries">
+                <li class="entry">
+                    <a href="https://thingsyoudidntknowexisted.jacobcole.net/" target="_blank" rel="noopener">
+                        <span class="entry-name">The Main Directory</span>
+                        <span class="entry-note">All the hidden rooms, at once.</span>
+                    </a>
+                    <span class="entry-domain">thingsyoudidntknowexisted</span>
+                </li>
+                <li class="entry">
+                    <a href="https://thingsyoudidntknowexisted.jacobcole.net/nyc" target="_blank" rel="noopener">
+                        <span class="entry-name">New York City</span>
+                        <span class="entry-note">Rooms in the city that never sleeps.</span>
+                    </a>
+                    <span class="entry-domain">/nyc</span>
+                </li>
+                <li class="entry">
+                    <a href="https://thingsyoudidntknowexisted.jacobcole.net/sf" target="_blank" rel="noopener">
+                        <span class="entry-name">San Francisco</span>
+                        <span class="entry-note">Rooms by the bay.</span>
+                    </a>
+                    <span class="entry-domain">/sf</span>
+                </li>
+                <li class="entry">
+                    <a href="https://thingsyoudidntknowexisted.jacobcole.net/sandiego" target="_blank" rel="noopener">
+                        <span class="entry-name">San Diego</span>
+                        <span class="entry-note">Rooms under the Southern sun.</span>
+                    </a>
+                    <span class="entry-domain">/sandiego</span>
+                </li>
+                <li class="entry">
+                    <a href="https://thingsyoudidntknowexisted.jacobcole.net/mit" target="_blank" rel="noopener">
+                        <span class="entry-name">MIT</span>
+                        <span class="entry-note">Rooms around Cambridge.</span>
+                    </a>
+                    <span class="entry-domain">/mit</span>
+                </li>
+                <li class="entry">
+                    <a href="https://thingsyoudidntknowexisted.jacobcole.net/hawaii" target="_blank" rel="noopener">
+                        <span class="entry-name">Hawaii</span>
+                        <span class="entry-note">Rooms in the islands.</span>
+                    </a>
+                    <span class="entry-domain">/hawaii</span>
+                </li>
+                <li class="entry">
+                    <a href="https://thingsyoudidntknowexisted.jacobcole.net/portland" target="_blank" rel="noopener">
+                        <span class="entry-name">Portland</span>
+                        <span class="entry-note">Rooms among the rain and cedars.</span>
+                    </a>
+                    <span class="entry-domain">/portland</span>
+                </li>
+            </ul>
+        </section>
+
+        <!-- xiii. Experimental -->
+        <section class="chapter">
+            <p class="roman">xiii. the still&#8209;becoming</p>
+            <h2 class="chapter-title">What is half&#8209;finished</h2>
+            <p class="epigraph">What is half&#8209;finished is still becoming. Don't mistake the scaffold for the building.</p>
+            <ul class="entries">
+                <li class="entry">
+                    <a href="https://vrcoralreefs.jacobcole.net/" target="_blank" rel="noopener">
+                        <span class="entry-name">VR Coral Reefs</span>
+                        <span class="entry-note">Climate education, underwater, in a headset.</span>
+                    </a>
+                    <span class="entry-domain">vrcoralreefs.jacobcole.net</span>
+                </li>
+                <li class="entry">
+                    <a href="https://globalyogivillage.com/" target="_blank" rel="noopener">
+                        <span class="entry-name">Global Yogi Village</span>
+                        <span class="entry-note">A worldwide village, slowly being imagined.</span>
+                    </a>
+                    <span class="entry-domain">globalyogivillage.com</span>
+                </li>
+                <li class="entry">
+                    <a href="https://quantummafia.jacobcole.net/" target="_blank" rel="noopener">
+                        <span class="entry-name">Quantum Mafia</span>
+                        <span class="entry-note">A study group for quantum computing, over dinner.</span>
+                    </a>
+                    <span class="entry-domain">quantummafia.jacobcole.net</span>
+                </li>
+                <li class="entry">
+                    <a href="https://cryptoconnect.jacobcole.net/" target="_blank" rel="noopener">
+                        <span class="entry-name">CryptoConnect</span>
+                        <span class="entry-note">A cryptocurrency network, cautiously.</span>
+                    </a>
+                    <span class="entry-domain">cryptoconnect.jacobcole.net</span>
+                </li>
+            </ul>
+        </section>
+
+    </main>
+
+    <!-- ── Closing ─────────────────────────────── -->
+    <footer class="closing">
+        <div class="closing-glyph" aria-hidden="true">&middot; &middot; &middot;</div>
+        <p class="closing-text">Everything here is made in the belief that helping everyone &mdash; not just those who ask &mdash; is both possible, and worth the trouble of trying.</p>
+        <div class="closing-sig">
+            <p>An open project by</p>
+            <p><a href="https://jacobcole.ai">Jacob Cole</a> &amp; <a href="mailto:trattner@alum.mit.edu">Andrew Trattner</a></p>
+        </div>
+        <p class="colophon">
+            Set in Fraunces &amp; EB Garamond &middot; a living document &middot;
+            <a href="https://systematicaltruism.org">see the other directory</a>
+        </p>
+    </footer>
+
+    <script>
+        // Theme toggle
+        (function(){
+            var btn = document.getElementById('theme-toggle');
+            var root = document.documentElement;
+            function getSystemTheme() {
+                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            }
+            function applyTheme() {
+                var saved = localStorage.getItem('sa-contemplative-theme');
+                var theme = saved || getSystemTheme();
+                root.setAttribute('data-theme', theme);
+                btn.textContent = theme === 'dark' ? '☀' : '☾';
+            }
+            btn.addEventListener('click', function(){
+                var current = root.getAttribute('data-theme');
+                localStorage.setItem('sa-contemplative-theme', current === 'dark' ? 'light' : 'dark');
+                applyTheme();
+            });
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(){
+                if (!localStorage.getItem('sa-contemplative-theme')) applyTheme();
+            });
+            applyTheme();
+        })();
+
+        // Gentle fade-in on scroll
+        (function(){
+            if (!('IntersectionObserver' in window)) {
+                document.querySelectorAll('.chapter').forEach(function(ch){ ch.classList.add('visible'); });
+                return;
+            }
+            var observer = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+            document.querySelectorAll('.chapter').forEach(function(ch){ observer.observe(ch); });
+        })();
+    </script>
+</body>
+</html>
