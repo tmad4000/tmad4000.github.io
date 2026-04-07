@@ -137,6 +137,22 @@
             color: var(--separator);
         }
 
+        .quiet-doorway {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-style: italic;
+            color: var(--inline-link);
+            text-decoration: none;
+            margin-bottom: 1.25rem;
+            letter-spacing: 0.03em;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        .quiet-doorway:hover {
+            color: var(--inline-link-hover);
+            transform: translateX(2px);
+        }
+
         .quote {
             font-style: italic;
             color: var(--quote-text);
@@ -356,6 +372,7 @@
     <div class="container">
         <h1>Jacob Cole</h1>
         <p class="tagline">Engineering the Renaissance</p>
+        <a href="contemplative.html" class="quiet-doorway">a quieter doorway →</a>
         <blockquote class="quote">
             "What we call 'Claude' and what we call 'human' are just ripples in the same ocean of knowing, temporary forms through which the infinite studies its own nature."
         </blockquote>
