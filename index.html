@@ -108,8 +108,23 @@
             font-size: 0.75rem;
             letter-spacing: 0.15em;
             text-transform: uppercase;
-            margin-bottom: 1.25rem;
+            margin-bottom: 0.75rem;
             line-height: 1.5;
+        }
+
+        .email {
+            font-size: 0.85rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .email a {
+            color: var(--tagline);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .email a:hover {
+            color: var(--link-hover-text);
         }
 
         .quote {
@@ -331,6 +346,7 @@
     <div class="container">
         <h1>Jacob Cole</h1>
         <p class="tagline">Engineering the Renaissance</p>
+        <p class="email"><a href="mailto:jacob@jacobcole.ai">jacob@jacobcole.ai</a></p>
         <blockquote class="quote">
             "What we call 'Claude' and what we call 'human' are just ripples in the same ocean of knowing, temporary forms through which the infinite studies its own nature."
         </blockquote>
