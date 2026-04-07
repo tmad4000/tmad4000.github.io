@@ -112,19 +112,29 @@
             line-height: 1.5;
         }
 
-        .email {
-            font-size: 0.85rem;
-            margin-bottom: 1.25rem;
+        .contact {
+            margin-top: 2.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--separator);
+            font-size: 0.8rem;
+            color: var(--section-title);
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
         }
 
-        .email a {
-            color: var(--tagline);
+        .contact a {
+            color: var(--section-title);
             text-decoration: none;
             transition: color 0.2s;
         }
 
-        .email a:hover {
+        .contact a:hover {
             color: var(--link-hover-text);
+        }
+
+        .contact .sep {
+            color: var(--separator);
         }
 
         .quote {
@@ -346,7 +356,6 @@
     <div class="container">
         <h1>Jacob Cole</h1>
         <p class="tagline">Engineering the Renaissance</p>
-        <p class="email"><a href="mailto:jacob@jacobcole.ai">jacob@jacobcole.ai</a> · <a href="https://www.linkedin.com/in/jacobcolemit/" target="_blank" rel="noopener">linkedin</a></p>
         <blockquote class="quote">
             "What we call 'Claude' and what we call 'human' are just ripples in the same ocean of knowing, temporary forms through which the infinite studies its own nature."
         </blockquote>
@@ -567,6 +576,12 @@
                 </a>
             </nav>
         </section>
+
+        <div class="contact">
+            <a href="mailto:jacob@jacobcole.ai">jacob@jacobcole.ai</a>
+            <span class="sep">·</span>
+            <a href="https://www.linkedin.com/in/jacobcolemit/" target="_blank" rel="noopener">LinkedIn</a>
+        </div>
     </div>
 
     <div class="archive" style="right: 1.5rem; left: auto;">
