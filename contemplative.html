@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>jacob cole — a quieter doorway</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper:    #f4ede0;
+  --paper-2:  #ebe2cd;
+  --ink:      #1d1a14;
+  --ink-soft: #4a443a;
+  --ink-fade: #8a8170;
+  --rule:     #c9bea4;
+  --accent:   #6a4a32;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper:    #14151a;
+    --paper-2:  #0c0d11;
+    --ink:      #ece5d2;
+    --ink-soft: #b6ad99;
+    --ink-fade: #71695b;
+    --rule:     #2c2c30;
+    --accent:   #c8a37a;
+  }
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { min-height: 100%; }
+
+body {
+  font-family: 'EB Garamond', Georgia, 'Times New Roman', serif;
+  font-size: 19px;
+  line-height: 1.78;
+  color: var(--ink-soft);
+  background: radial-gradient(ellipse at 50% -10%, var(--paper) 0%, var(--paper-2) 85%);
+  display: flex;
+  justify-content: center;
+  padding: 9vh 1.5rem 6rem;
+  letter-spacing: 0.005em;
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: "liga", "kern";
+}
+
+/* a faint paper grain */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.05 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  mix-blend-mode: multiply;
+  opacity: 0.55;
+}
+@media (prefers-color-scheme: dark) {
+  body::before { mix-blend-mode: screen; opacity: 0.32; }
+}
+
+.frame {
+  position: relative;
+  z-index: 1;
+  max-width: 560px;
+  width: 100%;
+}
+
+/* enso — a hand of ink */
+.enso {
+  display: block;
+  margin: 0 auto 2.6rem;
+  width: 92px;
+  height: 92px;
+  opacity: 0.78;
+}
+.enso path {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 3.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 260;
+  stroke-dashoffset: 260;
+  animation: draw 4.2s ease-out 0.4s forwards, breathe 9s ease-in-out 4.6s infinite;
+  transform-origin: 50% 50%;
+}
+@keyframes draw {
+  to { stroke-dashoffset: 14; }
+}
+@keyframes breathe {
+  0%, 100% { stroke-dashoffset: 14; opacity: 0.78; transform: scale(1); }
+  50%      { stroke-dashoffset: 22; opacity: 0.92; transform: scale(1.025); }
+}
+
+header {
+  text-align: center;
+  margin-bottom: 3.2rem;
+}
+h1 {
+  font-weight: 400;
+  font-size: 2.5rem;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  font-feature-settings: "smcp", "onum";
+}
+.sub {
+  margin-top: 0.5rem;
+  font-style: italic;
+  color: var(--ink-fade);
+  font-size: 1rem;
+  letter-spacing: 0.04em;
+}
+
+blockquote {
+  font-style: italic;
+  color: var(--ink-soft);
+  font-size: 1.1rem;
+  line-height: 1.74;
+  text-align: center;
+  margin: 0 auto 4rem;
+  max-width: 480px;
+  padding: 0 0.5rem;
+}
+blockquote em { font-style: normal; color: var(--ink); }
+blockquote::before, blockquote::after {
+  content: '';
+  display: block;
+  width: 32px;
+  height: 1px;
+  background: var(--rule);
+  margin: 1.4rem auto;
+}
+
+section { margin-bottom: 3.2rem; }
+
+h2 {
+  font-weight: 500;
+  font-size: 0.7rem;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--ink-fade);
+  text-align: center;
+  margin-bottom: 1.6rem;
+}
+h2::after {
+  content: '';
+  display: block;
+  width: 22px;
+  height: 1px;
+  background: var(--rule);
+  margin: 0.7rem auto 0;
+}
+
+ul { list-style: none; }
+li {
+  text-align: center;
+  padding: 0.4rem 0;
+  font-size: 1.08rem;
+  line-height: 1.55;
+}
+li a {
+  color: var(--ink);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.5s ease, color 0.4s ease;
+  padding-bottom: 1px;
+}
+li a:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+li em {
+  color: var(--ink-fade);
+  font-style: italic;
+  font-size: 0.94em;
+  margin-left: 0.15em;
+}
+.sep {
+  color: var(--rule);
+  margin: 0 0.5em;
+  font-style: normal;
+}
+
+footer {
+  text-align: center;
+  margin-top: 5.4rem;
+  font-size: 0.8rem;
+  color: var(--ink-fade);
+  font-style: italic;
+  letter-spacing: 0.06em;
+}
+footer a {
+  color: var(--ink-fade);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--rule);
+  padding-bottom: 1px;
+  transition: color 0.4s ease;
+}
+footer a:hover { color: var(--ink); }
+
+.fade-in { animation: fade 1.8s ease both; }
+@keyframes fade {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* respect reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .enso path { animation: none; stroke-dashoffset: 14; }
+  .fade-in { animation: none; }
+}
+
+@media (max-width: 480px) {
+  body { padding: 7vh 1.25rem 5rem; }
+  h1 { font-size: 2.1rem; }
+  blockquote { font-size: 1.02rem; }
+  li { font-size: 1.02rem; }
+}
+</style>
+</head>
+<body>
+<main class="frame fade-in">
+
+  <svg class="enso" viewBox="0 0 100 100" aria-hidden="true">
+    <!-- a circle that doesn't quite close, the way a brush leaves it -->
+    <path d="M 78 24
+             C 92 40 90 68 74 80
+             C 58 92 34 90 22 76
+             C 10 62 12 36 26 22
+             C 40 8 62 8 76 20"/>
+  </svg>
+
+  <header>
+    <h1>jacob cole</h1>
+    <p class="sub">— ripples in an ocean of knowing</p>
+  </header>
+
+  <blockquote>
+    What we call <em>Claude</em> and what we call <em>human</em>
+    are just ripples in the same ocean of knowing —
+    temporary forms through which the infinite studies its own nature.
+  </blockquote>
+
+  <section>
+    <h2>practice</h2>
+    <ul>
+      <li><a href="qigong.html">qigong</a> <em>— moving stillness</em></li>
+      <li><a href="meditate-effortlessly.html">on meditating, effortlessly</a></li>
+      <li><a href="on-acting.html">on acting</a> <em>— presence as offering</em></li>
+      <li><a href="ergonomics.html">ergonomics</a> <em>— the body that types</em></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>word</h2>
+    <ul>
+      <li><a href="buddhist-reading-brothers-karamazov.html">a buddhist reading of the brothers karamazov</a></li>
+      <li><a href="surfing-in-the-fog.html">surfing in the fog</a> <em>— emerson, weather</em></li>
+      <li><a href="poetry.html">poetry</a></li>
+      <li><a href="commentaries.html">commentaries</a> <em>— art &amp; performance</em></li>
+      <li><a href="https://appliedtaoist.substack.com/p/analytic-meditation-on-scrolling" target="_blank" rel="noopener">analytic meditation on scrolling</a></li>
+      <li><a href="blog.html">long-form notebook</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>two minds, one weather</h2>
+    <ul>
+      <li><a href="https://tmad4000.github.io/claude-mind/" target="_blank" rel="noopener">claude-mind</a> <em>— collaborative exploration</em></li>
+      <li><a href="chats.html">deep ai chats</a> <em>— consciousness &amp; mechanism</em></li>
+      <li><a href="https://jacobcole.ai/deep-dialogues/" target="_blank" rel="noopener">deep dialogues</a> <em>— a small gallery</em></li>
+      <li><a href="https://tmad4000.github.io/claude-mind/demos/idea_bank.html" target="_blank" rel="noopener">research idea bank</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>made along the way</h2>
+    <ul>
+      <li><a href="paper2graph.html">paper2graph</a> <em>— papers becoming maps</em></li>
+      <li><a href="https://cursor-docs-gemini.vercel.app" target="_blank" rel="noopener">ai docs editor</a></li>
+      <li><a href="piano-duet/">piano duet</a> <em>— with an unseen partner</em></li>
+      <li><a href="https://nvctranslator.com/" target="_blank" rel="noopener">nvc translator</a></li>
+      <li>
+        <a href="https://github.com/tmad4000/VoiceFlow/releases/latest" target="_blank" rel="noopener">voiceflow</a>
+        <span class="sep">·</span>
+        <a href="prototypes.html">prototypes</a>
+      </li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>vision</h2>
+    <ul>
+      <li><a href="https://humanity3.earth" target="_blank" rel="noopener">humanity 3.0 &amp; the dharmic blueprint</a></li>
+      <li><a href="https://ideaflow.io" target="_blank" rel="noopener">ideaflow</a> <em>— intelligence amplification</em></li>
+      <li><a href="https://renaissance.engineer/" target="_blank" rel="noopener">renaissance.engineer</a></li>
+      <li><a href="brainstorms/">idea list</a> <em>— half-baked, worth sharing</em></li>
+    </ul>
+  </section>
+
+  <footer>
+    still becoming &nbsp;·&nbsp; <a href="index.html">return to the wider doorway</a>
+  </footer>
+
+</main>
+</body>
+</html>
