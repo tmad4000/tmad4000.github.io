@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>picortex — mockups</title>
+<style>
+  body{margin:0;padding:50px 24px;font:16px/1.55 -apple-system,BlinkMacSystemFont,"SF Pro Text",Inter,sans-serif;background:#0a0a0a;color:#e8e8e8;max-width:720px;margin:0 auto}
+  h1{font-size:2rem;letter-spacing:-.02em;margin:0 0 8px}
+  .tag{color:#8b6dff;font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;display:block}
+  p{color:#bdbdbd;max-width:60ch}
+  a{color:#8b6dff;text-decoration:none} a:hover{text-decoration:underline}
+  ul{list-style:none;padding:0;margin:32px 0 0}
+  li{background:#161616;border:1px solid #2a2a2a;border-radius:10px;padding:16px 20px;margin:10px 0}
+  li h2{font-size:1.08rem;margin:0 0 4px}
+  li p{font-size:.92rem;margin:0;color:#8a8a8a}
+  footer{margin:40px 0 0;color:#8a8a8a;font-size:.85rem}
+</style>
+</head>
+<body>
+<span class="tag">picortex · mockups</span>
+<h1>Texting-agent mockups</h1>
+<p>Three self-contained HTML mockups for a planned project: a Claude-backed agent added to iMessage or OpenChat group texts, with consent-mediated disclosure of private data. See <a href="https://wikihub.globalbr.ai/@jacobcole/picortex">the wiki</a> for full planning docs.</p>
+<ul>
+  <li>
+    <h2><a href="00-platonic-ideal.html">00 — Platonic ideal</a></h2>
+    <p>UX scenes (attention, the consent-loop split view, manifest dialog, reactions) + abstract architecture diagram + user stories.</p>
+  </li>
+  <li>
+    <h2><a href="01-option-2-piyush-style.html">01 — Option 2 · Piyush-style</a></h2>
+    <p>Concrete 3-machine architecture: Bot Gateway + Workspace Host + noos. SSH + <code>claude --session-id -p</code> per turn.</p>
+  </li>
+  <li>
+    <h2><a href="02-option-4-noos-style.html">02 — Option 4 · Noos-style</a></h2>
+    <p>Concrete 1-box stateless architecture. Per-turn ephemeral <code>claude --print</code> with transcript rebuilt from SQLite. Cheapest to ship.</p>
+  </li>
+</ul>
+<footer>
+  <p><a href="/">&larr; tmad4000.github.io</a> · <a href="https://wikihub.globalbr.ai/@jacobcole/picortex">wiki</a></p>
+</footer>
+</body>
+</html>

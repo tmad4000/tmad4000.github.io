@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>picortex — Platonic ideal</title>
+<style>
+  :root{
+    --bg:#0a0a0a; --surface:#161616; --elev:#1e1e1e; --border:#2a2a2a;
+    --text:#e8e8e8; --muted:#8a8a8a; --mutedless:#bdbdbd;
+    --accent:#8b6dff; --accent-soft:#3a2f66;
+    --msg-me:#0a84ff; --msg-them:#2c2c2e; --msg-bot:#1b3a35; --msg-bot-bd:#215c52;
+    --ok:#30d158; --warn:#ffd60a; --bad:#ff453a;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro","Inter","Helvetica Neue",Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:var(--sans);-webkit-font-smoothing:antialiased;line-height:1.5}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  code{font-family:var(--mono);background:var(--elev);padding:1px 6px;border-radius:4px;font-size:.9em}
+  nav.top{position:sticky;top:0;z-index:10;background:rgba(10,10,10,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+  nav.top .inner{max-width:1100px;margin:0 auto;padding:14px 22px;display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+  nav.top .brand{font-weight:700;letter-spacing:-.01em}
+  nav.top .brand .dot{color:var(--accent)}
+  nav.top .links{display:flex;gap:14px;flex-wrap:wrap}
+  nav.top .links a{color:var(--mutedless);font-size:.92rem}
+  nav.top .links a.current{color:var(--text)}
+  nav.top .badge{margin-left:auto;font-size:.78rem;color:var(--muted);border:1px solid var(--border);padding:3px 8px;border-radius:999px}
+  main{max-width:1100px;margin:0 auto;padding:44px 22px 100px}
+  h1{font-size:2.4rem;margin:0 0 12px;letter-spacing:-.02em;line-height:1.15}
+  h1 .tag{color:var(--accent);font-weight:500;font-size:.9rem;letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:8px}
+  h2{font-size:1.5rem;margin:56px 0 14px;letter-spacing:-.015em}
+  h2 .num{display:inline-block;width:28px;height:28px;line-height:28px;text-align:center;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-size:.85rem;margin-right:10px;vertical-align:middle}
+  h3{font-size:1.05rem;margin:22px 0 10px;color:var(--mutedless);font-weight:600}
+  p.lead{font-size:1.1rem;color:var(--mutedless);max-width:68ch;margin:0 0 18px}
+  p{max-width:72ch;color:var(--mutedless)}
+  .hr{height:1px;background:var(--border);margin:56px 0}
+
+  /* info boxes */
+  .quote-box{border-left:3px solid var(--accent);background:linear-gradient(180deg,rgba(139,109,255,.05),rgba(139,109,255,0));padding:18px 22px;border-radius:0 8px 8px 0;margin:18px 0}
+  .quote-box .label{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:4px}
+  .quote-box p{color:var(--text);margin:6px 0}
+  .callout{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px 22px;margin:14px 0}
+
+  /* story cards */
+  .stories{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin:22px 0}
+  .story{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px}
+  .story .who{font-size:.78rem;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+  .story .line{font-size:1rem;color:var(--text);margin:0}
+
+  /* scene section */
+  .scene{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start;margin:22px 0}
+  .scene.single{grid-template-columns:1fr;max-width:600px}
+  @media (max-width:800px){.scene{grid-template-columns:1fr}}
+  .pane{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+  .pane .hd{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;background:var(--elev)}
+  .pane .hd .title{font-weight:600;font-size:.95rem}
+  .pane .hd .sub{color:var(--muted);font-size:.82rem;margin-left:auto}
+  .pane .hd .kind{font-size:.7rem;padding:2px 8px;border-radius:999px;text-transform:uppercase;letter-spacing:.08em}
+  .pane .hd .kind.group{background:#3a2f66;color:#b39eff}
+  .pane .hd .kind.dm{background:#1f3a1f;color:#6fd07a}
+  .pane .chat{padding:14px 14px 18px;min-height:200px}
+
+  /* iMessage-y bubbles */
+  .msg{display:flex;flex-direction:column;margin:6px 0;max-width:78%}
+  .msg.them{align-self:flex-start;align-items:flex-start}
+  .msg.me{align-self:flex-end;align-items:flex-end;margin-left:auto}
+  .msg.bot{align-self:flex-start;align-items:flex-start}
+  .msg .author{font-size:.7rem;color:var(--muted);padding:0 12px 3px}
+  .msg .bubble{padding:8px 13px;border-radius:18px;font-size:.95rem;line-height:1.32;white-space:pre-wrap}
+  .msg.them .bubble{background:var(--msg-them);color:var(--text);border-bottom-left-radius:4px}
+  .msg.me .bubble{background:var(--msg-me);color:#fff;border-bottom-right-radius:4px}
+  .msg.bot .bubble{background:var(--msg-bot);border:1px solid var(--msg-bot-bd);color:#d5f2ea;border-bottom-left-radius:4px}
+  .msg .reactions{display:flex;gap:4px;margin-top:3px;padding:0 8px}
+  .msg .reactions .react{background:var(--elev);border:1px solid var(--border);border-radius:999px;padding:1px 8px;font-size:.74rem;color:var(--mutedless)}
+  .msg .reactions .react.bot-reacted{background:#1b3a35;border-color:#215c52;color:#b6e8dc}
+  .msg .replyto{background:var(--elev);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:10px;padding:4px 10px;font-size:.8rem;color:var(--muted);margin-bottom:3px;max-width:100%;white-space:normal}
+  .msg .replyto b{color:var(--mutedless)}
+
+  .timestamp{text-align:center;color:var(--muted);font-size:.74rem;margin:12px 0;letter-spacing:.02em}
+  .typing{display:inline-flex;align-items:center;gap:3px;background:var(--msg-them);padding:10px 14px;border-radius:18px;border-bottom-left-radius:4px}
+  .typing span{width:6px;height:6px;background:#9a9a9f;border-radius:50%;animation:blink 1.4s infinite ease-in-out both}
+  .typing span:nth-child(1){animation-delay:-.32s}
+  .typing span:nth-child(2){animation-delay:-.16s}
+  @keyframes blink{0%,80%,100%{opacity:.2;transform:translateY(0)}40%{opacity:1;transform:translateY(-2px)}}
+  .chat {display:flex;flex-direction:column}
+
+  /* action row (approve/deny) */
+  .actions-row{display:flex;gap:8px;margin:6px 0 2px;padding:0 8px;align-self:flex-start;flex-wrap:wrap}
+  .action-btn{background:var(--elev);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-size:.82rem;color:var(--text);display:inline-flex;gap:6px;align-items:center}
+  .action-btn.approve{background:#0e3020;border-color:#184a33;color:#66e09b}
+  .action-btn.deny{background:#3a1414;border-color:#5a2020;color:#ff8a7e}
+  .action-btn.edit{background:#2d2a12;border-color:#4a4420;color:#ffd86e}
+  .action-btn .key{font-size:.72rem;color:var(--muted);border:1px solid var(--border);border-radius:4px;padding:0 5px;font-family:var(--mono)}
+
+  /* label row between messages */
+  .divider-label{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:.76rem;margin:12px 4px;text-transform:uppercase;letter-spacing:.1em}
+  .divider-label::before, .divider-label::after{content:"";flex:1;height:1px;background:var(--border)}
+
+  /* architecture */
+  .arch-wrap{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;overflow-x:auto}
+  .arch-wrap svg{display:block;margin:0 auto;max-width:100%;height:auto}
+  .legend{display:flex;flex-wrap:wrap;gap:14px;margin:18px 0 4px;font-size:.85rem;color:var(--mutedless)}
+  .legend .dot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:middle}
+
+  /* flow steps */
+  .flow{counter-reset:step;padding:0;margin:18px 0;list-style:none;display:grid;grid-template-columns:1fr;gap:8px}
+  .flow li{counter-increment:step;display:flex;gap:14px;align-items:flex-start;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px}
+  .flow li::before{content:counter(step);flex-shrink:0;width:26px;height:26px;line-height:26px;text-align:center;border-radius:50%;background:var(--accent);color:#fff;font-size:.82rem;font-weight:600}
+  .flow li .text{flex:1;font-size:.93rem;color:var(--mutedless)}
+  .flow li .text b{color:var(--text)}
+  .flow li code{font-size:.82rem}
+
+  /* footer */
+  footer{max-width:1100px;margin:0 auto;padding:40px 22px 80px;color:var(--muted);font-size:.85rem;border-top:1px solid var(--border)}
+  footer .row{display:flex;gap:22px;flex-wrap:wrap}
+
+  /* figcaption */
+  figure{margin:0}
+  figcaption{color:var(--muted);font-size:.82rem;padding:8px 6px 0;text-align:center}
+</style>
+</head>
+<body>
+
+<nav class="top"><div class="inner">
+  <span class="brand">picortex<span class="dot">.</span></span>
+  <div class="links">
+    <a class="current" href="00-platonic-ideal.html">Platonic ideal</a>
+    <a href="01-option-2-piyush-style.html">Option 2 · Piyush-style</a>
+    <a href="02-option-4-noos-style.html">Option 4 · Noos-style</a>
+    <a href="https://wikihub.globalbr.ai/@jacobcole/picortex/docs/prd/002-texting-experience">PRD 002 ↗</a>
+  </div>
+  <span class="badge">2026-04-23 · provisional</span>
+</div></nav>
+
+<main>
+
+<h1><span class="tag">Mockup 00</span>The platonic ideal</h1>
+<p class="lead">What an "awesome texting experience" feels like from the user's side, and the abstract architecture that must be behind it. Implementation choices (tmux vs <code>claude&nbsp;-c&nbsp;-p</code>, one-box vs two-box) are deferred to the concrete-option mockups — this page is <em>what it must feel like</em>, not <em>how we build it</em>.</p>
+
+<div class="quote-box">
+  <div class="label">The one test</div>
+  <p>A friend adds the bot to a group text. Over the next hour: it stays quiet during chatter. When @mentioned with a public-friendly question, it replies usefully in &lt;15 s. When someone asks "is Jacob free Tuesday?", the bot says "let me check", DMs Jacob privately with the question + proposed response, and only answers the group once Jacob approves. No one sees private information Jacob didn't explicitly approve.</p>
+</div>
+
+<h2><span class="num">1</span>User stories</h2>
+<div class="stories">
+  <div class="story"><div class="who">As Jacob</div><p class="line">I add my bot to a group chat with two friends. It answers their questions without me having to respond myself, and it knows when to stay quiet.</p></div>
+  <div class="story"><div class="who">As Jacob's friend</div><p class="line">I ask "is Jacob free Tuesday?" in the group. I get a real answer within a couple of minutes, not "I can't access that."</p></div>
+  <div class="story"><div class="who">As Jacob</div><p class="line">When the bot needs my private info to answer in a group, it DMs me with the exact response it wants to send, and I approve or tweak before anything leaves my DMs.</p></div>
+  <div class="story"><div class="who">As Jacob</div><p class="line">I can tell the bot "louder" or "quieter" per chat, and I can see and shape what it's allowed to know about me in each chat.</p></div>
+  <div class="story"><div class="who">As a group member</div><p class="line">When I react ⭐ to a useful bot message, it saves it to Jacob's notes on our behalf. ❌ retracts a bad bot answer.</p></div>
+  <div class="story"><div class="who">As Jacob</div><p class="line">It feels native — threads, reactions, typing indicator, no markdown walls on iMessage.</p></div>
+</div>
+
+<h2><span class="num">2</span>Scene A — bot respects attention</h2>
+<p>Default in a new group chat: <code>mentions-only</code>. Bot stays silent through normal chatter. Speaks when @mentioned, replied-to, or slash-commanded.</p>
+
+<div class="scene single">
+  <figure>
+  <div class="pane">
+    <div class="hd"><span class="title">Tuesday plans</span><span class="kind group">group · 4 people</span><span class="sub">iMessage</span></div>
+    <div class="chat">
+      <div class="timestamp">Today 3:42 PM</div>
+      <div class="msg them"><div class="author">Alice</div><div class="bubble">ok who's in for dinner tuesday</div></div>
+      <div class="msg me"><div class="bubble">I'm game. any preference on where?</div></div>
+      <div class="msg them"><div class="author">Bob</div><div class="bubble">italian? the new place in the mission?</div></div>
+      <div class="msg them"><div class="author">Alice</div><div class="bubble">works for me</div></div>
+      <div class="divider-label">bot stays silent · not mentioned</div>
+      <div class="msg them"><div class="author">Bob</div><div class="bubble">@picortex what's the name of that italian place in the mission that opened last month</div></div>
+      <div class="msg bot"><div class="author">picortex</div><div class="bubble">Sorrel on Valencia St, opened mid-March. Reservations on Resy.</div></div>
+    </div>
+  </div>
+  <figcaption>P2 attention: four human turns pass without bot interruption; the explicit @mention triggers one focused reply.</figcaption>
+  </figure>
+</div>
+
+<h2><span class="num">3</span>Scene B — the consent loop (the banger)</h2>
+<p>Group members ask something that requires data the group's knowledge manifest doesn't cover. Bot pauses, DMs Jacob out-of-band with the proposed response, and only replies in-group after explicit approval.</p>
+
+<div class="scene">
+  <figure>
+  <div class="pane">
+    <div class="hd"><span class="title">Tuesday plans</span><span class="kind group">group · 4 people</span><span class="sub">iMessage</span></div>
+    <div class="chat">
+      <div class="msg them"><div class="author">Alice</div><div class="bubble">is jacob free at 7 on tuesday btw?</div></div>
+      <div class="msg bot"><div class="replyto"><b>Alice</b> · is jacob free at 7 on tuesday btw?</div><div class="bubble">Let me check with him — one sec.</div></div>
+      <div class="typing" style="margin:6px 0;align-self:flex-start"><span></span><span></span><span></span></div>
+      <div class="divider-label">— 48 seconds later —</div>
+      <div class="msg bot"><div class="replyto"><b>Alice</b> · is jacob free at 7 on tuesday btw?</div><div class="bubble">Jacob's open 7-9pm Tuesday. Works for him!</div></div>
+    </div>
+  </div>
+  <figcaption>Group view: bot acknowledges, types, and returns with a specific answer ~under a minute later.</figcaption>
+  </figure>
+
+  <figure>
+  <div class="pane">
+    <div class="hd"><span class="title">picortex (DM)</span><span class="kind dm">private</span><span class="sub">iMessage</span></div>
+    <div class="chat">
+      <div class="msg bot"><div class="bubble">👋 Quick approval needed.
+
+<b>Who's asking:</b> Alice, in "Tuesday plans" (with Bob + Carol)
+<b>Question:</b> "is jacob free at 7 on tuesday btw?"
+
+<b>What I need:</b> your calendar, Tue 7-9pm
+<b>I found:</b> no events scheduled 7-9pm Tuesday
+
+<b>Proposed reply to the group:</b>
+<i>"Jacob's open 7-9pm Tuesday. Works for him!"</i></div></div>
+      <div class="actions-row">
+        <span class="action-btn approve">✓ Approve <span class="key">y</span></span>
+        <span class="action-btn edit">✎ Edit first <span class="key">e</span></span>
+        <span class="action-btn deny">✗ Deny <span class="key">n</span></span>
+      </div>
+      <div class="msg me" style="margin-top:16px"><div class="bubble">y</div></div>
+      <div class="msg bot"><div class="bubble">Sent. Also logged — group "Tuesday plans" now has a single-use grant for calendar (expired).</div></div>
+    </div>
+  </div>
+  <figcaption>Jacob's private DM: bot shows context + proposed reply. Jacob approves with one character. The grant is single-use unless upgraded.</figcaption>
+  </figure>
+</div>
+
+<div class="callout">
+  <h3 style="margin-top:0">What the audit row looks like</h3>
+  <pre style="background:var(--bg);padding:12px 14px;border-radius:8px;overflow-x:auto;font-size:.84rem;color:var(--mutedless);margin:8px 0 0"><code>DisclosureEvent {
+  id:              "de_7x9k2",
+  source_chat:     "group:tuesday-plans",
+  source_message:  "msg_4801",
+  asker:           "+1-415-555-alice",
+  data_accessed:   ["calendar:2026-04-28T19:00/21:00"],
+  proposed_reply:  "Jacob's open 7-9pm Tuesday. Works for him!",
+  approval_mode:   "approve-exact",
+  approver:        "jacob",
+  approved_at:     "2026-04-23T20:01:12Z",
+  final_reply:     "...(same as proposed)...",
+  grant_ttl:       "single-use"
+}</code></pre>
+</div>
+
+<h2><span class="num">4</span>Scene C — manifest dialog</h2>
+<p>Bot will disclose its own boundaries when asked. This is both a feature and a trust signal.</p>
+
+<div class="scene single">
+  <div class="pane">
+    <div class="hd"><span class="title">Tuesday plans</span><span class="kind group">group · 4 people</span></div>
+    <div class="chat">
+      <div class="msg them"><div class="author">Carol</div><div class="bubble">@picortex what do you actually know about jacob in this chat</div></div>
+      <div class="msg bot"><div class="bubble">Fair question. In this chat I have:
+
+<b>Permanent:</b>
+• This group's transcript (since I was added)
+• Jacob's name + the fact that he's a participant
+
+<b>Not available here without his approval:</b>
+• Personal calendar
+• Private notes
+• Contact list
+• Other chats
+
+When someone asks something that needs the above, I DM him and wait for approval before replying here.</div></div>
+    </div>
+  </div>
+</div>
+
+<h2><span class="num">5</span>Scene D — reactions trigger behavior</h2>
+<p>Reactions are first-class input. Bot reacts to acknowledge (🤔 thinking, ✅ done). Reactions on the bot trigger save/retract/remember.</p>
+
+<div class="scene">
+  <div class="pane">
+    <div class="hd"><span class="title">Jacob · picortex (DM)</span><span class="kind dm">private</span></div>
+    <div class="chat">
+      <div class="msg me"><div class="bubble">find me a paper on compositional generalization and summarize 3 bullets</div></div>
+      <div class="msg bot"><div class="bubble">🤔</div><div class="reactions"><span class="react bot-reacted">🤔 picortex</span></div></div>
+      <div class="divider-label">— 22 seconds —</div>
+      <div class="msg bot"><div class="bubble"><b>Lake & Baroni, "Generalization without Systematicity" (ICML 2018)</b>
+
+• Modern seq2seq models fail at compositional splits even with massive data
+• SCAN benchmark isolates compositional generalization from other failure modes
+• Authors show primitive commands are learned but novel compositions catastrophically fail</div><div class="reactions"><span class="react">⭐ jacob</span></div></div>
+      <div class="msg bot"><div class="bubble">Saved to your notes as <i>papers/lake-baroni-2018.md</i></div></div>
+    </div>
+  </div>
+
+  <div class="pane">
+    <div class="hd"><span class="title">Tuesday plans</span><span class="kind group">group</span></div>
+    <div class="chat">
+      <div class="msg them"><div class="author">Bob</div><div class="bubble">@picortex give me a quick tl;dr on quantum entanglement</div></div>
+      <div class="msg bot"><div class="bubble">Two particles become linked so that measuring one instantly determines the state of the other, even across arbitrary distances — even though no information is transmitted and relativity is preserved...</div><div class="reactions"><span class="react">❌ jacob</span></div></div>
+      <div class="msg bot"><div class="bubble">↑ retracted by Jacob. Happy to try again if anyone rephrases.</div></div>
+    </div>
+  </div>
+</div>
+
+<h2><span class="num">6</span>Architecture — abstract, channel- and executor-agnostic</h2>
+<p>The minimum set of components any concrete option must instantiate. The platonic architecture only names <em>roles</em>, not <em>machines</em> or <em>processes</em>. See the two concrete mockups for one-box and two-box materializations of these roles.</p>
+
+<div class="arch-wrap">
+<svg viewBox="0 0 960 640" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Platonic architecture diagram">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#8b6dff"/>
+    </marker>
+    <marker id="arrMuted" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#6a6a6a"/>
+    </marker>
+    <linearGradient id="gBot" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1e1e1e"/><stop offset="1" stop-color="#161616"/></linearGradient>
+  </defs>
+  <style>
+    .box{fill:url(#gBot);stroke:#2a2a2a;stroke-width:1.3;rx:10;ry:10}
+    .box.accent{stroke:#8b6dff}
+    .box.dmph{fill:#12201c;stroke:#215c52}
+    .box.phone{fill:#1a1a1a;stroke:#3a3a3a}
+    .label{fill:#e8e8e8;font:600 14px -apple-system,Inter,sans-serif}
+    .sub{fill:#8a8a8a;font:500 11px -apple-system,Inter,sans-serif}
+    .edge{stroke:#8b6dff;stroke-width:1.6;fill:none}
+    .edge.muted{stroke:#6a6a6a;stroke-dasharray:4 4}
+    .edge-label{fill:#bdbdbd;font:500 10.5px var(--mono),monospace}
+  </style>
+
+  <!-- Users row -->
+  <g>
+    <rect class="box phone" x="40" y="20" width="180" height="56" rx="10"/>
+    <text class="label" x="130" y="44" text-anchor="middle">Jacob's phone</text>
+    <text class="sub" x="130" y="62" text-anchor="middle">iMessage · DM with bot</text>
+
+    <rect class="box phone" x="260" y="20" width="180" height="56" rx="10"/>
+    <text class="label" x="350" y="44" text-anchor="middle">Group chat</text>
+    <text class="sub" x="350" y="62" text-anchor="middle">Alice · Bob · Carol</text>
+
+    <rect class="box phone" x="740" y="20" width="180" height="56" rx="10"/>
+    <text class="label" x="830" y="44" text-anchor="middle">Jacob's phone</text>
+    <text class="sub" x="830" y="62" text-anchor="middle">iMessage · DM (out-of-band)</text>
+  </g>
+
+  <!-- Channel -->
+  <rect class="box" x="120" y="118" width="480" height="52"/>
+  <text class="label" x="360" y="142" text-anchor="middle">Channel adapter</text>
+  <text class="sub" x="360" y="159" text-anchor="middle">Linq iMessage · OR · OpenChat · one event vocabulary</text>
+
+  <!-- Bot Gateway -->
+  <rect class="box accent" x="160" y="210" width="400" height="64"/>
+  <text class="label" x="360" y="236" text-anchor="middle">Bot Gateway</text>
+  <text class="sub" x="360" y="255" text-anchor="middle">HMAC verify · dedup · canonical message log · dispatch</text>
+
+  <!-- Attention gate -->
+  <rect class="box" x="60" y="316" width="180" height="56"/>
+  <text class="label" x="150" y="340" text-anchor="middle">Attention gate</text>
+  <text class="sub" x="150" y="357" text-anchor="middle">mentions / replies / LLM discriminator</text>
+
+  <!-- Executor -->
+  <rect class="box" x="280" y="316" width="160" height="56"/>
+  <text class="label" x="360" y="340" text-anchor="middle">Executor</text>
+  <text class="sub" x="360" y="357" text-anchor="middle">runs one turn</text>
+
+  <!-- Consent broker -->
+  <rect class="box dmph" x="480" y="316" width="200" height="56"/>
+  <text class="label" x="580" y="340" text-anchor="middle">Consent broker</text>
+  <text class="sub" x="580" y="357" text-anchor="middle">pause · DM Jacob · resume</text>
+
+  <!-- Knowledge layer -->
+  <rect class="box" x="160" y="416" width="400" height="64"/>
+  <text class="label" x="360" y="440" text-anchor="middle">Knowledge layer</text>
+  <text class="sub" x="360" y="459" text-anchor="middle">per-chat manifest · noos graph · transcript · files</text>
+
+  <!-- Out-of-band DM -->
+  <rect class="box dmph" x="720" y="316" width="220" height="64"/>
+  <text class="label" x="830" y="342" text-anchor="middle">Out-of-band DM path</text>
+  <text class="sub" x="830" y="360" text-anchor="middle">DisclosureEvent audit · approve/deny</text>
+
+  <!-- Audit / log -->
+  <rect class="box" x="60" y="514" width="820" height="56"/>
+  <text class="label" x="470" y="538" text-anchor="middle">Audit / canonical log</text>
+  <text class="sub" x="470" y="555" text-anchor="middle">every inbound · every turn · every consent decision · every outbound</text>
+
+  <!-- edges -->
+  <path class="edge" d="M 130,76 L 130,118"/>
+  <path class="edge" d="M 350,76 L 350,118"/>
+  <path class="edge" d="M 360,170 L 360,210"/>
+
+  <path class="edge" d="M 260,274 C 220,290 180,300 150,316"/>
+  <path class="edge" d="M 360,274 L 360,316"/>
+  <path class="edge" d="M 460,274 C 500,290 540,300 580,316"/>
+
+  <path class="edge muted" marker-end="url(#arrMuted)" d="M 680,348 L 720,348"/>
+  <path class="edge muted" marker-end="url(#arrMuted)" d="M 830,316 C 830,270 830,240 830,76"/>
+  <path class="edge muted" marker-start="url(#arrMuted)" d="M 920,316 C 920,130 920,108 360,170"/>
+
+  <path class="edge" d="M 150,372 C 190,390 230,410 260,416"/>
+  <path class="edge" d="M 360,372 L 360,416"/>
+  <path class="edge" d="M 580,372 C 540,390 500,410 460,416"/>
+  <path class="edge" d="M 360,480 L 360,514"/>
+
+  <!-- edge labels -->
+  <text class="edge-label" x="280" y="300" text-anchor="middle">inbound event</text>
+  <text class="edge-label" x="700" y="340" text-anchor="middle">pause turn</text>
+  <text class="edge-label" x="880" y="200">approve / deny</text>
+  <text class="edge-label" x="470" y="400" text-anchor="middle">query ctx</text>
+</svg>
+<div class="legend">
+  <span><span class="dot" style="background:#1e1e1e;border:1px solid #2a2a2a"></span>stateless role</span>
+  <span><span class="dot" style="background:#12201c;border:1px solid #215c52"></span>out-of-band / privacy path</span>
+  <span><span class="dot" style="background:#1a1a1a;border:1px solid #3a3a3a"></span>user endpoint</span>
+  <span><span class="dot" style="background:#8b6dff"></span>in-channel flow</span>
+  <span><span class="dot" style="background:#6a6a6a"></span>out-of-band flow</span>
+</div>
+</div>
+
+<h2><span class="num">7</span>Flow of a consent-loop turn</h2>
+<ol class="flow">
+  <li><div class="text"><b>Inbound.</b> Alice's message arrives on the Channel adapter (Linq or OpenChat webhook). HMAC verified, dedup'd, logged.</div></li>
+  <li><div class="text"><b>Attention gate.</b> Contains <code>@picortex</code> and a question addressed to Jacob's calendar. Gate passes.</div></li>
+  <li><div class="text"><b>Executor starts turn.</b> Reads the chat's manifest — <code>calendar</code> not in scope.</div></li>
+  <li><div class="text"><b>Pause → consent broker.</b> Executor yields; consent broker takes over. Bot emits "let me check" to the group; typing indicator on.</div></li>
+  <li><div class="text"><b>Out-of-band DM to Jacob.</b> Consent broker formats context + proposed response; sends via the same Channel adapter to Jacob's DM.</div></li>
+  <li><div class="text"><b>Jacob approves.</b> Reply "y" (or tap approve). Broker validates, writes <code>DisclosureEvent</code>, resumes the original turn with scope expanded.</div></li>
+  <li><div class="text"><b>Final reply.</b> Executor finishes and emits the approved message into the group. Audit row closes with <code>final_reply</code>.</div></li>
+  <li><div class="text"><b>Timeout path.</b> If Jacob doesn't respond in 10 min, broker closes the loop: group gets "I need to check on that offline", audit row marks <code>approval_mode: "timeout"</code>. No indefinite waits.</div></li>
+</ol>
+
+<div class="hr"></div>
+
+<h2><span class="num">8</span>What's explicitly abstract here</h2>
+<ul>
+  <li>Nothing says <em>one process or two</em>, <em>one box or many</em>, <em>tmux or not</em>.</li>
+  <li>Knowledge layer is drawn as one role but in reality is <code>{ per-chat manifest store, noos graph, transcript, files }</code> — any of which can live anywhere.</li>
+  <li>The Channel adapter hides Linq vs OpenChat specifics — both normalize to the same event vocabulary.</li>
+  <li>The Executor is the most replaceable piece: <code>claude -c -p</code> per turn, a tmux REPL, OpenClaw, or something else — all satisfy this diagram.</li>
+</ul>
+
+<h2><span class="num">9</span>What the concrete options change</h2>
+<div class="stories">
+  <div class="story"><div class="who">Option 2 · Piyush-style</div><p class="line">Bot Gateway and Executor live on different machines. Executor is an SSH call that runs <code>claude --session-id &lt;chat&gt; -p</code>. Knowledge layer is HTTP to noos on a third box. <a href="01-option-2-piyush-style.html">See mockup →</a></p></div>
+  <div class="story"><div class="who">Option 4 · Noos-style</div><p class="line">Everything in one process, no persistent workspace. Executor rebuilds transcript per turn and calls <code>claude --print</code>. Knowledge layer is HTTP to noos. <a href="02-option-4-noos-style.html">See mockup →</a></p></div>
+</div>
+
+</main>
+
+<footer>
+  <div class="row">
+    <span>picortex · mockup 00 · 2026-04-23</span>
+    <a href="https://wikihub.globalbr.ai/@jacobcole/picortex">Wiki landing ↗</a>
+    <a href="https://wikihub.globalbr.ai/@jacobcole/picortex/docs/prd/002-texting-experience">PRD 002 ↗</a>
+    <a href="https://wikihub.globalbr.ai/@jacobcole/picortex/docs/plans/2026-04-23-prototype-options">Prototype options ↗</a>
+  </div>
+</footer>
+
+</body>
+</html>

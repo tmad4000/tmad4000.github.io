@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>picortex — Option 4 · Noos-style stateless</title>
+<style>
+  :root{
+    --bg:#0a0a0a; --surface:#161616; --elev:#1e1e1e; --border:#2a2a2a;
+    --text:#e8e8e8; --muted:#8a8a8a; --mutedless:#bdbdbd;
+    --accent:#8b6dff; --accent-soft:#3a2f66;
+    --ok:#30d158; --warn:#ffd60a; --bad:#ff453a;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro","Inter","Helvetica Neue",Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:var(--sans);-webkit-font-smoothing:antialiased;line-height:1.5}
+  a{color:var(--accent);text-decoration:none} a:hover{text-decoration:underline}
+  code{font-family:var(--mono);background:var(--elev);padding:1px 6px;border-radius:4px;font-size:.9em}
+  pre{font-family:var(--mono);background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px 16px;overflow-x:auto;font-size:.84rem;color:var(--mutedless);margin:12px 0}
+  nav.top{position:sticky;top:0;z-index:10;background:rgba(10,10,10,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+  nav.top .inner{max-width:1100px;margin:0 auto;padding:14px 22px;display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+  nav.top .brand{font-weight:700;letter-spacing:-.01em} nav.top .brand .dot{color:var(--accent)}
+  nav.top .links{display:flex;gap:14px;flex-wrap:wrap}
+  nav.top .links a{color:var(--mutedless);font-size:.92rem} nav.top .links a.current{color:var(--text)}
+  nav.top .badge{margin-left:auto;font-size:.78rem;color:var(--muted);border:1px solid var(--border);padding:3px 8px;border-radius:999px}
+  main{max-width:1100px;margin:0 auto;padding:44px 22px 100px}
+  h1{font-size:2.3rem;margin:0 0 12px;letter-spacing:-.02em;line-height:1.15}
+  h1 .tag{color:var(--accent);font-weight:500;font-size:.9rem;letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:8px}
+  h2{font-size:1.45rem;margin:50px 0 14px;letter-spacing:-.015em}
+  h2 .num{display:inline-block;width:28px;height:28px;line-height:28px;text-align:center;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-size:.85rem;margin-right:10px;vertical-align:middle}
+  h3{font-size:1.02rem;margin:22px 0 10px;color:var(--mutedless);font-weight:600}
+  p.lead{font-size:1.08rem;color:var(--mutedless);max-width:68ch;margin:0 0 18px}
+  p{max-width:72ch;color:var(--mutedless)}
+  .hr{height:1px;background:var(--border);margin:48px 0}
+
+  .quote-box{border-left:3px solid var(--accent);background:linear-gradient(180deg,rgba(139,109,255,.05),rgba(139,109,255,0));padding:16px 22px;border-radius:0 8px 8px 0;margin:14px 0}
+  .quote-box .label{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:4px}
+  .quote-box p{color:var(--text);margin:4px 0}
+
+  .arch-wrap{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;overflow-x:auto}
+  .arch-wrap svg{display:block;margin:0 auto;max-width:100%;height:auto}
+  .legend{display:flex;flex-wrap:wrap;gap:14px;margin:18px 0 4px;font-size:.85rem;color:var(--mutedless)}
+  .legend .dot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:middle}
+
+  .cols2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media (max-width:760px){.cols2{grid-template-columns:1fr}}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px}
+  .card.ok{border-left:3px solid var(--ok)}
+  .card.warn{border-left:3px solid var(--warn)}
+  .card.bad{border-left:3px solid var(--bad)}
+  .card h3{margin-top:0}
+  .card ul{margin:6px 0;padding-left:22px} .card li{color:var(--mutedless);margin:3px 0}
+
+  .flow{counter-reset:step;padding:0;margin:18px 0;list-style:none;display:grid;grid-template-columns:1fr;gap:8px}
+  .flow li{counter-increment:step;display:flex;gap:14px;align-items:flex-start;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px}
+  .flow li::before{content:counter(step);flex-shrink:0;width:26px;height:26px;line-height:26px;text-align:center;border-radius:50%;background:var(--accent);color:#fff;font-size:.82rem;font-weight:600}
+  .flow li .text{flex:1;font-size:.93rem;color:var(--mutedless)}
+  .flow li .text b{color:var(--text)}
+  .flow li code{font-size:.82rem}
+
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:.92rem}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);color:var(--mutedless)}
+  th{color:var(--text);font-weight:600;background:var(--surface)}
+  tr:last-child td{border-bottom:0}
+
+  footer{max-width:1100px;margin:0 auto;padding:36px 22px 80px;color:var(--muted);font-size:.85rem;border-top:1px solid var(--border)}
+  footer .row{display:flex;gap:22px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+
+<nav class="top"><div class="inner">
+  <span class="brand">picortex<span class="dot">.</span></span>
+  <div class="links">
+    <a href="00-platonic-ideal.html">Platonic ideal</a>
+    <a href="01-option-2-piyush-style.html">Option 2 · Piyush-style</a>
+    <a class="current" href="02-option-4-noos-style.html">Option 4 · Noos-style</a>
+    <a href="https://wikihub.globalbr.ai/@jacobcole/picortex/docs/prd/002-texting-experience">PRD 002 ↗</a>
+  </div>
+  <span class="badge">concrete · 1 machine + noos</span>
+</div></nav>
+
+<main>
+
+<h1><span class="tag">Mockup 02 · Option 4</span>Noos-style (stateless, per-turn, no workspace)</h1>
+<p class="lead">The <a href="00-platonic-ideal.html">platonic ideal</a> realized with no workspace filesystem. Each turn is a fresh <code>claude --print</code> that receives system prompt + recent transcript + manifest-scoped context. Closest to how noos's existing Slack bot already operates. Fastest path to ship.</p>
+
+<div class="quote-box">
+  <div class="label">TL;DR architectural difference</div>
+  <p>One box for everything bot-related. No per-chat Linux users, no home dirs, no tmux, no SSH. Turns are stateless; continuity lives in SQLite + a system prompt rebuilt per turn. noos graph is still a drop-in over HTTPS.</p>
+</div>
+
+<p><b>UX is the same as the platonic ideal.</b> For the user-facing scenes, see <a href="00-platonic-ideal.html">Mockup 00</a>.</p>
+
+<h2><span class="num">1</span>The one box (plus noos)</h2>
+
+<div class="arch-wrap">
+<svg viewBox="0 0 1000 580" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Option 4 architecture">
+  <defs>
+    <marker id="arrA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#8b6dff"/>
+    </marker>
+    <marker id="arrM" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#6a6a6a"/>
+    </marker>
+  </defs>
+  <style>
+    .machine{fill:#12141a;stroke:#30385a;stroke-width:1.5;rx:14;ry:14}
+    .svc{fill:#1e1e1e;stroke:#2a2a2a;stroke-width:1;rx:8;ry:8}
+    .svc.hot{stroke:#8b6dff}
+    .svc.dm{fill:#12201c;stroke:#215c52}
+    .svc.ephemeral{fill:#2a1f12;stroke:#5a4420;stroke-dasharray:5 3}
+    .title{fill:#e8e8e8;font:600 13px -apple-system,Inter,sans-serif}
+    .mtitle{fill:#bdbdbd;font:500 11px -apple-system,Inter,sans-serif;letter-spacing:.04em;text-transform:uppercase}
+    .sub{fill:#8a8a8a;font:500 10.5px -apple-system,Inter,sans-serif}
+    .code{fill:#b3a6ff;font:500 10.5px ui-monospace,monospace}
+    .edge{stroke:#8b6dff;stroke-width:1.6;fill:none}
+    .edge.muted{stroke:#6a6a6a;stroke-dasharray:4 4}
+    .elabel{fill:#bdbdbd;font:500 10.5px ui-monospace,monospace}
+  </style>
+
+  <!-- user endpoints -->
+  <rect class="svc" x="10" y="16" width="170" height="48" rx="10"/>
+  <text class="title" x="95" y="38" text-anchor="middle">Group chat</text>
+  <text class="sub"   x="95" y="54" text-anchor="middle">iMessage / OpenChat</text>
+
+  <rect class="svc dm" x="820" y="16" width="170" height="48" rx="10"/>
+  <text class="title" x="905" y="38" text-anchor="middle">Jacob's DM</text>
+  <text class="sub"   x="905" y="54" text-anchor="middle">out-of-band approval</text>
+
+  <!-- Machine A -->
+  <rect class="machine" x="30" y="100" width="940" height="340"/>
+  <text class="mtitle" x="500" y="124" text-anchor="middle">MACHINE A · Bot (Fly.io machine, ~1 GB RAM)</text>
+  <text class="sub"    x="500" y="139" text-anchor="middle">Fastify process · systemd/fly-proxy · auto-scales to zero when idle</text>
+
+  <rect class="svc hot" x="60" y="160" width="880" height="52"/>
+  <text class="title" x="500" y="182" text-anchor="middle">Linq / OpenChat channel adapter</text>
+  <text class="sub"   x="500" y="199" text-anchor="middle">HMAC verify · dedup · normalize</text>
+
+  <rect class="svc" x="60" y="226" width="260" height="56"/>
+  <text class="title" x="190" y="249" text-anchor="middle">Attention gate</text>
+  <text class="sub"   x="190" y="266" text-anchor="middle">mentions / discriminator</text>
+
+  <rect class="svc" x="340" y="226" width="280" height="56"/>
+  <text class="title" x="480" y="249" text-anchor="middle">Turn builder</text>
+  <text class="sub"   x="480" y="266" text-anchor="middle">rebuild transcript + scoped context per turn</text>
+
+  <rect class="svc dm" x="640" y="226" width="300" height="56"/>
+  <text class="title" x="790" y="249" text-anchor="middle">Consent broker (paused turns)</text>
+  <text class="sub"   x="790" y="266" text-anchor="middle">SQLite row per pending · timer · resume</text>
+
+  <rect class="svc ephemeral" x="60" y="296" width="560" height="56"/>
+  <text class="title" x="340" y="318" text-anchor="middle">Ephemeral subprocess per turn</text>
+  <text class="sub"   x="340" y="337" text-anchor="middle"><tspan class="code">claude --print --system "&lt;sys&gt;" "&lt;transcript + input&gt;"</tspan> · dies after stdout</text>
+
+  <rect class="svc" x="640" y="296" width="300" height="56"/>
+  <text class="title" x="790" y="318" text-anchor="middle">SQLite canonical log</text>
+  <text class="sub"   x="790" y="335" text-anchor="middle">messages · manifests · DisclosureEvent · paused-turn rehydration</text>
+
+  <rect class="svc" x="60" y="366" width="880" height="56"/>
+  <text class="title" x="500" y="388" text-anchor="middle">Outbound · Linq/OpenChat sendMessage + Disclosure audit</text>
+  <text class="sub"   x="500" y="405" text-anchor="middle">each turn closes with a row; paused turns write the "let me check" ack</text>
+
+  <!-- noos -->
+  <rect class="machine" x="220" y="470" width="560" height="94"/>
+  <text class="mtitle" x="500" y="494" text-anchor="middle">noos graph (existing Lightsail)</text>
+  <text class="sub"    x="500" y="509" text-anchor="middle">HTTPS · x-api-key · scoped read per chat</text>
+  <rect class="svc" x="250" y="516" width="500" height="36"/>
+  <text class="title" x="500" y="539" text-anchor="middle">GET /api/nodes?tags=... · GET /api/feedback · etc.</text>
+
+  <!-- edges -->
+  <path class="edge" marker-end="url(#arrA)" marker-start="url(#arrA)" d="M 95,64 L 95,160"/>
+  <text class="elabel" x="105" y="100">HMAC webhook / sendMessage</text>
+
+  <path class="edge muted" marker-end="url(#arrM)" marker-start="url(#arrM)" d="M 905,64 C 905,220 850,260 790,282"/>
+  <text class="elabel" x="800" y="120" text-anchor="end">out-of-band DM</text>
+
+  <path class="edge" marker-end="url(#arrA)" d="M 500,422 L 500,470"/>
+  <text class="elabel" x="515" y="455">HTTPS · noos API</text>
+</svg>
+<div class="legend">
+  <span><span class="dot" style="background:#12141a;border:1px solid #30385a"></span>machine</span>
+  <span><span class="dot" style="background:#1e1e1e;border:1px solid #2a2a2a"></span>service</span>
+  <span><span class="dot" style="background:#2a1f12;border:1px solid #5a4420"></span>ephemeral subprocess</span>
+  <span><span class="dot" style="background:#12201c;border:1px solid #215c52"></span>out-of-band path</span>
+  <span><span class="dot" style="background:#8b6dff"></span>in-channel flow</span>
+</div>
+</div>
+
+<h2><span class="num">2</span>What lives where</h2>
+
+<table>
+  <thead><tr><th>Component</th><th>Where</th><th>Persistence</th></tr></thead>
+  <tbody>
+    <tr><td>Channel adapter + everything bot-related</td><td>One Fastify process on Fly Machine</td><td>Restart-survivable via SQLite</td></tr>
+    <tr><td>SQLite canonical log</td><td>Fly volume (1-5 GB, cheap)</td><td>Only durable state. Backed up nightly.</td></tr>
+    <tr><td>Claude session state</td><td>Nowhere. Rebuilt every turn from SQLite messages.</td><td>N/A — intentionally stateless</td></tr>
+    <tr><td>Per-chat workspace FS</td><td>Does not exist</td><td>N/A</td></tr>
+    <tr><td>Consent-broker paused turns</td><td>SQLite row: <code>paused_turns(id, chat_id, proposed_reply, expires_at, …)</code></td><td>Survives restart</td></tr>
+    <tr><td>noos graph</td><td>Existing Lightsail deploy, HTTPS</td><td>—</td></tr>
+  </tbody>
+</table>
+
+<h2><span class="num">3</span>Concrete consent-loop turn (wire view)</h2>
+
+<ol class="flow">
+  <li><div class="text"><b>Inbound webhook.</b> Linq POSTs to <code>/api/linq/inbound</code>. HMAC verified. Row inserted in <code>messages</code>.</div></li>
+  <li><div class="text"><b>Attention gate passes</b> (@mention). Turn builder reads <code>chat_config</code> + last N messages + manifest. Calendar not in scope.</div></li>
+  <li><div class="text"><b>Consent broker writes paused-turn row</b> with the planned scope expansion and proposed reply <em>draft</em>. Bot sends group ack via Linq: "Let me check with him — one sec." Typing indicator on.</div></li>
+  <li><div class="text"><b>Out-of-band DM to Jacob</b> with context + proposed response + shortcuts. Paused-turn row references this DM's message ID.</div></li>
+  <li><div class="text"><b>Jacob replies <code>y</code>.</b> Inbound handler matches the DM reply to the paused turn. Row updated: <code>approval_mode=approve-exact</code>.</div></li>
+  <li><div class="text"><b>Turn runs.</b> Turn builder rebuilds the transcript for the group + adds the now-approved calendar context. Spawns subprocess:<br><code>claude --print --system "&lt;sys with calendar ok&gt;" "&lt;transcript + ask&gt;"</code></div></li>
+  <li><div class="text"><b>stdout → outbound.</b> Subprocess exits, bot sends final reply to group via Linq. Paused-turn row closed. DisclosureEvent written.</div></li>
+</ol>
+
+<h2><span class="num">4</span>Code sketch (the turn builder)</h2>
+
+<pre><code>// src/turn.ts — stateless per-turn execution (Option 4)
+import { spawn } from 'child_process'
+
+export async function executeTurn(chat: Chat, msg: Message, scope: Scope) {
+  const transcript = await loadTranscript(chat.id, { last: 12 })   // from SQLite
+  const graphCtx   = await noos.fetchContext(chat.id, scope)        // HTTPS
+  const systemPrompt = composeSystemPrompt(chat, scope, graphCtx)
+  const turnInput   = formatTranscript(transcript) + '\n\n' + msg.text
+
+  const claude = spawn('claude', ['--print', '--system', systemPrompt, turnInput], {
+    env: { ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY },
+    timeout: 90_000,
+  })
+
+  const out = await collectStdout(claude)
+  return recordAndSend(chat, out)
+}
+</code></pre>
+
+<h3>Consent broker — pause state as a single SQLite row</h3>
+<pre><code>CREATE TABLE paused_turns (
+  id             TEXT PRIMARY KEY,
+  chat_id        TEXT NOT NULL,
+  source_msg_id  TEXT NOT NULL,
+  dm_msg_id      TEXT NOT NULL,       -- Jacob's DM we're awaiting approval from
+  proposed_reply TEXT NOT NULL,
+  scope_expand   JSON NOT NULL,       -- {calendar: "2026-04-28T19:00/21:00"}
+  approval_mode  TEXT,                -- null | approve-exact | approve-subset | deny | timeout
+  expires_at     INTEGER NOT NULL,    -- unix ms
+  created_at     INTEGER NOT NULL,
+  resolved_at    INTEGER
+);
+</code></pre>
+
+<h2><span class="num">5</span>Strengths &amp; costs, head-to-head</h2>
+
+<div class="cols2">
+  <div class="card ok">
+    <h3>Strengths</h3>
+    <ul>
+      <li><b>Simplicity.</b> One process. No SSH. No Linux users. No tmux. No workspace FS. Fits in a <500 LOC core.</li>
+      <li><b>Cheapest to run.</b> ~$5/mo Fly machine that scales to zero when idle.</li>
+      <li><b>Trivially portable.</b> Deploy anywhere Node runs. No OS-specific assumptions.</li>
+      <li><b>Fastest to ship.</b> If the dev surface (terminal + file browser) is deferred, this is an order-of-magnitude less code than Option 2.</li>
+      <li><b>Inherently bounded.</b> Each turn's context = transcript + explicit scope. No drift, no leftover state, no "what did Claude remember from three weeks ago?"</li>
+      <li><b>Well-trodden pattern.</b> Matches noos's existing Slack bot; predictable failure modes.</li>
+    </ul>
+  </div>
+  <div class="card warn">
+    <h3>Costs / risks</h3>
+    <ul>
+      <li><b>No workspace for code execution.</b> If you ever want Claude to <em>run</em> things on your behalf, you bolt Option 2's workspace host onto this, or migrate.</li>
+      <li><b>Transcript cost.</b> Every turn re-sends N messages to the model. Linear-ish token cost per conversation depth.</li>
+      <li><b>No session continuity other than the transcript.</b> If a multi-turn thought needed scratch-pad state, you're rebuilding it each turn.</li>
+      <li><b>Consent-loop timing depends on one process.</b> If the process restarts mid-consent-loop, you rely on SQLite rehydration — less clean than Option 2's A/B split.</li>
+      <li><b>Shared process memory.</b> A bug that leaks one chat's state could cross chats (vs Option 2's OS-enforced separation). Mitigable with care; not free.</li>
+    </ul>
+  </div>
+</div>
+
+<h2><span class="num">6</span>Five failure modes &amp; what happens</h2>
+
+<table>
+  <thead><tr><th>Failure</th><th>User-visible</th><th>Recovery</th></tr></thead>
+  <tbody>
+    <tr><td>Process restart during a consent loop</td><td>Brief delay; bot posts final answer when approved</td><td>Paused turns rehydrated from SQLite on boot; DM reply match resumes</td></tr>
+    <tr><td>Claude CLI crash mid-turn</td><td>"I had a glitch, try again"</td><td>Single-turn fail; no state to clean up</td></tr>
+    <tr><td>noos down</td><td>"I can't reach my knowledge graph right now"</td><td>Non-graph questions still answered; graph questions retry</td></tr>
+    <tr><td>Anthropic API rate-limit / outage</td><td>Queue + "I'm saturated, one moment"</td><td>Exponential backoff; drops to tier-2 model if configured</td></tr>
+    <tr><td>SQLite corruption (rare)</td><td>Full outage until restore</td><td>Nightly Fly-volume snapshot; restore in minutes</td></tr>
+  </tbody>
+</table>
+
+<h2><span class="num">7</span>Why this might be the answer</h2>
+<div class="quote-box">
+  <p>If PRD 002's v0.1 minimum slice ships without a dev surface (Q2 says "defer"), this is the simplest thing that hits every pillar. P4 consent-loop works cleanly with a single SQLite paused-turns table. Reactions and threading come for free from Claude CLI + Linq. Cost per month is lunch money. Option 2 becomes a possible <em>upgrade path</em> if/when code execution becomes the use case — but you don't need it to ship.</p>
+</div>
+
+<h2><span class="num">8</span>Migration path Option 4 → Option 2 (if/when needed)</h2>
+<ol class="flow">
+  <li><div class="text"><b>Trigger.</b> A real use case demands "bot runs a script / edits a file / uses <code>rg</code>" — not just "bot answers questions".</div></li>
+  <li><div class="text"><b>Provision machine B.</b> Add the workspace host; the channel adapter / SQLite / consent broker stay on machine A unchanged.</div></li>
+  <li><div class="text"><b>Swap the executor.</b> <code>spawn('claude', ['--print', …])</code> becomes an SSH exec to machine B. Everything else is identical.</div></li>
+  <li><div class="text"><b>Turn builder carries session-id.</b> On B, use <code>claude --session-id &lt;chat&gt; -p</code> so Claude's own memory is in B's <code>~/.claude/</code> — full Option 2 shape.</div></li>
+  <li><div class="text"><b>Migrate one chat at a time.</b> New chats get workspaces immediately; existing chats inherit them lazily on next inbound. No big-bang cutover.</div></li>
+</ol>
+
+<p>This migration is <em>additive</em>, not a rewrite. The Channel, SQLite, manifest, consent broker, and audit layer never move.</p>
+
+<div class="hr"></div>
+
+<p style="text-align:center;color:var(--muted);font-size:.92rem">Compare with the platonic ideal (<a href="00-platonic-ideal.html">Mockup 00</a>) or the 2-box Option 2 design (<a href="01-option-2-piyush-style.html">Mockup 01</a>).</p>
+
+</main>
+
+<footer>
+  <div class="row">
+    <span>picortex · mockup 02 · Option 4 · 2026-04-23</span>
+    <a href="https://wikihub.globalbr.ai/@jacobcole/picortex/docs/plans/2026-04-23-prototype-options">Prototype options ↗</a>
+    <a href="https://wikihub.globalbr.ai/@jacobcole/picortex/docs/prd/002-texting-experience">PRD 002 ↗</a>
+  </div>
+</footer>
+
+</body>
+</html>
