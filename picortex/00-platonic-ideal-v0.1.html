@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>picortex — Platonic ideal</title>
+<title>picortex — Platonic ideal (v0.1, superseded)</title>
 <style>
   :root{
     --bg:#0a0a0a; --surface:#161616; --elev:#1e1e1e; --border:#2a2a2a;
@@ -131,12 +131,12 @@
     <a href="02-option-4-noos-style.html">Option 4 · Noos-style</a>
     <a href="https://wikihub.globalbr.ai/@jacobcole/picortex/docs/prd/002-texting-experience">PRD 002 ↗</a>
   </div>
-  <span class="badge" style="background:#0e3020;border-color:#184a33;color:#66e09b">v0.2 · current</span>
-  <span class="badge">2026-04-23 · provisional</span>
+  <span class="badge" style="background:#3a1414;border-color:#5a2020;color:#ff8a7e">v0.1 · superseded</span>
+  <span class="badge">2026-04-23</span>
 </div></nav>
 
-<div style="background:#161616;border:1px solid #2a2a2a;padding:10px 22px;color:var(--mutedless);font:500 13px/1.5 var(--sans);max-width:1100px;margin:10px auto 0;border-radius:8px">
-  <b>v0.2</b> — Architecture diagram revised to show Jacob's phone once; "out-of-band" is now a property of the path (different DM thread from the group), not a separate endpoint. &middot; <a href="00-platonic-ideal-v0.1.html">View v0.1 for comparison →</a>
+<div style="background:#3a2f12;border-left:3px solid #ffd60a;padding:14px 22px;color:#e8e8e8;font:500 14px/1.5 var(--sans);max-width:1100px;margin:12px auto 0;border-radius:0 8px 8px 0">
+  <b style="color:#ffd60a">Historical · v0.1</b> — The architecture diagram on this page drew Jacob's phone <em>twice</em> (once for inbound DMs, once for approval prompts). Same device, same DM thread — drawn as two boxes, which was confusing. Fixed in <a href="00-platonic-ideal.html" style="color:#8b6dff">v0.2 (current)</a>. Kept here for comparison.
 </div>
 
 <main>
@@ -325,23 +325,17 @@ When someone asks something that needs the above, I DM him and wait for approval
 
   <!-- Users row -->
   <g>
-    <rect class="box phone" x="40" y="14" width="230" height="66" rx="10"/>
-    <text class="label" x="155" y="38" text-anchor="middle">Jacob's phone · DM with bot</text>
-    <text class="sub" x="155" y="56" text-anchor="middle">inbound DMs  +  bot-initiated</text>
-    <text class="sub" x="155" y="70" text-anchor="middle">approval prompts (same thread)</text>
+    <rect class="box phone" x="40" y="20" width="180" height="56" rx="10"/>
+    <text class="label" x="130" y="44" text-anchor="middle">Jacob's phone</text>
+    <text class="sub" x="130" y="62" text-anchor="middle">iMessage · DM with bot</text>
 
-    <rect class="box phone" x="300" y="14" width="210" height="66" rx="10"/>
-    <text class="label" x="405" y="38" text-anchor="middle">Group chat</text>
-    <text class="sub" x="405" y="56" text-anchor="middle">Alice · Bob · Carol · bot</text>
-    <text class="sub" x="405" y="70" text-anchor="middle">where the ask originates</text>
-  </g>
+    <rect class="box phone" x="260" y="20" width="180" height="56" rx="10"/>
+    <text class="label" x="350" y="44" text-anchor="middle">Group chat</text>
+    <text class="sub" x="350" y="62" text-anchor="middle">Alice · Bob · Carol</text>
 
-  <!-- Annotation explaining out-of-band -->
-  <g transform="translate(640,14)">
-    <rect x="0" y="0" width="280" height="66" rx="10" fill="#12201c" stroke="#215c52" stroke-dasharray="5 3"/>
-    <text class="label" x="140" y="28" text-anchor="middle" fill="#b6e8dc">"Out-of-band" =</text>
-    <text class="sub" x="140" y="46" text-anchor="middle">same phone, same channel, same</text>
-    <text class="sub" x="140" y="60" text-anchor="middle">DM — different thread from the group</text>
+    <rect class="box phone" x="740" y="20" width="180" height="56" rx="10"/>
+    <text class="label" x="830" y="44" text-anchor="middle">Jacob's phone</text>
+    <text class="sub" x="830" y="62" text-anchor="middle">iMessage · DM (out-of-band)</text>
   </g>
 
   <!-- Channel -->
@@ -385,28 +379,18 @@ When someone asks something that needs the above, I DM him and wait for approval
   <text class="sub" x="470" y="555" text-anchor="middle">every inbound · every turn · every consent decision · every outbound</text>
 
   <!-- edges -->
-  <!-- Jacob's DM (inbound) → channel adapter -->
-  <path class="edge" d="M 155,80 L 155,118"/>
-  <!-- group chat → channel adapter -->
-  <path class="edge" d="M 405,80 L 405,118"/>
-  <!-- channel adapter → bot gateway -->
+  <path class="edge" d="M 130,76 L 130,118"/>
+  <path class="edge" d="M 350,76 L 350,118"/>
   <path class="edge" d="M 360,170 L 360,210"/>
 
-  <!-- bot gateway → attention / executor / consent broker -->
   <path class="edge" d="M 260,274 C 220,290 180,300 150,316"/>
   <path class="edge" d="M 360,274 L 360,316"/>
   <path class="edge" d="M 460,274 C 500,290 540,300 580,316"/>
 
-  <!-- consent broker → out-of-band DM path -->
   <path class="edge muted" marker-end="url(#arrMuted)" d="M 680,348 L 720,348"/>
+  <path class="edge muted" marker-end="url(#arrMuted)" d="M 830,316 C 830,270 830,240 830,76"/>
+  <path class="edge muted" marker-start="url(#arrMuted)" d="M 920,316 C 920,130 920,108 360,170"/>
 
-  <!-- out-of-band DM path → OUTBOUND (bot DM asks Jacob via channel adapter) -->
-  <path class="edge muted" marker-end="url(#arrMuted)" d="M 830,316 C 830,220 640,185 500,170"/>
-
-  <!-- Jacob's DM (approval reply) → channel adapter → consent broker -->
-  <path class="edge muted" marker-start="url(#arrMuted)" d="M 920,316 C 935,200 620,105 270,50"/>
-
-  <!-- knowledge layer edges -->
   <path class="edge" d="M 150,372 C 190,390 230,410 260,416"/>
   <path class="edge" d="M 360,372 L 360,416"/>
   <path class="edge" d="M 580,372 C 540,390 500,410 460,416"/>
@@ -415,20 +399,16 @@ When someone asks something that needs the above, I DM him and wait for approval
   <!-- edge labels -->
   <text class="edge-label" x="280" y="300" text-anchor="middle">inbound event</text>
   <text class="edge-label" x="700" y="340" text-anchor="middle">pause turn</text>
-  <text class="edge-label" x="620" y="240">bot → Jacob's DM</text>
-  <text class="edge-label" x="560" y="130" text-anchor="end">Jacob's reply ← broker</text>
+  <text class="edge-label" x="880" y="200">approve / deny</text>
   <text class="edge-label" x="470" y="400" text-anchor="middle">query ctx</text>
 </svg>
 <div class="legend">
   <span><span class="dot" style="background:#1e1e1e;border:1px solid #2a2a2a"></span>stateless role</span>
   <span><span class="dot" style="background:#12201c;border:1px solid #215c52"></span>out-of-band / privacy path</span>
   <span><span class="dot" style="background:#1a1a1a;border:1px solid #3a3a3a"></span>user endpoint</span>
-  <span><span class="dot" style="background:#8b6dff"></span>in-channel (group) flow</span>
-  <span><span class="dot" style="background:#6a6a6a"></span>out-of-band (private DM) flow</span>
+  <span><span class="dot" style="background:#8b6dff"></span>in-channel flow</span>
+  <span><span class="dot" style="background:#6a6a6a"></span>out-of-band flow</span>
 </div>
-<p style="color:var(--muted);font-size:.88rem;margin:14px 0 0">
-  <b>Why "out-of-band"?</b> The approval question from the bot goes to Jacob's private DM with the bot — not back into the group where Alice asked. Same phone, same app, same DM thread Jacob already uses for 1:1 chats; distinct conversation from the group. The group only sees "let me check" and the eventual answer (or "I don't have access to that"). Alice cannot observe that an approval loop happened.
-</p>
 </div>
 
 <h2><span class="num">7</span>Flow of a consent-loop turn</h2>

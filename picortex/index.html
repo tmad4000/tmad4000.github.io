@@ -5,36 +5,59 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>picortex — mockups</title>
 <style>
-  body{margin:0;padding:50px 24px;font:16px/1.55 -apple-system,BlinkMacSystemFont,"SF Pro Text",Inter,sans-serif;background:#0a0a0a;color:#e8e8e8;max-width:720px;margin:0 auto}
+  body{margin:0;padding:50px 24px;font:16px/1.55 -apple-system,BlinkMacSystemFont,"SF Pro Text",Inter,sans-serif;background:#0a0a0a;color:#e8e8e8;max-width:760px;margin:0 auto}
   h1{font-size:2rem;letter-spacing:-.02em;margin:0 0 8px}
+  h2{font-size:1rem;margin:36px 0 10px;color:#bdbdbd;letter-spacing:.04em;text-transform:uppercase;font-weight:600}
   .tag{color:#8b6dff;font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;display:block}
   p{color:#bdbdbd;max-width:60ch}
   a{color:#8b6dff;text-decoration:none} a:hover{text-decoration:underline}
-  ul{list-style:none;padding:0;margin:32px 0 0}
-  li{background:#161616;border:1px solid #2a2a2a;border-radius:10px;padding:16px 20px;margin:10px 0}
-  li h2{font-size:1.08rem;margin:0 0 4px}
+  ul{list-style:none;padding:0;margin:8px 0 0}
+  li{background:#161616;border:1px solid #2a2a2a;border-radius:10px;padding:16px 20px;margin:10px 0;position:relative}
+  li h3{font-size:1.06rem;margin:0 0 4px;display:flex;align-items:center;gap:10px}
   li p{font-size:.92rem;margin:0;color:#8a8a8a}
+  .ver{display:inline-block;font-size:.7rem;padding:2px 8px;border-radius:999px;letter-spacing:.04em;font-weight:600}
+  .ver.current{background:#0e3020;color:#66e09b;border:1px solid #184a33}
+  .ver.old{background:#3a1414;color:#ff8a7e;border:1px solid #5a2020}
   footer{margin:40px 0 0;color:#8a8a8a;font-size:.85rem}
+  .changelog{background:#121212;border:1px solid #2a2a2a;border-radius:10px;padding:14px 20px;margin-top:10px;font-size:.88rem;color:#9a9a9a}
+  .changelog b{color:#e8e8e8}
 </style>
 </head>
 <body>
 <span class="tag">picortex · mockups</span>
 <h1>Texting-agent mockups</h1>
 <p>Three self-contained HTML mockups for a planned project: a Claude-backed agent added to iMessage or OpenChat group texts, with consent-mediated disclosure of private data. See <a href="https://wikihub.globalbr.ai/@jacobcole/picortex">the wiki</a> for full planning docs.</p>
+
+<h2>Current</h2>
 <ul>
   <li>
-    <h2><a href="00-platonic-ideal.html">00 — Platonic ideal</a></h2>
-    <p>UX scenes (attention, the consent-loop split view, manifest dialog, reactions) + abstract architecture diagram + user stories.</p>
+    <h3><a href="00-platonic-ideal.html">00 — Platonic ideal</a> <span class="ver current">v0.2 · current</span></h3>
+    <p>UX scenes (attention, the consent-loop split view, manifest dialog, reactions) + abstract architecture diagram + user stories. Diagram fixed 2026-04-23 per Jacob's feedback on v0.1.</p>
   </li>
   <li>
-    <h2><a href="01-option-2-piyush-style.html">01 — Option 2 · Piyush-style</a></h2>
+    <h3><a href="01-option-2-piyush-style.html">01 — Option 2 · Piyush-style</a> <span class="ver current">v0.1 · current</span></h3>
     <p>Concrete 3-machine architecture: Bot Gateway + Workspace Host + noos. SSH + <code>claude --session-id -p</code> per turn.</p>
   </li>
   <li>
-    <h2><a href="02-option-4-noos-style.html">02 — Option 4 · Noos-style</a></h2>
+    <h3><a href="02-option-4-noos-style.html">02 — Option 4 · Noos-style</a> <span class="ver current">v0.1 · current</span></h3>
     <p>Concrete 1-box stateless architecture. Per-turn ephemeral <code>claude --print</code> with transcript rebuilt from SQLite. Cheapest to ship.</p>
   </li>
 </ul>
+
+<h2>Historical</h2>
+<ul>
+  <li>
+    <h3><a href="00-platonic-ideal-v0.1.html">00 — Platonic ideal</a> <span class="ver old">v0.1 · superseded</span></h3>
+    <p>Initial draft. Architecture diagram drew Jacob's phone <em>twice</em> (inbound DM + approval) — same device, same DM thread, two boxes. Confusing, replaced by v0.2. Kept for comparison.</p>
+  </li>
+</ul>
+
+<h2>Version history</h2>
+<div class="changelog">
+  <p><b>2026-04-23</b> — Mockup 00 bumped v0.1 → v0.2. Jacob noted "the left Jacob-phone box is already a DM — the right one is redundant." Fixed: single phone endpoint, dashed arrows loop back to it, with an inline annotation defining "out-of-band" as <em>different DM thread</em>, not different endpoint. Plus a plain-language explainer paragraph below the legend.</p>
+  <p><b>2026-04-23</b> — Mockups 00, 01, 02 all shipped at v0.1 in one session.</p>
+</div>
+
 <footer>
   <p><a href="/">&larr; tmad4000.github.io</a> · <a href="https://wikihub.globalbr.ai/@jacobcole/picortex">wiki</a></p>
 </footer>
