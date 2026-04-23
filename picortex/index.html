@@ -13,34 +13,41 @@
   a{color:#8b6dff;text-decoration:none} a:hover{text-decoration:underline}
   ul{list-style:none;padding:0;margin:8px 0 0}
   li{background:#161616;border:1px solid #2a2a2a;border-radius:10px;padding:16px 20px;margin:10px 0;position:relative}
-  li h3{font-size:1.06rem;margin:0 0 4px;display:flex;align-items:center;gap:10px}
+  li h3{font-size:1.06rem;margin:0 0 4px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
   li p{font-size:.92rem;margin:0;color:#8a8a8a}
   .ver{display:inline-block;font-size:.7rem;padding:2px 8px;border-radius:999px;letter-spacing:.04em;font-weight:600}
   .ver.current{background:#0e3020;color:#66e09b;border:1px solid #184a33}
   .ver.old{background:#3a1414;color:#ff8a7e;border:1px solid #5a2020}
+  .ver.ref{background:#3a2f12;color:#ffd86e;border:1px solid #4a4420}
   footer{margin:40px 0 0;color:#8a8a8a;font-size:.85rem}
   .changelog{background:#121212;border:1px solid #2a2a2a;border-radius:10px;padding:14px 20px;margin-top:10px;font-size:.88rem;color:#9a9a9a}
   .changelog b{color:#e8e8e8}
+  .changelog p{margin:6px 0}
+  code{background:#1e1e1e;padding:1px 6px;border-radius:4px;font-family:ui-monospace,Menlo,monospace;font-size:.9em}
 </style>
 </head>
 <body>
 <span class="tag">picortex · mockups</span>
 <h1>Texting-agent mockups</h1>
-<p>Three self-contained HTML mockups for a planned project: a Claude-backed agent added to iMessage or OpenChat group texts, with consent-mediated disclosure of private data. See <a href="https://wikihub.globalbr.ai/@jacobcole/picortex">the wiki</a> for full planning docs.</p>
+<p>Four self-contained HTML artifacts for a planned project: a Claude-backed agent added to iMessage or OpenChat group texts, with consent-mediated disclosure of private data. See <a href="https://wikihub.globalbr.ai/@jacobcole/picortex">the wiki</a> for full planning docs.</p>
 
 <h2>Current</h2>
 <ul>
   <li>
     <h3><a href="00-platonic-ideal.html">00 — Platonic ideal</a> <span class="ver current">v0.2 · current</span></h3>
-    <p>UX scenes (attention, the consent-loop split view, manifest dialog, reactions) + abstract architecture diagram + user stories. Diagram fixed 2026-04-23 per Jacob's feedback on v0.1.</p>
+    <p>UX scenes (attention, the consent-loop split view, manifest dialog, reactions) + abstract architecture diagram + user stories. Diagram fixed 2026-04-23 per feedback on v0.1.</p>
   </li>
   <li>
-    <h3><a href="01-option-2-piyush-style.html">01 — Option 2 · Piyush-style</a> <span class="ver current">v0.1 · current</span></h3>
-    <p>Concrete 3-machine architecture: Bot Gateway + Workspace Host + noos. SSH + <code>claude --session-id -p</code> per turn.</p>
+    <h3><a href="01-option-2-no-docker.html">01 — Option 2 · No-Docker architecture</a> <span class="ver current">v0.2 · current</span></h3>
+    <p>Concrete 2-box architecture: bot server + Claude box, plus reused noos graph on a third. SSH + <code>claude --session-id -p</code> per turn. Credit/divergence box distinguishes what's borrowed from Piyush's Jan 2026 design vs. what's new. Formerly labeled "Piyush-style."</p>
   </li>
   <li>
     <h3><a href="02-option-4-noos-style.html">02 — Option 4 · Noos-style</a> <span class="ver current">v0.1 · current</span></h3>
     <p>Concrete 1-box stateless architecture. Per-turn ephemeral <code>claude --print</code> with transcript rebuilt from SQLite. Cheapest to ship.</p>
+  </li>
+  <li>
+    <h3><a href="03-piyush-literal.html">03 — Piyush's literal architecture</a> <span class="ver ref">reference</span></h3>
+    <p>What Piyush Jha actually shipped in Jan 2026 — 9 commits of per-user web chat over SSH to a single shared EC2. Not a proposal; kept so other mockups can credit the pattern honestly.</p>
   </li>
 </ul>
 
@@ -48,13 +55,19 @@
 <ul>
   <li>
     <h3><a href="00-platonic-ideal-v0.1.html">00 — Platonic ideal</a> <span class="ver old">v0.1 · superseded</span></h3>
-    <p>Initial draft. Architecture diagram drew Jacob's phone <em>twice</em> (inbound DM + approval) — same device, same DM thread, two boxes. Confusing, replaced by v0.2. Kept for comparison.</p>
+    <p>Initial draft. Architecture diagram drew Jacob's phone <em>twice</em> (inbound DM + approval) — same device, same DM thread, two boxes. Confusing, replaced by v0.2.</p>
+  </li>
+  <li>
+    <h3><a href="01-option-2-piyush-style-v0.1.html">01 — Option 2 · Piyush-style</a> <span class="ver old">v0.1 · renamed</span></h3>
+    <p>Previous version of mockup 01. The label "Piyush-style" oversold how much of Piyush's original design was carried over — renamed to "No-Docker architecture" in v0.2 and paired with mockup 03 (Piyush's literal architecture) to keep provenance honest.</p>
   </li>
 </ul>
 
 <h2>Version history</h2>
 <div class="changelog">
-  <p><b>2026-04-23</b> — Mockup 00 bumped v0.1 → v0.2. Jacob noted "the left Jacob-phone box is already a DM — the right one is redundant." Fixed: single phone endpoint, dashed arrows loop back to it, with an inline annotation defining "out-of-band" as <em>different DM thread</em>, not different endpoint. Plus a plain-language explainer paragraph below the legend.</p>
+  <p><b>2026-04-23</b> — Mockup 01 bumped v0.1 → v0.2. Renamed from "Piyush-style" to "No-Docker architecture." Dropped "Bot Gateway" jargon → plain "bot server." Added credit/divergence box. Created mockup 03 as a dedicated reference for Piyush's literal design. Old URL <code>01-option-2-piyush-style.html</code> now serves a redirect stub to the new canonical.</p>
+  <p><b>2026-04-23</b> — Mockup 03 new at v0.1. Reference doc only — not a picortex proposal.</p>
+  <p><b>2026-04-23</b> — Mockup 00 bumped v0.1 → v0.2. Architecture diagram collapsed duplicate Jacob-phone boxes into one; added annotation that "out-of-band" means different DM <em>thread</em>, not different endpoint.</p>
   <p><b>2026-04-23</b> — Mockups 00, 01, 02 all shipped at v0.1 in one session.</p>
 </div>
 
