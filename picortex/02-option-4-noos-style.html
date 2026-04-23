@@ -74,8 +74,9 @@
   <span class="brand">picortex<span class="dot">.</span></span>
   <div class="links">
     <a href="00-platonic-ideal.html">Platonic ideal</a>
-    <a href="01-option-2-piyush-style.html">Option 2 · Piyush-style</a>
+    <a href="01-option-2-no-docker.html">Option 2 · No-Docker</a>
     <a class="current" href="02-option-4-noos-style.html">Option 4 · Noos-style</a>
+    <a href="03-piyush-literal.html">03 · Piyush (reference)</a>
     <a href="https://wikihub.globalbr.ai/@jacobcole/picortex/docs/prd/002-texting-experience">PRD 002 ↗</a>
   </div>
   <span class="badge">concrete · 1 machine + noos</span>
@@ -297,9 +298,9 @@ export async function executeTurn(chat: Chat, msg: Message, scope: Scope) {
 <h2><span class="num">8</span>Migration path Option 4 → Option 2 (if/when needed)</h2>
 <ol class="flow">
   <li><div class="text"><b>Trigger.</b> A real use case demands "bot runs a script / edits a file / uses <code>rg</code>" — not just "bot answers questions".</div></li>
-  <li><div class="text"><b>Provision machine B.</b> Add the workspace host; the channel adapter / SQLite / consent broker stay on machine A unchanged.</div></li>
-  <li><div class="text"><b>Swap the executor.</b> <code>spawn('claude', ['--print', …])</code> becomes an SSH exec to machine B. Everything else is identical.</div></li>
-  <li><div class="text"><b>Turn builder carries session-id.</b> On B, use <code>claude --session-id &lt;chat&gt; -p</code> so Claude's own memory is in B's <code>~/.claude/</code> — full Option 2 shape.</div></li>
+  <li><div class="text"><b>Provision box B.</b> Add the Claude box (workspace host); the channel adapter / SQLite / consent broker stay on box A unchanged.</div></li>
+  <li><div class="text"><b>Swap the executor.</b> <code>spawn('claude', ['--print', …])</code> becomes an SSH exec to box B. Everything else is identical.</div></li>
+  <li><div class="text"><b>Turn builder carries session-id.</b> On B, use <code>claude --session-id &lt;chat&gt; -p</code> so Claude's own memory is in B's <code>~/.claude/</code> — full No-Docker (Option 2) shape.</div></li>
   <li><div class="text"><b>Migrate one chat at a time.</b> New chats get workspaces immediately; existing chats inherit them lazily on next inbound. No big-bang cutover.</div></li>
 </ol>
 
@@ -307,7 +308,7 @@ export async function executeTurn(chat: Chat, msg: Message, scope: Scope) {
 
 <div class="hr"></div>
 
-<p style="text-align:center;color:var(--muted);font-size:.92rem">Compare with the platonic ideal (<a href="00-platonic-ideal.html">Mockup 00</a>) or the 2-box Option 2 design (<a href="01-option-2-piyush-style.html">Mockup 01</a>).</p>
+<p style="text-align:center;color:var(--muted);font-size:.92rem">Compare with the platonic ideal (<a href="00-platonic-ideal.html">Mockup 00</a>) or the 2-box <a href="01-option-2-no-docker.html">No-Docker design</a>.</p>
 
 </main>
 

@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>picortex — Piyush's actual architecture (reference)</title>
+<style>
+  :root{
+    --bg:#0a0a0a; --surface:#161616; --elev:#1e1e1e; --border:#2a2a2a;
+    --text:#e8e8e8; --muted:#8a8a8a; --mutedless:#bdbdbd;
+    --accent:#8b6dff; --accent-soft:#3a2f66;
+    --ok:#30d158; --warn:#ffd60a; --bad:#ff453a;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro","Inter","Helvetica Neue",Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:var(--sans);-webkit-font-smoothing:antialiased;line-height:1.5}
+  a{color:var(--accent);text-decoration:none} a:hover{text-decoration:underline}
+  code{font-family:var(--mono);background:var(--elev);padding:1px 6px;border-radius:4px;font-size:.9em}
+  pre{font-family:var(--mono);background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px 16px;overflow-x:auto;font-size:.84rem;color:var(--mutedless);margin:12px 0}
+  nav.top{position:sticky;top:0;z-index:10;background:rgba(10,10,10,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+  nav.top .inner{max-width:1100px;margin:0 auto;padding:14px 22px;display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+  nav.top .brand{font-weight:700;letter-spacing:-.01em} nav.top .brand .dot{color:var(--accent)}
+  nav.top .links{display:flex;gap:14px;flex-wrap:wrap}
+  nav.top .links a{color:var(--mutedless);font-size:.92rem} nav.top .links a.current{color:var(--text)}
+  nav.top .badge{margin-left:auto;font-size:.78rem;color:var(--muted);border:1px solid var(--border);padding:3px 8px;border-radius:999px}
+  main{max-width:1100px;margin:0 auto;padding:44px 22px 100px}
+  h1{font-size:2.2rem;margin:0 0 12px;letter-spacing:-.02em;line-height:1.15}
+  h1 .tag{color:var(--accent);font-weight:500;font-size:.9rem;letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:8px}
+  h2{font-size:1.4rem;margin:46px 0 14px;letter-spacing:-.015em}
+  h2 .num{display:inline-block;width:28px;height:28px;line-height:28px;text-align:center;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-size:.85rem;margin-right:10px;vertical-align:middle}
+  h3{font-size:1rem;margin:22px 0 10px;color:var(--mutedless);font-weight:600}
+  p.lead{font-size:1.05rem;color:var(--mutedless);max-width:68ch;margin:0 0 18px}
+  p{max-width:72ch;color:var(--mutedless)}
+
+  .banner{background:#3a2f12;border-left:3px solid #ffd60a;padding:14px 22px;color:#e8e8e8;font:500 14px/1.55 var(--sans);border-radius:0 8px 8px 0;margin:12px 0}
+  .banner b{color:#ffd60a}
+
+  .arch-wrap{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;overflow-x:auto}
+  .arch-wrap svg{display:block;margin:0 auto;max-width:100%;height:auto}
+
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:.92rem}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);color:var(--mutedless)}
+  th{color:var(--text);font-weight:600;background:var(--surface)}
+  tr:last-child td{border-bottom:0}
+  td code{font-size:.82rem}
+
+  .hr{height:1px;background:var(--border);margin:40px 0}
+  footer{max-width:1100px;margin:0 auto;padding:36px 22px 80px;color:var(--muted);font-size:.85rem;border-top:1px solid var(--border)}
+  footer .row{display:flex;gap:22px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+
+<nav class="top"><div class="inner">
+  <span class="brand">picortex<span class="dot">.</span></span>
+  <div class="links">
+    <a href="00-platonic-ideal.html">Platonic ideal</a>
+    <a href="01-option-2-no-docker.html">Option 2 · No-Docker</a>
+    <a href="02-option-4-noos-style.html">Option 4 · Noos-style</a>
+    <a class="current" href="03-piyush-literal.html">03 · Piyush (reference)</a>
+    <a href="https://wikihub.globalbr.ai/@jacobcole/picortex/docs/prd/002-texting-experience">PRD 002 ↗</a>
+  </div>
+  <span class="badge" style="background:#3a2f12;border-color:#4a4420;color:#ffd86e">reference · not a proposal</span>
+</div></nav>
+
+<main>
+
+<h1><span class="tag">Mockup 03 · Reference</span>Piyush's actual architecture</h1>
+<p class="lead">What <b>Piyush Jha</b> actually shipped in January 2026 — the first nine commits of <code>IdeaFlowCo/cortex</code> before Tejas DC rewrote everything onto Fly.io Docker containers. This page exists so nothing in the picortex planning docs overstates what's "from Piyush" vs. what's new.</p>
+
+<div class="banner">
+  <b>Reference only.</b> This is not a picortex proposal. It's a factual snapshot of someone else's design, kept here so the <a href="01-option-2-no-docker.html">No-Docker architecture</a> (Option 2) can credit the parts it borrows without pretending to be a clone.
+</div>
+
+<h2><span class="num">1</span>The nine commits</h2>
+<p>All by Piyush Jha <code>&lt;piyushjha8164@gmail.com&gt;</code>, 2026-01-20 through 2026-01-23. Final tip: <code>d2d6a534</code>. Replaced wholesale starting <code>af3a76f5</code> (Tejas DC, 2026-01-26).</p>
+
+<pre><code>238052c4  2026-01-20  Initial commit: Initialize Cortex project with Beads
+21a765f4  2026-01-20  Add all Cortex project tickets with dependencies
+f43d1c25  2026-01-20  Implement complete Cortex cloud Claude CLI platform
+424b15df  2026-01-20  Add EC2 infrastructure setup documentation and scripts
+e6d1c738  2026-01-20  Fix SSH streaming and improve chat functionality
+168eb7ae  2026-01-20  Remove tsc from build command for Vercel deployment
+880ba248  2026-01-20  Add project documentation files
+82327e54  2026-01-23  Add SSH key generation for direct workspace access
+d2d6a534  2026-01-23  Update README.md</code></pre>
+
+<h2><span class="num">2</span>The architecture</h2>
+
+<div class="arch-wrap">
+<svg viewBox="0 0 900 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Piyush's literal architecture">
+  <defs>
+    <marker id="arrA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#8b6dff"/>
+    </marker>
+    <marker id="arrG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#6fd07a"/>
+    </marker>
+  </defs>
+  <style>
+    .machine{fill:#12141a;stroke:#30385a;stroke-width:1.5;rx:14;ry:14}
+    .svc{fill:#1e1e1e;stroke:#2a2a2a;stroke-width:1;rx:8;ry:8}
+    .user{fill:#1a1a1a;stroke:#3a3a3a;rx:10;ry:10}
+    .title{fill:#e8e8e8;font:600 13px -apple-system,Inter,sans-serif}
+    .mtitle{fill:#bdbdbd;font:500 11px -apple-system,Inter,sans-serif;letter-spacing:.04em;text-transform:uppercase}
+    .sub{fill:#8a8a8a;font:500 10.5px -apple-system,Inter,sans-serif}
+    .code{fill:#b3a6ff;font:500 10.5px ui-monospace,monospace}
+    .edge{stroke:#8b6dff;stroke-width:1.6;fill:none}
+    .edge.ssh{stroke:#6fd07a}
+    .elabel{fill:#bdbdbd;font:500 10.5px ui-monospace,monospace}
+  </style>
+
+  <!-- Browser -->
+  <rect class="user" x="30" y="20" width="200" height="52"/>
+  <text class="title" x="130" y="42" text-anchor="middle">Browser</text>
+  <text class="sub"   x="130" y="58" text-anchor="middle">signed-up user · JWT cookie</text>
+
+  <!-- Vercel -->
+  <rect class="svc" x="280" y="20" width="200" height="52"/>
+  <text class="title" x="380" y="42" text-anchor="middle">Vercel CDN</text>
+  <text class="sub"   x="380" y="58" text-anchor="middle">React 19 + Vite static build</text>
+
+  <!-- Backend server -->
+  <rect class="machine" x="30" y="120" width="450" height="240"/>
+  <text class="mtitle" x="255" y="144" text-anchor="middle">BACKEND SERVER</text>
+  <text class="sub"    x="255" y="159" text-anchor="middle">Node · Express · Prisma · Socket.IO · runs anywhere (not specified)</text>
+
+  <rect class="svc" x="55" y="180" width="400" height="52"/>
+  <text class="title" x="255" y="201" text-anchor="middle">Express + Socket.IO</text>
+  <text class="sub"   x="255" y="218" text-anchor="middle">auth · chat routes · provisioning · files · voice · terminal</text>
+
+  <rect class="svc" x="55" y="248" width="195" height="44"/>
+  <text class="title" x="152" y="267" text-anchor="middle">sshService</text>
+  <text class="sub"   x="152" y="282" text-anchor="middle">pooled SSH · ed25519</text>
+
+  <rect class="svc" x="260" y="248" width="195" height="44"/>
+  <text class="title" x="357" y="267" text-anchor="middle">Prisma + SQLite</text>
+  <text class="sub"   x="357" y="282" text-anchor="middle">User · Workspace · Message</text>
+
+  <rect class="svc" x="55" y="302" width="400" height="44"/>
+  <text class="title" x="255" y="321" text-anchor="middle">claudeService.executePrompt(username, prompt)</text>
+  <text class="sub"   x="255" y="336" text-anchor="middle"><tspan class="code">claude -c --dangerously-skip-permissions -p "&lt;text&gt;"</tspan> via SSH</text>
+
+  <!-- EC2 workspace host -->
+  <rect class="machine" x="520" y="120" width="350" height="240"/>
+  <text class="mtitle" x="695" y="144" text-anchor="middle">EC2 WORKSPACE HOST</text>
+  <text class="sub"    x="695" y="159" text-anchor="middle">single shared Ubuntu 22.04 · t3.medium · 50GB</text>
+
+  <rect class="svc" x="545" y="180" width="300" height="46"/>
+  <text class="title" x="695" y="200" text-anchor="middle">cortex_admin (service)</text>
+  <text class="sub"   x="695" y="216" text-anchor="middle">sudoers: useradd · userdel · chown · chmod · mkdir · sudo -u *</text>
+
+  <rect class="svc" x="545" y="238" width="144" height="46"/>
+  <text class="title" x="617" y="258" text-anchor="middle">cortex_user_1</text>
+  <text class="sub"   x="617" y="274" text-anchor="middle">~/workspace/ · .claude/</text>
+
+  <rect class="svc" x="701" y="238" width="144" height="46"/>
+  <text class="title" x="773" y="258" text-anchor="middle">cortex_user_2</text>
+  <text class="sub"   x="773" y="274" text-anchor="middle">~/workspace/ · .claude/</text>
+
+  <rect class="svc" x="545" y="296" width="300" height="46"/>
+  <text class="title" x="695" y="316" text-anchor="middle">apiKeyHelper + Claude CLI preinstalled</text>
+  <text class="sub"   x="695" y="332" text-anchor="middle">one Anthropic key per user, encrypted server-side</text>
+
+  <!-- edges -->
+  <path class="edge" marker-end="url(#arrA)" marker-start="url(#arrA)" d="M 130,72 L 130,120"/>
+  <text class="elabel" x="140" y="100">HTTPS + WS</text>
+
+  <path class="edge" marker-end="url(#arrA)" marker-start="url(#arrA)" d="M 380,72 L 380,180"/>
+  <text class="elabel" x="390" y="130">static assets</text>
+
+  <path class="edge ssh" marker-end="url(#arrG)" d="M 455,270 L 545,260"/>
+  <text class="elabel" x="495" y="255" text-anchor="middle">ssh -i key</text>
+</svg>
+<p style="color:var(--muted);font-size:.84rem;text-align:center;margin-top:6px">Three tiers. Not three picortex-style "machines" — it's Vercel (just a CDN for the static build) + a backend server somewhere + one EC2 box where every user has their own Linux account.</p>
+</div>
+
+<h2><span class="num">3</span>The turn loop — <em>literally</em> his code</h2>
+
+<p>From <code>backend/src/services/claudeService.ts</code> at <code>d2d6a534</code>:</p>
+
+<pre><code>async executePrompt(username: string, prompt: string): Promise&lt;ClaudeResult&gt; {
+  const escapedPrompt = prompt.replace(/'/g, "'\\''").replace(/"/g, '\\"');
+
+  // -c continues the previous conversation session
+  // --dangerously-skip-permissions allows file operations without interactive prompts
+  const command = `claude -c --dangerously-skip-permissions -p "${escapedPrompt}"`;
+  const result = await sshService.execAsUser(username, command);
+
+  if (result.code !== 0) {
+    return { content: '', error: result.stderr || 'Claude CLI execution failed' };
+  }
+  return { content: result.stdout };
+}</code></pre>
+
+<p>And the chat WebSocket handler in <code>backend/src/websocket/handlers/chatHandler.ts</code>:</p>
+
+<pre><code>socket.on('chat:message', async (data) =&gt; {
+  const workspace = await prisma.workspace.findUnique({ where: { userId } });
+  if (!workspace || workspace.status !== 'ready') return socket.emit('chat:error', ...);
+
+  await prisma.message.create({ data: { userId, role: 'user', content: data.content } });
+  socket.emit('chat:thinking', { status: true });
+
+  let fullResponse = '';
+  await claudeService.executePromptStreaming(workspace.linuxUsername, data.content, (chunk) =&gt; {
+    fullResponse += chunk;
+    socket.emit('chat:response', { content: chunk, done: false });
+  });
+
+  await prisma.message.create({ data: { userId, role: 'assistant', content: fullResponse } });
+});</code></pre>
+
+<p>That's the whole engine. Per turn: pull the chat's Linux username, SSH in, run <code>claude -c -p</code>, stream stdout back through WebSocket, write the result to Prisma. No tmux, no sentinels, no queues. ~80 lines.</p>
+
+<h2><span class="num">4</span>Features (and the noticeable absences)</h2>
+
+<table>
+  <thead><tr><th>What Piyush had</th><th>What he didn't</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>Signup + JWT auth; user brings own Anthropic key</td>
+      <td>No texting / iMessage / SMS surface at all</td>
+    </tr>
+    <tr>
+      <td>Per-user workspace provisioning over 4 WebSocket progress steps</td>
+      <td>No group chats; no multi-participant conversations</td>
+    </tr>
+    <tr>
+      <td>Web chat UI (single thread per user)</td>
+      <td>No attention gating — a web chatbot either responds or doesn't</td>
+    </tr>
+    <tr>
+      <td>File browser (ls / read / write) over SSH</td>
+      <td>No consent / approval loop — there's only one user per workspace</td>
+    </tr>
+    <tr>
+      <td>xterm.js web terminal with an SSH PTY</td>
+      <td>No knowledge graph — files and Claude's memory were the whole context</td>
+    </tr>
+    <tr>
+      <td>OpenAI-based voice chat (<code>voiceService.ts</code>)</td>
+      <td>No audit log beyond <code>Message</code> rows</td>
+    </tr>
+    <tr>
+      <td><code>apiKeyHelper</code> so workspaces never held plaintext keys</td>
+      <td>No sharing / bridging between workspaces</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2><span class="num">5</span>What the No-Docker architecture borrows (and what it adds)</h2>
+
+<table>
+  <thead><tr><th>Borrowed from Piyush</th><th>New in <a href="01-option-2-no-docker.html">No-Docker</a></th></tr></thead>
+  <tbody>
+    <tr><td>Split: bot server &ne; workspace host</td><td>Per-chat (not per-user) Linux accounts</td></tr>
+    <tr><td>SSH exec per turn, one command per turn</td><td>Attention gate (mentions-only, discriminator)</td></tr>
+    <tr><td><code>claude -c -p</code> pattern</td><td>Consent broker + out-of-band DM approvals (PRD 002 P4)</td></tr>
+    <tr><td>Narrow sudoers scoped to <code>useradd</code> family only</td><td>noos knowledge graph on a third reused box</td></tr>
+    <tr><td>apiKeyHelper so workspace FS has no plaintext keys</td><td>Linq / OpenChat channel (no web chat in v0.1)</td></tr>
+    <tr><td>Mock SSH mode for dev</td><td>DisclosureEvent &amp; ManifestEvent audit tables</td></tr>
+  </tbody>
+</table>
+
+<h2><span class="num">6</span>Why his design was replaced</h2>
+<p>Cortex pivoted from "per-user web chat for one team" to a multi-tenant enterprise product. That pivot needed:</p>
+<ul>
+  <li>Per-<em>chat</em> (not per-user) workspace isolation, so group texts could each have their own filesystem</li>
+  <li>Container-strength tenant isolation as the product opened to outside paying users</li>
+  <li>Linq / iMessage as a first-class surface, not the browser web chat</li>
+</ul>
+<p>Tejas DC's <code>af3a76f5</code> introduced Fly.io Docker containers per workspace; everything Piyush wrote was replaced in the process. For picortex-as-a-personal-tool, the pivot's justification doesn't apply — Piyush's simpler design is arguably the better starting point.</p>
+
+<div class="hr"></div>
+
+<p style="text-align:center;color:var(--muted);font-size:.92rem">See also: <a href="https://wikihub.globalbr.ai/@jacobcole/picortex/docs/wiki/piyush-era-design">docs/wiki/piyush-era-design.md</a> (full text study) · <a href="01-option-2-no-docker.html">Mockup 01 — what picortex actually proposes</a></p>
+
+</main>
+
+<footer>
+  <div class="row">
+    <span>picortex · mockup 03 · reference · 2026-04-23</span>
+    <a href="https://github.com/IdeaFlowCo/cortex/commit/d2d6a534">Piyush's final commit ↗</a>
+    <a href="https://wikihub.globalbr.ai/@jacobcole/picortex/docs/wiki/piyush-era-design">Full study ↗</a>
+  </div>
+</footer>
+
+</body>
+</html>

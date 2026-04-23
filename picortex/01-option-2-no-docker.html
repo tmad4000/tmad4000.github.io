@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>picortex — Option 2 · No-Docker architecture</title>
+<style>
+  :root{
+    --bg:#0a0a0a; --surface:#161616; --elev:#1e1e1e; --border:#2a2a2a;
+    --text:#e8e8e8; --muted:#8a8a8a; --mutedless:#bdbdbd;
+    --accent:#8b6dff; --accent-soft:#3a2f66;
+    --ok:#30d158; --warn:#ffd60a; --bad:#ff453a;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro","Inter","Helvetica Neue",Arial,sans-serif;
+    --msg-me:#0a84ff; --msg-them:#2c2c2e; --msg-bot:#1b3a35; --msg-bot-bd:#215c52;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:var(--sans);-webkit-font-smoothing:antialiased;line-height:1.5}
+  a{color:var(--accent);text-decoration:none} a:hover{text-decoration:underline}
+  code{font-family:var(--mono);background:var(--elev);padding:1px 6px;border-radius:4px;font-size:.9em}
+  pre{font-family:var(--mono);background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px 16px;overflow-x:auto;font-size:.84rem;color:var(--mutedless);margin:12px 0}
+  nav.top{position:sticky;top:0;z-index:10;background:rgba(10,10,10,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+  nav.top .inner{max-width:1100px;margin:0 auto;padding:14px 22px;display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+  nav.top .brand{font-weight:700;letter-spacing:-.01em} nav.top .brand .dot{color:var(--accent)}
+  nav.top .links{display:flex;gap:14px;flex-wrap:wrap}
+  nav.top .links a{color:var(--mutedless);font-size:.92rem} nav.top .links a.current{color:var(--text)}
+  nav.top .badge{margin-left:auto;font-size:.78rem;color:var(--muted);border:1px solid var(--border);padding:3px 8px;border-radius:999px}
+  main{max-width:1100px;margin:0 auto;padding:44px 22px 100px}
+  h1{font-size:2.3rem;margin:0 0 12px;letter-spacing:-.02em;line-height:1.15}
+  h1 .tag{color:var(--accent);font-weight:500;font-size:.9rem;letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:8px}
+  h2{font-size:1.45rem;margin:50px 0 14px;letter-spacing:-.015em}
+  h2 .num{display:inline-block;width:28px;height:28px;line-height:28px;text-align:center;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-size:.85rem;margin-right:10px;vertical-align:middle}
+  h3{font-size:1.02rem;margin:22px 0 10px;color:var(--mutedless);font-weight:600}
+  p.lead{font-size:1.08rem;color:var(--mutedless);max-width:68ch;margin:0 0 18px}
+  p{max-width:72ch;color:var(--mutedless)}
+  .hr{height:1px;background:var(--border);margin:48px 0}
+
+  .quote-box{border-left:3px solid var(--accent);background:linear-gradient(180deg,rgba(139,109,255,.05),rgba(139,109,255,0));padding:16px 22px;border-radius:0 8px 8px 0;margin:14px 0}
+  .quote-box .label{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:4px}
+  .quote-box p{color:var(--text);margin:4px 0}
+
+  .credit-box{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin:14px 0;font-size:.93rem;color:var(--mutedless)}
+  .credit-box b{color:var(--text)}
+  .credit-box table{margin:10px 0 0;font-size:.88rem}
+
+  .arch-wrap{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;overflow-x:auto}
+  .arch-wrap svg{display:block;margin:0 auto;max-width:100%;height:auto}
+  .legend{display:flex;flex-wrap:wrap;gap:14px;margin:18px 0 4px;font-size:.85rem;color:var(--mutedless)}
+  .legend .dot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:middle}
+
+  .cols2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media (max-width:760px){.cols2{grid-template-columns:1fr}}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px}
+  .card.ok{border-left:3px solid var(--ok)}
+  .card.warn{border-left:3px solid var(--warn)}
+  .card.bad{border-left:3px solid var(--bad)}
+  .card h3{margin-top:0}
+  .card ul{margin:6px 0;padding-left:22px} .card li{color:var(--mutedless);margin:3px 0}
+
+  .flow{counter-reset:step;padding:0;margin:18px 0;list-style:none;display:grid;grid-template-columns:1fr;gap:8px}
+  .flow li{counter-increment:step;display:flex;gap:14px;align-items:flex-start;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px}
+  .flow li::before{content:counter(step);flex-shrink:0;width:26px;height:26px;line-height:26px;text-align:center;border-radius:50%;background:var(--accent);color:#fff;font-size:.82rem;font-weight:600}
+  .flow li .text{flex:1;font-size:.93rem;color:var(--mutedless)}
+  .flow li .text b{color:var(--text)}
+  .flow li code{font-size:.82rem}
+
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:.92rem}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);color:var(--mutedless)}
+  th{color:var(--text);font-weight:600;background:var(--surface)}
+  tr:last-child td{border-bottom:0}
+
+  footer{max-width:1100px;margin:0 auto;padding:36px 22px 80px;color:var(--muted);font-size:.85rem;border-top:1px solid var(--border)}
+  footer .row{display:flex;gap:22px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+
+<nav class="top"><div class="inner">
+  <span class="brand">picortex<span class="dot">.</span></span>
+  <div class="links">
+    <a href="00-platonic-ideal.html">Platonic ideal</a>
+    <a class="current" href="01-option-2-no-docker.html">Option 2 · No-Docker</a>
+    <a href="02-option-4-noos-style.html">Option 4 · Noos-style</a>
+    <a href="03-piyush-literal.html">03 · Piyush (reference)</a>
+    <a href="https://wikihub.globalbr.ai/@jacobcole/picortex/docs/prd/002-texting-experience">PRD 002 ↗</a>
+  </div>
+  <span class="badge" style="background:#0e3020;border-color:#184a33;color:#66e09b">v0.2 · current</span>
+  <span class="badge">concrete · 2 new boxes</span>
+</div></nav>
+
+<div style="background:#161616;border:1px solid #2a2a2a;padding:10px 22px;color:var(--mutedless);font:500 13px/1.5 var(--sans);max-width:1100px;margin:10px auto 0;border-radius:8px">
+  <b>v0.2</b> — Renamed from "Piyush-style" to "No-Docker architecture." Dropped "Bot Gateway" jargon in favor of plain "Bot server." Added a proper credit / divergence box linking to <a href="03-piyush-literal.html">mockup 03 (Piyush's literal architecture)</a>. &middot; <a href="01-option-2-piyush-style-v0.1.html">View v0.1 for comparison →</a>
+</div>
+
+<main>
+
+<h1><span class="tag">Mockup 01 · Option 2</span>No-Docker architecture<br><span style="font-weight:500;font-size:1.4rem;color:var(--mutedless)">(two-box, <code>claude -c -p</code> per turn)</span></h1>
+<p class="lead">The <a href="00-platonic-ideal.html">platonic ideal</a> realized with two small Linux boxes and one HTTPS call to noos. No Docker. No Kubernetes. No tmux. No long-lived REPLs. A small bot server handles the channel and routing; a separate little machine is where Claude actually runs, one SSH-exec per turn.</p>
+
+<div class="quote-box">
+  <div class="label">TL;DR</div>
+  <p>Bot server on box A. Per-chat Linux users + home dirs on box B (literally "a little machine you can open a Claude on"). Each turn: A opens an SSH session as chat-X on B and runs <code>claude --session-id X -p "&lt;prompt&gt;"</code>. stdout is the reply. noos graph is reused on its existing box (C). Bot server's crash doesn't lose any Claude sessions — they're on B.</p>
+</div>
+
+<div class="credit-box">
+  <b>Credit &amp; divergence.</b> The two-box + SSH + <code>claude -p</code>-per-turn pattern was pioneered by Piyush Jha in pre-container Cortex (SHAs <code>238052c4</code> → <code>d2d6a534</code>, Jan 20-23 2026). For what he <em>actually</em> shipped — web-chat only, per-<em>user</em> workspaces, no consent loop, no knowledge graph — see <a href="03-piyush-literal.html">Mockup 03 · Piyush's literal architecture</a>. This mockup keeps the pattern and adds:
+  <table style="margin-top:8px">
+    <thead><tr><th style="background:transparent">Borrowed from Piyush</th><th style="background:transparent">New here</th></tr></thead>
+    <tbody>
+      <tr><td>Split: bot ≠ workspace host</td><td>Per-chat (not per-user) Linux users</td></tr>
+      <tr><td>SSH exec per turn</td><td>Attention gate (mentions-only, discriminator)</td></tr>
+      <tr><td><code>claude -c -p</code></td><td>Consent broker + out-of-band DM approvals (PRD 002 P4)</td></tr>
+      <tr><td>Narrow sudoers (useradd/chmod only)</td><td>noos knowledge graph (box C)</td></tr>
+      <tr><td>Per-user apiKeyHelper</td><td>Linq / OpenChat channel (not web chat)</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<p><b>UX is the same as the platonic ideal.</b> This page focuses on the mechanical architecture. For the user-facing scenes (attention, consent loop, manifest dialog, reactions), see <a href="00-platonic-ideal.html">Mockup 00</a>.</p>
+
+<h2><span class="num">1</span>The machines</h2>
+
+<div class="arch-wrap">
+<svg viewBox="0 0 1000 620" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="No-Docker architecture">
+  <defs>
+    <marker id="arrA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#8b6dff"/>
+    </marker>
+    <marker id="arrM" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#6a6a6a"/>
+    </marker>
+    <marker id="arrG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#6fd07a"/>
+    </marker>
+  </defs>
+  <style>
+    .machine{fill:#12141a;stroke:#30385a;stroke-width:1.5;rx:14;ry:14}
+    .svc{fill:#1e1e1e;stroke:#2a2a2a;stroke-width:1;rx:8;ry:8}
+    .svc.hot{stroke:#8b6dff}
+    .svc.chat{fill:#171a2e;stroke:#324a6a}
+    .svc.dm{fill:#12201c;stroke:#215c52}
+    .title{fill:#e8e8e8;font:600 13px -apple-system,Inter,sans-serif}
+    .mtitle{fill:#bdbdbd;font:500 11px -apple-system,Inter,sans-serif;letter-spacing:.04em;text-transform:uppercase}
+    .sub{fill:#8a8a8a;font:500 10.5px -apple-system,Inter,sans-serif}
+    .code{fill:#b3a6ff;font:500 10.5px ui-monospace,monospace}
+    .edge{stroke:#8b6dff;stroke-width:1.6;fill:none}
+    .edge.ssh{stroke:#6fd07a}
+    .edge.muted{stroke:#6a6a6a;stroke-dasharray:4 4}
+    .elabel{fill:#bdbdbd;font:500 10.5px ui-monospace,monospace}
+  </style>
+
+  <!-- user endpoints -->
+  <rect class="svc" x="10" y="16" width="170" height="48" rx="10"/>
+  <text class="title" x="95" y="38" text-anchor="middle">Group chat</text>
+  <text class="sub"   x="95" y="54" text-anchor="middle">iMessage / OpenChat</text>
+
+  <rect class="svc dm" x="815" y="16" width="175" height="48" rx="10"/>
+  <text class="title" x="902" y="38" text-anchor="middle">Jacob's DM with bot</text>
+  <text class="sub"   x="902" y="54" text-anchor="middle">inbound + out-of-band approval</text>
+
+  <!-- Box A -->
+  <rect class="machine" x="30" y="100" width="420" height="370"/>
+  <text class="mtitle" x="240" y="124" text-anchor="middle">BOX A · Bot server</text>
+  <text class="sub"    x="240" y="139" text-anchor="middle">Hetzner VPS · 2 vCPU · 4 GB RAM · Ubuntu 22.04</text>
+
+  <rect class="svc hot" x="55" y="160" width="370" height="56"/>
+  <text class="title" x="240" y="183" text-anchor="middle">Linq / OpenChat channel adapter</text>
+  <text class="sub"   x="240" y="200" text-anchor="middle">HMAC verify · dedup · normalize event vocabulary</text>
+
+  <rect class="svc" x="55" y="232" width="175" height="56"/>
+  <text class="title" x="143" y="255" text-anchor="middle">Attention gate</text>
+  <text class="sub"   x="143" y="272" text-anchor="middle">mentions / discriminator</text>
+
+  <rect class="svc" x="250" y="232" width="175" height="56"/>
+  <text class="title" x="337" y="255" text-anchor="middle">Turn dispatcher</text>
+  <text class="sub"   x="337" y="272" text-anchor="middle">queue · concurrency · retry</text>
+
+  <rect class="svc dm" x="55" y="304" width="370" height="56"/>
+  <text class="title" x="240" y="327" text-anchor="middle">Consent broker</text>
+  <text class="sub"   x="240" y="344" text-anchor="middle">in-memory pause · DM Jacob · timer · Disclosure audit</text>
+
+  <rect class="svc" x="55" y="376" width="370" height="56"/>
+  <text class="title" x="240" y="399" text-anchor="middle">SQLite canonical log</text>
+  <text class="sub"   x="240" y="416" text-anchor="middle">chats · messages · manifests · DisclosureEvent · ManifestEvent</text>
+
+  <!-- Box B -->
+  <rect class="machine" x="550" y="100" width="430" height="310"/>
+  <text class="mtitle" x="765" y="124" text-anchor="middle">BOX B · Claude box (workspace host)</text>
+  <text class="sub"    x="765" y="139" text-anchor="middle">Hetzner VPS · 4 vCPU · 8 GB RAM · Linux users per chat</text>
+
+  <rect class="svc chat" x="575" y="160" width="380" height="52"/>
+  <text class="title" x="765" y="182" text-anchor="middle">picortex service user (admin)</text>
+  <text class="sub"   x="765" y="199" text-anchor="middle">sudoers: useradd, userdel, chown, chmod, runuser · NO bash</text>
+
+  <rect class="svc chat" x="575" y="224" width="182" height="52"/>
+  <text class="title" x="666" y="246" text-anchor="middle">chat-a1b2 (home 0700)</text>
+  <text class="sub"   x="666" y="263" text-anchor="middle">.claude/ · workspace/ · .picortex/</text>
+
+  <rect class="svc chat" x="773" y="224" width="182" height="52"/>
+  <text class="title" x="864" y="246" text-anchor="middle">chat-c3d4 (home 0700)</text>
+  <text class="sub"   x="864" y="263" text-anchor="middle">.claude/ · workspace/ · .picortex/</text>
+
+  <rect class="svc" x="575" y="288" width="380" height="56"/>
+  <text class="title" x="765" y="308" text-anchor="middle">On turn: <tspan class="code">runuser -u chat-X -- claude --session-id X -p "&lt;text&gt;"</tspan></text>
+  <text class="sub"   x="765" y="326" text-anchor="middle">stdout → Bot server · session continuity in ~/.claude/ on this host</text>
+
+  <!-- Box C -->
+  <rect class="machine" x="160" y="500" width="680" height="94"/>
+  <text class="mtitle" x="500" y="524" text-anchor="middle">BOX C · noos graph (existing, reused)</text>
+  <text class="sub"    x="500" y="539" text-anchor="middle">already deployed on Lightsail · HTTPS · x-api-key · read-only for picortex</text>
+
+  <rect class="svc" x="190" y="546" width="620" height="36"/>
+  <text class="title" x="500" y="569" text-anchor="middle">GET /api/nodes?tags=...&amp;limit=... · POST /api/nodes (writes later, with approval)</text>
+
+  <!-- edges -->
+  <path class="edge" marker-end="url(#arrA)" marker-start="url(#arrA)" d="M 95,64 L 95,160"/>
+  <text class="elabel" x="105" y="100">HMAC webhook / sendMessage</text>
+
+  <path class="edge muted" marker-end="url(#arrM)" marker-start="url(#arrM)" d="M 902,64 C 902,250 700,320 425,332"/>
+  <text class="elabel" x="600" y="160">out-of-band DM (same channel)</text>
+
+  <path class="edge ssh" marker-end="url(#arrG)" d="M 425,260 L 575,260"/>
+  <text class="elabel" x="500" y="250" text-anchor="middle">ssh -i key chat-X@B</text>
+
+  <path class="edge" marker-end="url(#arrA)" d="M 240,432 L 240,500"/>
+  <text class="elabel" x="255" y="470">HTTPS · noos API</text>
+
+  <path class="edge muted" marker-end="url(#arrM)" d="M 765,344 L 765,500"/>
+  <text class="elabel" x="780" y="420">optional MCP · noos</text>
+</svg>
+<div class="legend">
+  <span><span class="dot" style="background:#12141a;border:1px solid #30385a"></span>machine / box</span>
+  <span><span class="dot" style="background:#1e1e1e;border:1px solid #2a2a2a"></span>service on the box</span>
+  <span><span class="dot" style="background:#171a2e;border:1px solid #324a6a"></span>per-chat Linux user</span>
+  <span><span class="dot" style="background:#12201c;border:1px solid #215c52"></span>out-of-band path</span>
+  <span><span class="dot" style="background:#8b6dff"></span>HTTPS / in-channel</span>
+  <span><span class="dot" style="background:#6fd07a"></span>SSH</span>
+</div>
+</div>
+
+<h2><span class="num">2</span>What lives where</h2>
+
+<table>
+  <thead><tr><th>Component</th><th>Box</th><th>Process / store</th><th>Cost of failure</th></tr></thead>
+  <tbody>
+    <tr><td>Channel adapter + bot logic</td><td>A</td><td>Fastify service, systemd</td><td>Inbound queue stalls; no data loss (Linq retries).</td></tr>
+    <tr><td>SQLite canonical log</td><td>A (local disk)</td><td><code>/var/lib/picortex/picortex.sqlite</code></td><td>Fatal. Daily <code>litestream</code> → S3.</td></tr>
+    <tr><td>Consent broker (pause state)</td><td>A</td><td>In-memory + SQLite rehydration row</td><td>Recovered from SQLite on restart; pending group waits survive.</td></tr>
+    <tr><td>Per-chat Linux user + home dir</td><td>B</td><td><code>/srv/picortex/chats/&lt;chat&gt;</code></td><td>Only that chat's context/memory lost if B is wiped.</td></tr>
+    <tr><td>Claude session memory</td><td>B</td><td><code>~chat-X/.claude/</code></td><td>Per-chat. Each chat resurrects with fresh memory; transcript rebuild possible from A's log.</td></tr>
+    <tr><td>noos graph</td><td>C</td><td>Neo4j (existing Lightsail deploy)</td><td>Bot degrades gracefully: "I can't reach my knowledge right now."</td></tr>
+  </tbody>
+</table>
+
+<h2><span class="num">3</span>Concrete consent-loop turn (wire view)</h2>
+
+<ol class="flow">
+  <li><div class="text"><b>A · inbound webhook.</b> Linq POSTs <code>message.received</code> for "is jacob free tuesday?" to <code>https://picortex.globalbr.ai/api/linq/inbound</code>. HMAC verified. Row inserted in <code>messages</code> on A's SQLite.</div></li>
+  <li><div class="text"><b>A · attention gate passes</b> (@mention detected). A · Turn dispatcher checks the chat's manifest row: <code>calendar</code> not in scope.</div></li>
+  <li><div class="text"><b>A · consent broker activates.</b> Inserts <code>DisclosureEvent (approval_mode: pending, ttl_expires_at: +10min)</code>. Sends group ack via Linq sendMessage: "Let me check with him — one sec." Typing indicator on.</div></li>
+  <li><div class="text"><b>A · out-of-band DM</b> to Jacob via Linq sendMessage with full context + proposed response + approve/deny keys.</div></li>
+  <li><div class="text"><b>A · Jacob replies <code>y</code>.</b> Broker matches to the pending DisclosureEvent, marks <code>approval_mode: approve-exact</code>, expands turn scope to include <code>calendar:2026-04-28T19:00/21:00</code>.</div></li>
+  <li><div class="text"><b>A → B · SSH.</b> Turn dispatcher opens SSH to box B:<br><code>ssh -i /etc/picortex/keys/b_admin.pem picortex@B<br>sudo -u chat-a1b2 -H claude --session-id chat-a1b2 -p "&lt;system+context+prompt&gt;"</code></div></li>
+  <li><div class="text"><b>B · Claude runs.</b> Reads <code>~/.claude/sessions/chat-a1b2/</code> for prior turns on this chat. Calls optional noos MCP tool to check calendar. stdout = proposed reply.</div></li>
+  <li><div class="text"><b>A · outbound.</b> Bot server receives stdout over SSH, writes to SQLite, sends final reply to group via Linq sendMessage. Closes DisclosureEvent with <code>final_reply</code> + <code>grant_ttl: single-use</code>.</div></li>
+</ol>
+
+<h2><span class="num">4</span>Code sketch (bot server's executor)</h2>
+
+<pre><code>// boxA/src/executor.ts — per-turn dispatcher (Option 2 · No-Docker)
+import { SSHClient } from './ssh.js'
+import { scopedCtx } from './manifest.js'
+
+export async function executeTurn(chat: Chat, message: Message, scope: Scope) {
+  const turnId = ulid()
+  const ctxSystem = buildSystemPrompt(chat, scope)   // manifest-filtered
+  const prompt = formatTurnInput(message)
+
+  // One SSH exec per turn. No tmux, no sentinels.
+  const { stdout, code } = await ssh.execAsUser(
+    chat.unix_user,
+    ['claude', '--session-id', chat.id, '-p', '--dangerously-skip-permissions', '--system', ctxSystem, prompt],
+    { env: { PICORTEX_TURN_ID: turnId }, timeout_ms: 120_000 },
+  )
+
+  if (code !== 0) return replyFailure(stdout)
+  return recordAndSend(chat, stdout, { turnId })
+}
+</code></pre>
+
+<h3>Consent broker — pause/resume</h3>
+<pre><code>// On pause: write DisclosureEvent row, send DM, return to event loop.
+// On Jacob's reply: match by (jacob_dm_chat_id, in-flight-row), re-invoke executeTurn with expanded scope.
+// On timeout: clear row, send group "I need to check on that offline", log approval_mode="timeout".
+</code></pre>
+
+<h2><span class="num">5</span>Strengths &amp; costs, head-to-head</h2>
+
+<div class="cols2">
+  <div class="card ok">
+    <h3>Strengths</h3>
+    <ul>
+      <li><b>Privacy split matches the threat model.</b> A Claude turn that gets prompt-injected into <code>cat ~/.ssh/id_rsa</code> runs on B; the DM-approval state and Linq webhook secret live on A. Two independent blast radii.</li>
+      <li><b>Crash safety.</b> A can restart mid-turn without losing Claude's memory (it's on B). B can be rebooted per-chat-user without affecting the bot.</li>
+      <li><b>No tmux fragility.</b> No sentinel protocol. <code>-p</code> + stdout is the entire reply-capture contract.</li>
+      <li><b>Linear cost.</b> ~$10/mo box A + ~$15/mo box B + free box C (shared with noos).</li>
+      <li><b>Matches existing deploy patterns.</b> Box B = a stripped-down jcortex clone. Box A = same systemd+Caddy pattern as voice-assistant.</li>
+      <li><b>No Docker.</b> No daemon, no image cache, no network namespace layering, no compose file. Lowest infra-surface-area option that still gives you real per-chat isolation.</li>
+    </ul>
+  </div>
+  <div class="card warn">
+    <h3>Costs / risks</h3>
+    <ul>
+      <li><b>Two boxes to maintain.</b> Provisioning, keys, firewall rules, upgrades — doubled.</li>
+      <li><b>SSH setup burden.</b> ed25519 key distribution, <code>authorized_keys</code> hygiene, monitored sudoers drop-in. Manageable but not zero.</li>
+      <li><b>Latency floor bumped by SSH.</b> ~80-200 ms round-trip overhead per turn vs a single-box architecture. Warm reply still within budget (&lt;15 s).</li>
+      <li><b>B must stay online</b> for turns to complete. If B is down, turns queue on A; Linq retry saves us.</li>
+      <li><b>Claude CLI behavior dependency.</b> <code>--session-id</code> contract + <code>~/.claude/</code> layout are upstream-owned. Drift = work.</li>
+    </ul>
+  </div>
+</div>
+
+<h2><span class="num">6</span>Five failure modes &amp; what happens</h2>
+
+<table>
+  <thead><tr><th>Failure</th><th>User-visible</th><th>Recovery</th></tr></thead>
+  <tbody>
+    <tr><td>A restart mid-turn</td><td>Brief typing indicator gap; bot posts "back online, here's that answer" if turn was in consent-loop pause</td><td>Rehydrate paused DisclosureEvents from SQLite on boot</td></tr>
+    <tr><td>B down</td><td>Bot: "I'm briefly unable to think — one moment" in DM; groups get nothing until B returns</td><td>Retry turn once B is up; Linq retries inbound for up to 24 h</td></tr>
+    <tr><td>C (noos) down</td><td>Bot: "I can't reach my knowledge graph right now — try again?"</td><td>Attention gate still works; non-graph questions still answered</td></tr>
+    <tr><td>SSH key rotation mid-flight</td><td>Single turn fails loudly; reply is "I had a glitch, try again"</td><td>Key reloaded from Vault/env on next turn</td></tr>
+    <tr><td>Claude CLI OOMs on B</td><td>Turn errors out; reply "Jacob's bot had a glitch"</td><td>cgroup memory limit per chat user prevents cross-chat impact</td></tr>
+  </tbody>
+</table>
+
+<h2><span class="num">7</span>Why this might be the answer</h2>
+<div class="quote-box">
+  <p>Codex's session review flagged S3 (single shared tmux) and the tmux sentinel protocol as the weakest parts of the original picortex plan. The <code>claude -c -p</code>-per-turn-over-SSH pattern sidesteps both — Piyush already ran the spike in Jan 2026 and it worked. The boxes are cheap, the isolation story matches the threat model, and the consent-loop broker pattern composes naturally on top.</p>
+</div>
+
+<h2><span class="num">8</span>What this doesn't solve</h2>
+<ul>
+  <li>Does not protect against a compromised <em>noos</em> (box C) leaking data. That's a separate trust boundary.</li>
+  <li>Does not eliminate shared-kernel risk on B. If the D2 isolation report finds Linux-user perms insufficient for the real threat model, B's per-chat users get wrapped in <code>bubblewrap</code> or Landlock — composes naturally, no re-architecture.</li>
+  <li>Does not give you an ephemeral per-chat machine (Option 3). If that becomes the real privacy requirement, B's per-chat users are replaced with Fly Machines per chat.</li>
+</ul>
+
+<div class="hr"></div>
+
+<p style="text-align:center;color:var(--muted);font-size:.92rem">Compare with the <a href="00-platonic-ideal.html">platonic ideal</a>, the <a href="02-option-4-noos-style.html">stateless Option 4</a>, or what <a href="03-piyush-literal.html">Piyush actually shipped</a>.</p>
+
+</main>
+
+<footer>
+  <div class="row">
+    <span>picortex · mockup 01 · No-Docker architecture · v0.2 · 2026-04-23</span>
+    <a href="03-piyush-literal.html">Piyush's actual architecture ↗</a>
+    <a href="https://wikihub.globalbr.ai/@jacobcole/picortex/docs/plans/2026-04-23-prototype-options">Prototype options ↗</a>
+    <a href="https://wikihub.globalbr.ai/@jacobcole/picortex/docs/prd/002-texting-experience">PRD 002 ↗</a>
+  </div>
+</footer>
+
+</body>
+</html>

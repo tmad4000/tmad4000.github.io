@@ -127,8 +127,9 @@
   <span class="brand">picortex<span class="dot">.</span></span>
   <div class="links">
     <a class="current" href="00-platonic-ideal.html">Platonic ideal</a>
-    <a href="01-option-2-piyush-style.html">Option 2 · Piyush-style</a>
+    <a href="01-option-2-no-docker.html">Option 2 · No-Docker</a>
     <a href="02-option-4-noos-style.html">Option 4 · Noos-style</a>
+    <a href="03-piyush-literal.html">03 · Piyush (reference)</a>
     <a href="https://wikihub.globalbr.ai/@jacobcole/picortex/docs/prd/002-texting-experience">PRD 002 ↗</a>
   </div>
   <span class="badge" style="background:#0e3020;border-color:#184a33;color:#66e09b">v0.2 · current</span>
@@ -455,7 +456,7 @@ When someone asks something that needs the above, I DM him and wait for approval
 
 <h2><span class="num">9</span>What the concrete options change</h2>
 <div class="stories">
-  <div class="story"><div class="who">Option 2 · Piyush-style</div><p class="line">Bot Gateway and Executor live on different machines. Executor is an SSH call that runs <code>claude --session-id &lt;chat&gt; -p</code>. Knowledge layer is HTTP to noos on a third box. <a href="01-option-2-piyush-style.html">See mockup →</a></p></div>
+  <div class="story"><div class="who">Option 2 · No-Docker</div><p class="line">Bot server and the Claude box live on different machines. Executor is an SSH call that runs <code>claude --session-id &lt;chat&gt; -p</code>. Knowledge layer is HTTP to noos on a third reused box. <a href="01-option-2-no-docker.html">See mockup →</a> (or <a href="03-piyush-literal.html">the reference doc</a> for what Piyush literally shipped)</p></div>
   <div class="story"><div class="who">Option 4 · Noos-style</div><p class="line">Everything in one process, no persistent workspace. Executor rebuilds transcript per turn and calls <code>claude --print</code>. Knowledge layer is HTTP to noos. <a href="02-option-4-noos-style.html">See mockup →</a></p></div>
 </div>
 
