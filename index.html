@@ -364,6 +364,91 @@
         .theme-toggle:hover {
             opacity: 0.65;
         }
+
+        /* Filter bar */
+        .filter-bar {
+            margin-bottom: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .filter-search {
+            width: 100%;
+            background: var(--link-bg);
+            border: 1px solid var(--archive-border);
+            border-radius: 8px;
+            padding: 0.55rem 0.85rem;
+            font-size: 0.8rem;
+            color: var(--text);
+            font-family: inherit;
+            box-shadow: 0 1px 2px var(--link-shadow);
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+        }
+
+        .filter-search::placeholder {
+            color: var(--inline-link);
+        }
+
+        .filter-search:focus {
+            border-color: var(--inline-link-hover);
+            box-shadow: 0 1px 4px var(--link-hover-shadow);
+        }
+
+        .filter-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.35rem;
+        }
+
+        .filter-chip {
+            font-size: 0.7rem;
+            letter-spacing: 0.03em;
+            padding: 0.3rem 0.7rem;
+            border-radius: 999px;
+            border: 1px solid var(--archive-border);
+            background: var(--link-bg);
+            color: var(--section-title);
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.15s ease;
+        }
+
+        .filter-chip:hover {
+            color: var(--link-hover-text);
+            border-color: var(--inline-link-hover);
+        }
+
+        .filter-chip.active {
+            background: var(--quote-border);
+            color: var(--link-hover-text);
+            border-color: var(--quote-border);
+        }
+
+        [data-theme="dark"] .filter-chip.active {
+            background: var(--inline-link-hover);
+            color: var(--bg-end);
+            border-color: var(--inline-link-hover);
+        }
+
+        .section.filtered-out,
+        .links a.filtered-out,
+        .inline-links.filtered-out {
+            display: none;
+        }
+
+        .filter-empty {
+            font-size: 0.8rem;
+            color: var(--inline-link);
+            font-style: italic;
+            padding: 1rem 0.25rem;
+            display: none;
+        }
+
+        .filter-empty.show {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -376,7 +461,24 @@
         <blockquote class="quote">
             "What we call 'Claude' and what we call 'human' are just ripples in the same ocean of knowing, temporary forms through which the infinite studies its own nature."
         </blockquote>
-        <section class="section">
+
+        <div class="filter-bar" role="search">
+            <input type="search" class="filter-search" id="filter-search" placeholder="Filter…" aria-label="Filter links by text">
+            <div class="filter-chips" id="filter-chips" role="tablist" aria-label="Filter by category">
+                <button class="filter-chip active" data-filter="all" role="tab" aria-selected="true">All</button>
+                <button class="filter-chip" data-filter="ai" role="tab">AI &amp; Tools</button>
+                <button class="filter-chip" data-filter="asks" role="tab">Open Asks</button>
+                <button class="filter-chip" data-filter="projects" role="tab">Projects</button>
+                <button class="filter-chip" data-filter="writing" role="tab">Writing</button>
+                <button class="filter-chip" data-filter="essays" role="tab">Essays</button>
+                <button class="filter-chip" data-filter="press" role="tab">Press</button>
+                <button class="filter-chip" data-filter="qigong" role="tab">Qigong</button>
+                <button class="filter-chip" data-filter="resources" role="tab">Resources</button>
+            </div>
+            <p class="filter-empty" id="filter-empty">No matches. <button type="button" onclick="clearFilters()" style="background:none;border:none;color:inherit;text-decoration:underline;cursor:pointer;font:inherit;">Clear</button></p>
+        </div>
+
+        <section class="section" data-category="ai">
             <h2 class="section-title">AI Research & Tools</h2>
             <nav class="links">
                 <a href="https://cursor-docs-gemini.vercel.app" target="_blank" rel="noopener">
@@ -411,7 +513,7 @@
             </nav>
         </section>
 
-        <section class="section">
+        <section class="section" data-category="asks">
             <h2 class="section-title">Open Asks</h2>
             <nav class="links">
                 <a href="https://wikihub.globalbr.ai/@jacobcole/asks/paper2graph-collaborator" target="_blank" rel="noopener">
@@ -428,7 +530,7 @@
             </nav>
         </section>
 
-        <section class="section">
+        <section class="section" data-category="projects">
             <h2 class="section-title">Projects</h2>
             <nav class="links">
                 <a href="https://github.com/tmad4000/OpenMarkdownReader/releases/latest" target="_blank" rel="noopener">
@@ -479,7 +581,7 @@
             </nav>
         </section>
 
-        <section class="section">
+        <section class="section" data-category="press">
             <h2 class="section-title">Press & Podcasts</h2>
             <nav class="links">
                 <a href="press.html">
@@ -490,7 +592,7 @@
             </nav>
         </section>
 
-        <section class="section">
+        <section class="section" data-category="qigong">
             <h2 class="section-title">Qigong</h2>
             <nav class="links">
                 <a href="qigong.html">
@@ -501,7 +603,7 @@
             </nav>
         </section>
 
-        <section class="section">
+        <section class="section" data-category="essays">
             <h2 class="section-title">Essays</h2>
             <nav class="links">
                 <a href="buddhist-reading-brothers-karamazov.html">
@@ -517,7 +619,7 @@
             </nav>
         </section>
 
-        <section class="section">
+        <section class="section" data-category="writing">
             <h2 class="section-title">Writing</h2>
             <nav class="links">
                 <a href="chats.html">
@@ -563,7 +665,7 @@
             </nav>
         </section>
 
-        <section class="section">
+        <section class="section" data-category="resources">
             <h2 class="section-title">Resources</h2>
             <nav class="links">
                 <a href="https://github.com/tmad4000/vibe-coding-guide" target="_blank" rel="noopener">
@@ -688,6 +790,111 @@
             });
 
             applyTheme();
+        })();
+
+        // Filter bar — category chips + text search, persisted in localStorage
+        (function() {
+            var chips = document.querySelectorAll('.filter-chip');
+            var searchInput = document.getElementById('filter-search');
+            var empty = document.getElementById('filter-empty');
+            var sections = document.querySelectorAll('.section[data-category]');
+            var activeCategory = localStorage.getItem('filter-category') || 'all';
+
+            // Restore active chip from storage
+            chips.forEach(function(c) {
+                c.classList.toggle('active', c.dataset.filter === activeCategory);
+                c.setAttribute('aria-selected', c.dataset.filter === activeCategory ? 'true' : 'false');
+            });
+
+            function applyFilter() {
+                var query = (searchInput.value || '').trim().toLowerCase();
+                var anyVisible = false;
+
+                sections.forEach(function(section) {
+                    var categoryMatch = activeCategory === 'all' || section.dataset.category === activeCategory;
+                    if (!categoryMatch) {
+                        section.classList.add('filtered-out');
+                        return;
+                    }
+
+                    if (!query) {
+                        section.classList.remove('filtered-out');
+                        section.querySelectorAll('.links a, .inline-links').forEach(function(el) {
+                            el.classList.remove('filtered-out');
+                        });
+                        anyVisible = true;
+                        return;
+                    }
+
+                    // Text search — check each link in section
+                    var sectionHasMatch = false;
+                    // Include section title in haystack for things like "writing" / "qigong"
+                    var titleEl = section.querySelector('.section-title');
+                    var sectionTitle = titleEl ? titleEl.textContent.toLowerCase() : '';
+                    var titleMatches = sectionTitle.indexOf(query) !== -1;
+
+                    section.querySelectorAll('.links > a').forEach(function(link) {
+                        var text = link.textContent.toLowerCase();
+                        var match = titleMatches || text.indexOf(query) !== -1;
+                        link.classList.toggle('filtered-out', !match);
+                        if (match) sectionHasMatch = true;
+                    });
+
+                    // Hide inline-links whose preceding main link is hidden; or show if title matches
+                    var prevLinkVisible = true;
+                    section.querySelectorAll('.links > *').forEach(function(el) {
+                        if (el.tagName === 'A') {
+                            prevLinkVisible = !el.classList.contains('filtered-out');
+                        } else if (el.classList.contains('inline-links')) {
+                            el.classList.toggle('filtered-out', !prevLinkVisible);
+                        }
+                    });
+
+                    section.classList.toggle('filtered-out', !sectionHasMatch);
+                    if (sectionHasMatch) anyVisible = true;
+                });
+
+                empty.classList.toggle('show', !anyVisible);
+            }
+
+            chips.forEach(function(chip) {
+                chip.addEventListener('click', function() {
+                    activeCategory = chip.dataset.filter;
+                    localStorage.setItem('filter-category', activeCategory);
+                    chips.forEach(function(c) {
+                        c.classList.toggle('active', c === chip);
+                        c.setAttribute('aria-selected', c === chip ? 'true' : 'false');
+                    });
+                    applyFilter();
+                });
+            });
+
+            var searchTimer;
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimer);
+                searchTimer = setTimeout(applyFilter, 80);
+            });
+
+            // Escape clears search
+            searchInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    searchInput.value = '';
+                    applyFilter();
+                }
+            });
+
+            window.clearFilters = function() {
+                searchInput.value = '';
+                activeCategory = 'all';
+                localStorage.setItem('filter-category', 'all');
+                chips.forEach(function(c) {
+                    c.classList.toggle('active', c.dataset.filter === 'all');
+                    c.setAttribute('aria-selected', c.dataset.filter === 'all' ? 'true' : 'false');
+                });
+                applyFilter();
+            };
+
+            applyFilter();
         })();
 
         function toggleArchive() {
