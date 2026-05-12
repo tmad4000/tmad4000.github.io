@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>labs · tmad4000</title>
+<style>
+  :root {
+    --bg-start: #f5f7fa; --bg-end: #e4e8ec;
+    --text: #333; --heading: #111; --tagline: #888;
+    --link-bg: #fff; --link-text: #444; --desc: #888;
+    --section-title: #999; --separator: #ccc;
+    --badge-alpha-bg: #fee2e2; --badge-alpha-text: #dc2626;
+    --badge-beta-bg: #fef3c7; --badge-beta-text: #d97706;
+    --link-shadow: rgba(0,0,0,.08); --link-hover-shadow: rgba(0,0,0,.1);
+    --link-hover-text: #000;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-start: #24272c; --bg-end: #2e3238;
+      --text: #c8c8c8; --heading: #e8e8e8; --tagline: #8a8a8a;
+      --link-bg: rgba(255,255,255,.06); --link-text: #bbb; --desc: #808080;
+      --section-title: #6a6a6a; --separator: #505050;
+      --badge-alpha-bg: rgba(220,38,38,.12); --badge-alpha-text: #f87171;
+      --badge-beta-bg: rgba(217,119,6,.12); --badge-beta-text: #fbbf24;
+      --link-shadow: rgba(0,0,0,.2); --link-hover-shadow: rgba(0,0,0,.3);
+      --link-hover-text: #e8e8e8;
+    }
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
+    color: var(--text); min-height: 100vh;
+    display: flex; align-items: flex-start; justify-content: center;
+    padding: 15vh 2rem 2rem;
+  }
+  .container { max-width: 520px; width: 100%; }
+  h1 { font-size: 2rem; color: var(--heading); margin-bottom: 0.5rem; }
+  .tagline {
+    color: var(--tagline); font-size: 0.75rem; letter-spacing: 0.15em;
+    text-transform: uppercase; margin-bottom: 2rem;
+  }
+  .section-title {
+    font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--section-title); margin-bottom: 0.75rem;
+  }
+  .links { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 2rem; }
+  .links a {
+    display: flex; align-items: center; gap: 0.75rem;
+    color: var(--link-text); text-decoration: none;
+    padding: 1rem 1.25rem; background: var(--link-bg);
+    border-radius: 8px; box-shadow: 0 1px 3px var(--link-shadow);
+    transition: all 0.2s ease;
+  }
+  .links a:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px var(--link-hover-shadow);
+    color: var(--link-hover-text);
+  }
+  .icon { font-size: 1.25rem; width: 1.5rem; text-align: center; }
+  .label { font-weight: 500; flex: 1; }
+  .desc { font-size: 0.8rem; color: var(--desc); }
+  .badge {
+    font-size: 0.65rem; padding: 0.15rem 0.5rem; border-radius: 4px;
+    text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;
+  }
+  .badge-alpha { background: var(--badge-alpha-bg); color: var(--badge-alpha-text); }
+  .badge-beta  { background: var(--badge-beta-bg);  color: var(--badge-beta-text); }
+  .back {
+    display: inline-block; margin-top: 2rem; padding-top: 1.5rem;
+    border-top: 1px solid var(--separator); color: var(--section-title);
+    text-decoration: none; font-size: 0.8rem;
+  }
+  .back:hover { color: var(--link-hover-text); }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1>labs</h1>
+    <div class="tagline">half-built things you can poke at</div>
+
+    <div class="section-title">Playable</div>
+    <div class="links">
+      <a href="https://realm.jacobcole.ai" target="_blank" rel="noopener">
+        <span class="icon">🌳</span>
+        <span class="label">Realm</span>
+        <span class="desc">tiny MMO prototype · click to walk, chop trees, talk to NPCs</span>
+        <span class="badge badge-alpha">alpha</span>
+      </a>
+    </div>
+
+    <a href="/" class="back">← back to jacobcole.ai</a>
+  </div>
+</body>
+</html>
