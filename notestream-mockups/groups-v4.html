@@ -1,0 +1,2055 @@
+<!DOCTYPE html>
+<!--
+  NOTESTREAM — GROUPS FEATURE v4 MOCK · FIDELITY PASS
+  =====================================================
+  Rebuilt from the actual app code, not my imagination.
+
+  Read line-by-line and faithful to:
+    - src/renderer/src/components/ui/sidebar.tsx  (shadcn primitive, 16rem width)
+    - src/renderer/src/components/app-sidebar.tsx (composition order)
+    - src/renderer/src/components/nav-main.tsx    (real labels + icons)
+    - src/renderer/src/components/nav-folders.tsx (sticky header + chevron)
+    - src/renderer/src/components/nav-hashtags.tsx (Globe = shared indicator)
+    - src/renderer/src/components/nav-pinned-notes.tsx (Pin/Unpin action)
+    - src/renderer/src/components/note-share-dialog.tsx (real dialog)
+    - src/renderer/src/components/notes.tsx       (real note row chrome)
+    - src/renderer/src/plugins/HashtagMark.ts     (renders as <span class="hashtag">)
+    - src/renderer/src/assets/tiptap.css          (color = var(--mention-text) — PURPLE)
+    - commit bb2747a                              (tint = bg-blue-50/65)
+
+  v1–v3 drew an inspired-by-Notestream look. This one is the look.
+  Each frame is a faithful BEFORE (today) next to AFTER (with Groups added).
+
+  Frames:
+    01. Side-by-side · sidebar today → with Groups
+    02. Side-by-side · share dialog today → with Groups picker
+    03. Side-by-side · note rendering today → with team-tag attribution
+    04. NavGroups section · all interaction states (expanded, action menu, empty)
+    05. Group settings · using actual shadcn Dialog form patterns
+    06. Hashtag autocomplete · matching the real dropdown style
+    07. Phone · uses Sheet (the real mobile sidebar pattern)
+    08. Visual diff · what changed from today, line-by-line
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Notestream — Groups v4 (fidelity pass)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* ===== REAL NOTESTREAM TOKENS (lifted from src/renderer/src/assets/index.css) ===== */
+    :root {
+      --background:          oklch(1 0 0);
+      --foreground:          oklch(0.145 0 0);
+      --card:                oklch(1 0 0);
+      --muted:               oklch(0.97 0 0);
+      --muted-foreground:    oklch(0.556 0 0);
+      --accent:              oklch(0.97 0 0);
+      --accent-foreground:   oklch(0.205 0 0);
+      --border:              oklch(0.922 0 0);
+      --sidebar:             oklch(0.975 0 0);
+      --sidebar-foreground:  oklch(0.145 0 0);
+      --sidebar-accent:      oklch(0.95 0 0);
+      --sidebar-accent-foreground: oklch(0.205 0 0);
+      --sidebar-border:      oklch(0.922 0 0);
+      --primary:             oklch(0.205 0 0);
+      --primary-foreground:  oklch(0.985 0 0);
+      /* Real hashtag color — same as @mentions, PURPLE */
+      --mention-text:        #6a00f5;
+      --mention-background:  rgba(88, 5, 255, 0.05);
+      --link:                #2563eb;
+      /* Tint applied to notes whose hashtag has been shared (commit bb2747a) */
+      --shared-tint:         oklch(0.97 0.013 250 / 65%);
+      /* Color for group identity (new) — derived from tag color but not chosen yet by team */
+      --group-accent:        oklch(0.55 0.16 220);  /* a calm blue, picked from chart-3 */
+
+      --radius:              0.625rem;
+      --radius-sm:           calc(0.625rem - 4px);
+      --radius-md:           calc(0.625rem - 2px);
+      --radius-lg:           0.625rem;
+
+      --sidebar-width:       16rem;  /* real width from sidebar.tsx */
+    }
+
+    .dark-frame {
+      --background:          oklch(0.185 0.005 286);
+      --foreground:          oklch(0.93 0.005 286);
+      --card:                oklch(0.23 0.005 286);
+      --muted:               oklch(0.28 0.005 286);
+      --muted-foreground:    oklch(0.68 0.01 286);
+      --accent:              oklch(0.28 0.005 286);
+      --accent-foreground:   oklch(0.93 0.005 286);
+      --border:              oklch(1 0 0 / 10%);
+      --sidebar:             oklch(0.15 0.005 286);
+      --sidebar-foreground:  oklch(0.93 0.005 286);
+      --sidebar-accent:      oklch(0.28 0.005 286);
+      --sidebar-accent-foreground: oklch(0.93 0.005 286);
+      --sidebar-border:      oklch(1 0 0 / 5%);
+      --mention-text:        #a78bfa;
+      --mention-background:  rgba(167, 139, 250, 0.10);
+      --shared-tint:         oklch(0.55 0.16 250 / 6%);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #ececef;
+      color: var(--foreground);
+      font-size: 14px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page { max-width: 1480px; margin: 0 auto; padding: 24px; }
+    .page-header { margin-bottom: 24px; }
+    .page-title { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
+    .page-sub { color: #4a4a4a; font-size: 13px; margin-top: 4px; }
+    .page-sub code { font-family: 'JetBrains Mono', monospace; font-size: 11.5px; background: white; padding: 1px 5px; border-radius: 3px; }
+
+    .toc {
+      background: white;
+      border: 1px solid #e6e6e6;
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin-bottom: 28px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 4px 16px;
+      font-size: 12.5px;
+    }
+    .toc a { color: var(--foreground); text-decoration: none; padding: 3px 0; display: flex; gap: 8px; }
+    .toc a:hover { color: var(--mention-text); }
+    .toc a .num { color: #999; font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+
+    .frame {
+      background: var(--background);
+      color: var(--foreground);
+      border: 1px solid #e6e6e6;
+      border-radius: 14px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+      margin-bottom: 28px;
+      overflow: hidden;
+    }
+    .frame-head {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--muted);
+    }
+    .frame-tag {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #2563eb;
+      background: rgba(37, 99, 235, 0.10);
+      padding: 3px 8px;
+      border-radius: 9999px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .frame-title { font-weight: 600; font-size: 13.5px; }
+    .frame-note { margin-left: auto; color: var(--muted-foreground); font-size: 12px; }
+
+    .split { display: grid; grid-template-columns: 1fr 1fr; min-height: 720px; }
+    .col { position: relative; overflow: hidden; }
+    .col + .col { border-left: 1px solid var(--border); }
+    .col-label {
+      position: absolute; top: 12px; right: 12px;
+      z-index: 10;
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 3px 9px; border-radius: 9999px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .col-label.before { background: #f5f5f5; color: #6b6b6b; }
+    .col-label.after { background: #2563eb; color: white; }
+
+    /* ===== SIDEBAR — replicating shadcn ui/sidebar.tsx ===== */
+    .app {
+      display: grid;
+      grid-template-columns: var(--sidebar-width) 1fr;
+      height: 100%;
+      min-height: 720px;
+      background: var(--background);
+    }
+    .sb {
+      background: var(--sidebar);
+      color: var(--sidebar-foreground);
+      border-right: 1px solid var(--sidebar-border);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+    .sb-header {
+      display: flex; flex-direction: column;
+      gap: 8px;
+      padding: 8px;
+    }
+    .sb-brand {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 8px;
+    }
+    .sb-brand svg { width: 18px; height: 18px; color: var(--muted-foreground); }
+    .sb-brand-name { font-size: 14px; font-weight: 500; }
+
+    .sb-content { flex: 1; overflow-y: auto; min-height: 0; }
+
+    .sb-group { padding: 8px 8px 8px 8px; }
+    .sb-group-label {
+      display: flex; align-items: center;
+      height: 32px;
+      padding: 0 8px;
+      font-size: 12px;
+      font-weight: 500;
+      color: color-mix(in oklab, var(--sidebar-foreground) 50%, transparent);
+      border-radius: 6px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .sb-group-label:hover {
+      background: var(--sidebar-accent);
+      color: var(--sidebar-accent-foreground);
+    }
+    .sb-group-label .label-text { flex: 1; }
+    .sb-group-label .chev {
+      width: 14px; height: 14px;
+      transition: transform 0.2s;
+      color: currentColor;
+      stroke-width: 1;
+      transform: scale(0.9);
+    }
+    .sb-group[data-open="true"] .chev { transform: scale(0.9) rotate(90deg); }
+    .sb-group-action {
+      width: 24px; height: 24px;
+      display: grid; place-items: center;
+      color: color-mix(in oklab, var(--sidebar-foreground) 50%, transparent);
+      border-radius: 4px;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.12s, background 0.12s;
+      position: absolute;
+      top: 12px; right: 12px;
+    }
+    .sb-group-action svg { width: 16px; height: 16px; }
+    .sb-group:hover .sb-group-action { opacity: 1; }
+    .sb-group-action:hover { background: color-mix(in oklab, var(--sidebar-foreground) 7%, transparent); }
+    .sb-group { position: relative; }
+
+    .sb-menu { display: flex; flex-direction: column; }
+    .sb-menu-item {
+      position: relative;
+      group: menu-item;
+    }
+    .sb-menu-button {
+      display: flex; align-items: center;
+      gap: 8px;
+      height: 32px;
+      width: 100%;
+      padding: 8px;
+      border-radius: 6px;
+      font-size: 14px;
+      text-align: left;
+      cursor: pointer;
+      background: transparent;
+      border: 0;
+      color: var(--sidebar-foreground);
+      font-family: inherit;
+      transition: background 0.12s, color 0.12s;
+    }
+    .sb-menu-button:hover {
+      background: var(--sidebar-accent);
+      color: var(--sidebar-accent-foreground);
+    }
+    .sb-menu-button[data-active="true"] {
+      background: var(--sidebar-accent);
+      color: var(--sidebar-accent-foreground);
+      font-weight: 500;
+    }
+    .sb-menu-button svg.icon {
+      width: 16px; height: 16px; flex-shrink: 0;
+      color: currentColor;
+      stroke-width: 2;
+    }
+    .sb-menu-button .label { flex: 1; min-width: 0; }
+    .sb-menu-button .row {
+      display: flex; align-items: center;
+      flex: 1; justify-content: space-between;
+    }
+    .sb-menu-button .truncate {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .sb-menu-badge {
+      pointer-events: none;
+      display: flex; align-items: center; justify-content: center;
+      height: 20px; min-width: 20px;
+      padding: 0 4px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+      color: color-mix(in oklab, var(--sidebar-foreground) 30%, transparent);
+      position: absolute;
+      right: 4px;
+      top: 6px;
+    }
+    .sb-menu-item:hover .sb-menu-badge,
+    .sb-menu-button[data-active="true"] ~ .sb-menu-badge {
+      color: var(--sidebar-accent-foreground);
+    }
+    .sb-menu-action {
+      position: absolute;
+      top: 4px; right: 4px;
+      width: 24px; height: 24px;
+      display: grid; place-items: center;
+      color: color-mix(in oklab, var(--sidebar-foreground) 50%, transparent);
+      border-radius: 6px;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.12s, background 0.12s;
+    }
+    .sb-menu-action svg { width: 14px; height: 14px; }
+    .sb-menu-item:hover .sb-menu-action { opacity: 1; }
+    .sb-menu-action:hover { background: color-mix(in oklab, var(--sidebar-foreground) 7%, transparent); }
+    /* Pushed left to make room for badge */
+    .sb-menu-action.right-7 { right: 28px; }
+
+    .sb-menu-sub {
+      display: flex; flex-direction: column;
+      gap: 4px;
+      margin-left: 14px;
+      padding: 2px 0 2px 10px;
+      border-left: 1px solid var(--sidebar-border);
+      transform: translateX(1px);
+    }
+    .sb-menu-sub-button {
+      display: flex; align-items: center;
+      gap: 8px;
+      height: 28px;
+      padding: 0 8px;
+      border-radius: 6px;
+      font-size: 14px;
+      color: var(--sidebar-foreground);
+      cursor: pointer;
+      transform: translateX(-1px);
+    }
+    .sb-menu-sub-button:hover {
+      background: var(--sidebar-accent);
+      color: var(--sidebar-accent-foreground);
+    }
+    .sb-menu-sub-button[data-active="true"] {
+      background: var(--sidebar-accent);
+      font-weight: 500;
+    }
+    .sb-menu-sub-button svg { width: 14px; height: 14px; color: var(--muted-foreground); flex-shrink: 0; }
+    .sb-menu-sub-button .truncate { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sb-menu-sub-button .count { font-size: 11px; color: var(--muted-foreground); font-variant-numeric: tabular-nums; }
+
+    .sb-empty {
+      padding: 6px 8px;
+      font-size: 12px;
+      color: color-mix(in oklab, var(--sidebar-foreground) 50%, transparent);
+    }
+
+    /* Group identity icon */
+    .gico {
+      width: 18px; height: 18px;
+      border-radius: 4px;
+      display: grid; place-items: center;
+      font-size: 9px; font-weight: 700;
+      color: white;
+      flex-shrink: 0;
+      letter-spacing: -0.02em;
+    }
+    .gico.lg { width: 28px; height: 28px; font-size: 11px; border-radius: 6px; }
+    .gico.xl { width: 48px; height: 48px; font-size: 16px; border-radius: 10px; }
+    .gico.ideaflow { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
+    .gico.family   { background: linear-gradient(135deg, #be185d, #be123c); }
+    .gico.book     { background: linear-gradient(135deg, #6d28d9, #5b21b6); }
+    .gico.ext      { background: linear-gradient(135deg, #059669, #047857); }
+    .gico.lattice  { background: linear-gradient(135deg, #ea580c, #c2410c); }
+
+    .avatar-stack { display: inline-flex; flex-shrink: 0; }
+    .avatar-stack > .av {
+      width: 18px; height: 18px; border-radius: 50%;
+      border: 1.5px solid var(--sidebar);
+      margin-left: -4px;
+      display: grid; place-items: center;
+      font-size: 9px; font-weight: 600; color: white;
+    }
+    .avatar-stack > .av:first-child { margin-left: 0; }
+    .av { display: inline-grid; place-items: center; border-radius: 50%; color: white; font-weight: 600; }
+    .av.sa { background: #ec4899; }
+    .av.da { background: #6366f1; }
+    .av.ja { background: #f59e0b; }
+    .av.jc { background: #2563eb; }
+    .av.an { background: #14b8a6; }
+    .av.km { background: #84cc16; }
+
+    /* ===== MAIN (note stream) — replicating notes.tsx ===== */
+    .main { background: var(--background); overflow-y: auto; }
+    .header {
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 12px;
+      background: var(--background);
+    }
+    .header svg { width: 16px; height: 16px; color: var(--muted-foreground); }
+    .header h2 { font-size: 14px; font-weight: 500; }
+    .header .spacer { flex: 1; }
+
+    .stream { padding: 0 20px; }
+
+    /* Real note row chrome — flat, border-t separators, no card */
+    .note-row {
+      border-top: 1px solid color-mix(in oklab, #9ca3af 40%, transparent);
+      padding: 12px 0;
+      position: relative;
+    }
+    .note-row:first-child { border-top: 0; }
+    .note-row.tinted {
+      margin: 10px 0;
+      padding: 12px 12px;
+      border-top: 0;
+      border-radius: 6px;
+      background: rgba(219, 234, 254, 0.65);  /* bg-blue-50/65 */
+    }
+    .dark-frame .note-row.tinted { background: rgba(59, 130, 246, 0.06); }
+    .note-meta {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 12px;
+      color: var(--muted-foreground);
+      margin-bottom: 6px;
+    }
+    .note-meta .av { width: 16px; height: 16px; font-size: 9px; }
+    .note-meta .author { color: var(--foreground); font-weight: 500; }
+    .note-meta .time { margin-left: auto; }
+    .you-badge {
+      font-size: 10px; padding: 1px 6px;
+      background: rgba(37, 99, 235, 0.10); color: #2563eb;
+      border-radius: 3px; font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+    .note-body { font-size: 14px; line-height: 1.55; color: var(--foreground); }
+    .note-body p + p { margin-top: 6px; }
+
+    /* HASHTAG — real Notestream styling: PURPLE, color: var(--mention-text), no background */
+    .hashtag {
+      cursor: pointer;
+      color: var(--mention-text);
+    }
+    .hashtag:hover { text-decoration: underline; }
+    /* NEW for Groups (additive): tiny group-icon prepended, hashtag itself stays purple */
+    .hashtag.team {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      vertical-align: baseline;
+    }
+    .hashtag.team .gico { width: 10px; height: 10px; font-size: 7px; border-radius: 2px; vertical-align: -1px; }
+    .mention {
+      color: var(--mention-text);
+      background: var(--mention-background);
+      padding: 0 3px; border-radius: 3px;
+    }
+
+    .note-foot {
+      display: flex; align-items: center; gap: 8px;
+      margin-top: 8px;
+      font-size: 11.5px;
+      color: var(--muted-foreground);
+      flex-wrap: wrap;
+    }
+    .foot-pill {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 1px 6px;
+      background: var(--muted);
+      border-radius: 3px;
+    }
+    .foot-pill .gico { width: 12px; height: 12px; font-size: 7px; border-radius: 2px; }
+    .foot-pill code { font-family: 'JetBrains Mono', monospace; color: var(--mention-text); font-size: 10.5px; }
+
+    /* ===== DIALOG — replicating real ui/dialog ===== */
+    .dialog-bg {
+      padding: 24px; background: linear-gradient(180deg, var(--muted), var(--background));
+      min-height: 600px;
+    }
+    .dialog {
+      max-width: 32rem;  /* sm:max-w-lg = 32rem */
+      width: 100%; margin: 0 auto;
+      background: var(--background);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.14);
+      padding: 24px;
+    }
+    .dialog-header { margin-bottom: 16px; }
+    .dialog-title { font-weight: 600; font-size: 16px; letter-spacing: -0.01em; }
+    .dialog-desc { color: var(--muted-foreground); font-size: 13px; margin-top: 4px; }
+    .dialog-body { display: flex; flex-direction: column; gap: 16px; }
+    .dialog-sep { height: 1px; background: var(--border); }
+
+    .link-row {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .input {
+      height: 32px; flex: 1;
+      padding: 0 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--background);
+      font-size: 13px;
+      color: var(--foreground);
+      font-family: inherit;
+    }
+    .input:focus { outline: 0; border-color: oklch(0.708 0 0); }
+    .input.h-7 { height: 28px; font-size: 12px; }
+    .btn {
+      height: 32px; padding: 0 14px;
+      border: 1px solid var(--border);
+      background: var(--background);
+      color: var(--foreground);
+      font-size: 13px; font-weight: 500;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: inherit;
+      display: inline-flex; align-items: center; gap: 4px;
+    }
+    .btn:hover { background: var(--muted); }
+    .btn.sm { height: 28px; padding: 0 10px; font-size: 12px; }
+    .btn.primary { background: var(--primary); color: var(--primary-foreground); border-color: var(--primary); }
+    .btn.primary:hover { background: oklch(0.3 0 0); }
+    .btn.destructive { border-color: oklch(0.577 0.245 27.325); color: oklch(0.577 0.245 27.325); }
+    .btn.destructive:hover { background: oklch(0.577 0.245 27.325 / 10%); }
+    .btn.outline { /* same as default */ }
+    .btn svg { width: 12px; height: 12px; }
+
+    .dialog-section-label { font-size: 14px; font-weight: 500; }
+
+    /* People row in share dialog */
+    .person-row {
+      display: flex; align-items: center; gap: 8px;
+      padding: 4px 0;
+    }
+    .person-row .av {
+      width: 32px; height: 32px; font-size: 12px;
+      flex-shrink: 0;
+    }
+    .person-row .info { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+    .person-row .name { font-size: 14px; color: var(--foreground); }
+    .person-row .email { font-size: 12px; color: var(--muted-foreground); }
+    .person-row .role-select {
+      height: 28px; padding: 0 8px;
+      border: 1px solid var(--border);
+      background: var(--background);
+      border-radius: 6px;
+      font-size: 12px; cursor: pointer;
+      color: var(--foreground);
+      font-family: inherit;
+    }
+    .person-row .invited-tag {
+      font-size: 12px; color: var(--muted-foreground);
+      padding: 0 8px;
+    }
+    .person-row .x {
+      padding: 4px; cursor: pointer;
+      color: var(--muted-foreground);
+      border-radius: 3px;
+      background: transparent; border: 0;
+    }
+    .person-row .x:hover { background: var(--accent); }
+    .person-row .x svg { width: 12px; height: 12px; }
+
+    .general-row {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .access-select {
+      height: 32px; padding: 0 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--background);
+      font-size: 13px; cursor: pointer;
+      color: var(--foreground);
+      font-family: inherit;
+      min-width: 200px;
+    }
+    .role-select-128 {
+      height: 32px; padding: 0 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--background);
+      font-size: 13px; cursor: pointer;
+      color: var(--foreground);
+      font-family: inherit;
+      width: 120px;
+    }
+
+    .switch-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-top: 4px;
+    }
+    .switch-row .label { font-size: 14px; font-weight: 500; }
+    .switch-row .sub { font-size: 12px; color: var(--muted-foreground); margin-top: 1px; }
+    .switch {
+      width: 36px; height: 20px;
+      background: var(--border);
+      border-radius: 9999px;
+      position: relative; cursor: pointer;
+    }
+    .switch::before {
+      content: ''; position: absolute; top: 2px; left: 2px;
+      width: 16px; height: 16px;
+      background: white; border-radius: 50%;
+      transition: transform 0.15s;
+    }
+    .switch.on { background: var(--primary); }
+    .switch.on::before { transform: translateX(16px); }
+
+    /* Save button at bottom of share dialog */
+    .save-btn-full {
+      width: 100%; height: 36px;
+      background: var(--primary); color: var(--primary-foreground);
+      border: 0; border-radius: 6px;
+      font-size: 14px; font-weight: 500; cursor: pointer;
+      font-family: inherit;
+    }
+
+    /* ===== AUTOCOMPLETE — matching the real plain dropdown ===== */
+    .editor-mock {
+      background: var(--background);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 18px;
+      max-width: 540px; margin: 0 auto;
+      position: relative;
+      min-height: 120px;
+    }
+    .editor-text { font-size: 14px; line-height: 1.6; }
+    .cursor {
+      display: inline-block; width: 1px; height: 1em;
+      background: var(--foreground); vertical-align: text-bottom;
+      animation: blink 1s steps(2) infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+    /* Real HashtagDropdownList — plain dropdown-menu div with buttons */
+    .ac-dropdown {
+      position: absolute;
+      top: 56px; left: 200px;
+      background: var(--background);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.10);
+      padding: 4px;
+      min-width: 240px;
+      z-index: 10;
+    }
+    .ac-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+      width: 100%;
+      background: transparent; border: 0;
+      color: var(--foreground);
+      font-family: inherit;
+    }
+    .ac-item:hover, .ac-item.hl { background: var(--accent); }
+    .ac-item svg { width: 14px; height: 14px; color: var(--muted-foreground); flex-shrink: 0; }
+    .ac-item .meta { margin-left: auto; font-size: 11px; color: var(--muted-foreground); font-variant-numeric: tabular-nums; }
+    .ac-item .gico { width: 14px; height: 14px; font-size: 8px; border-radius: 3px; }
+    .ac-item .name { flex: 1; min-width: 0; }
+
+    /* ===== SETTINGS PAGE ===== */
+    .settings-page { padding: 24px 28px 40px; max-width: 720px; margin: 0 auto; }
+    .settings-header {
+      display: flex; align-items: center; gap: 16px;
+      margin-bottom: 24px;
+    }
+    .settings-header .name { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
+    .settings-header .sub { color: var(--muted-foreground); font-size: 13px; margin-top: 2px; }
+    .settings-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+    .settings-card-head {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+    }
+    .settings-card-title { font-weight: 600; font-size: 14px; }
+    .settings-card-sub { color: var(--muted-foreground); font-size: 12.5px; margin-top: 2px; }
+    .settings-card-body { padding: 4px 0; }
+    .member-row {
+      display: grid;
+      grid-template-columns: 36px 1fr 110px 28px;
+      align-items: center; gap: 12px;
+      padding: 10px 18px;
+      border-bottom: 1px solid color-mix(in oklab, var(--border) 50%, transparent);
+    }
+    .member-row:last-child { border-bottom: 0; }
+    .member-row .av { width: 36px; height: 36px; font-size: 14px; }
+    .member-row .name { font-size: 14px; font-weight: 500; }
+    .member-row .email { font-size: 12px; color: var(--muted-foreground); }
+
+    /* ===== PHONE (Sheet on mobile) ===== */
+    .phone-stage {
+      padding: 32px; background: var(--muted);
+      display: flex; gap: 28px; justify-content: center; flex-wrap: wrap;
+    }
+    .phone {
+      width: 320px; background: var(--background);
+      border-radius: 32px;
+      border: 8px solid #1a1a1c;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.18);
+      overflow: hidden;
+    }
+    .phone-notch { background: #1a1a1c; height: 24px; display: flex; justify-content: center; align-items: center; }
+    .phone-notch::before { content: ''; width: 90px; height: 22px; background: #050505; border-radius: 0 0 18px 18px; margin-top: -4px; }
+    .phone-screen { height: 540px; background: var(--background); position: relative; overflow: hidden; }
+    .phone-screen.with-sheet::after {
+      content: ''; position: absolute; inset: 0;
+      background: rgba(0,0,0,0.4);
+    }
+    .phone-bar {
+      padding: 10px 16px; font-size: 11px;
+      display: flex; justify-content: space-between;
+    }
+    .phone-content { padding: 12px 14px; height: calc(100% - 32px); overflow-y: auto; }
+
+    .phone-sheet {
+      position: absolute;
+      top: 0; left: 0; bottom: 0;
+      width: 288px;  /* 18rem mobile width */
+      background: var(--sidebar);
+      box-shadow: 4px 0 16px rgba(0,0,0,0.2);
+      display: flex; flex-direction: column;
+      z-index: 10;
+    }
+
+    /* ===== DIFF table ===== */
+    .diff-table {
+      width: 100%; border-collapse: collapse;
+      font-size: 13px;
+    }
+    .diff-table th {
+      text-align: left;
+      padding: 12px 18px;
+      background: var(--muted);
+      font-weight: 600;
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted-foreground);
+      border-bottom: 1px solid var(--border);
+    }
+    .diff-table td {
+      padding: 12px 18px;
+      vertical-align: top;
+      border-bottom: 1px solid color-mix(in oklab, var(--border) 50%, transparent);
+    }
+    .diff-table tr:last-child td { border-bottom: 0; }
+    .diff-table td code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      background: var(--muted);
+      padding: 1px 5px;
+      border-radius: 3px;
+    }
+    .diff-table .delta { color: #2563eb; font-weight: 500; }
+
+    /* utilities */
+    code.path { font-family: 'JetBrains Mono', monospace; font-size: 11.5px; background: var(--muted); padding: 2px 5px; border-radius: 3px; }
+    a { color: var(--mention-text); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    svg { display: inline-block; vertical-align: middle; }
+
+    /* hide the SVG defs */
+    .icons-defs { width: 0; height: 0; position: absolute; }
+  </style>
+</head>
+<body>
+
+  <!-- ===== LUCIDE ICON DEFINITIONS (real SVG paths from lucide-react) ===== -->
+  <svg class="icons-defs" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <!-- Home -->
+      <symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/>
+        <path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+      </symbol>
+      <!-- SquareCheckBig -->
+      <symbol id="i-square-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m9 11 3 3L22 4"/>
+        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+      </symbol>
+      <!-- Share2 -->
+      <symbol id="i-share2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="18" cy="5" r="3"/>
+        <circle cx="6" cy="12" r="3"/>
+        <circle cx="18" cy="19" r="3"/>
+        <line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/>
+        <line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/>
+      </symbol>
+      <!-- Globe -->
+      <symbol id="i-globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/>
+        <path d="M2 12h20"/>
+      </symbol>
+      <!-- Users -->
+      <symbol id="i-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+        <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </symbol>
+      <!-- Hash -->
+      <symbol id="i-hash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="4" x2="20" y1="9" y2="9"/>
+        <line x1="4" x2="20" y1="15" y2="15"/>
+        <line x1="10" x2="8" y1="3" y2="21"/>
+        <line x1="16" x2="14" y1="3" y2="21"/>
+      </symbol>
+      <!-- AtSign -->
+      <symbol id="i-at" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="4"/>
+        <path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-3.92 7.94"/>
+      </symbol>
+      <!-- ChevronRight -->
+      <symbol id="i-chevron-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m9 18 6-6-6-6"/>
+      </symbol>
+      <!-- Plus -->
+      <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M5 12h14"/>
+        <path d="M12 5v14"/>
+      </symbol>
+      <!-- Ellipsis (horizontal dots) -->
+      <symbol id="i-ellipsis" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="1"/>
+        <circle cx="19" cy="12" r="1"/>
+        <circle cx="5" cy="12" r="1"/>
+      </symbol>
+      <!-- MoreHorizontal -->
+      <symbol id="i-more-h" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="1"/>
+        <circle cx="19" cy="12" r="1"/>
+        <circle cx="5" cy="12" r="1"/>
+      </symbol>
+      <!-- Folder -->
+      <symbol id="i-folder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/>
+      </symbol>
+      <!-- Search -->
+      <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/>
+        <path d="m21 21-4.3-4.3"/>
+      </symbol>
+      <!-- ArrowDownWideNarrow -->
+      <symbol id="i-sort-freq" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m3 16 4 4 4-4"/>
+        <path d="M7 20V4"/>
+        <path d="M11 4h10"/>
+        <path d="M11 8h7"/>
+        <path d="M11 12h4"/>
+      </symbol>
+      <!-- Link -->
+      <symbol id="i-link" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+      </symbol>
+      <!-- X -->
+      <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 6 6 18"/>
+        <path d="m6 6 12 12"/>
+      </symbol>
+      <!-- Calendar -->
+      <symbol id="i-calendar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M8 2v4"/>
+        <path d="M16 2v4"/>
+        <rect width="18" height="18" x="3" y="4" rx="2"/>
+        <path d="M3 10h18"/>
+      </symbol>
+      <!-- Settings -->
+      <symbol id="i-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+        <circle cx="12" cy="12" r="3"/>
+      </symbol>
+      <!-- Loader -->
+      <symbol id="i-loader" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+      </symbol>
+      <!-- PanelLeft -->
+      <symbol id="i-panel-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect width="18" height="18" x="3" y="3" rx="2"/>
+        <path d="M9 3v18"/>
+      </symbol>
+    </defs>
+  </svg>
+
+  <div class="page">
+    <div class="page-header">
+      <div class="page-title">Notestream — Groups (v4 · fidelity pass)</div>
+      <div class="page-sub">
+        Rebuilt from the real component code — shadcn primitives, actual lucide icons, real <code>--mention-text</code> purple for hashtags, real <code>bg-blue-50/65</code> tint, real share dialog layout. v1–v3 are kept for history.
+      </div>
+    </div>
+
+    <div class="toc">
+      <a href="#f01"><span class="num">01</span>Sidebar · today → with Groups</a>
+      <a href="#f02"><span class="num">02</span>Share dialog · today → with Groups</a>
+      <a href="#f03"><span class="num">03</span>Note rendering · today → with attribution</a>
+      <a href="#f04"><span class="num">04</span>NavGroups · interaction states</a>
+      <a href="#f05"><span class="num">05</span>Group settings page</a>
+      <a href="#f06"><span class="num">06</span>Hashtag autocomplete · real dropdown</a>
+      <a href="#f07"><span class="num">07</span>Phone · Sheet sidebar</a>
+      <a href="#f08"><span class="num">08</span>Visual diff · what actually changed</a>
+    </div>
+
+    <!-- ================================================================
+         01 — Side-by-side sidebar
+    ================================================================= -->
+    <div class="frame" id="f01">
+      <div class="frame-head">
+        <span class="frame-tag">01</span>
+        <span class="frame-title">Sidebar · today (faithful) → with Groups added</span>
+        <span class="frame-note">Real shadcn primitive · 16rem wide · real labels · real icons</span>
+      </div>
+      <div class="split">
+
+        <!-- TODAY -->
+        <div class="col">
+          <span class="col-label before">Today</span>
+          <div class="app">
+            <aside class="sb">
+              <div class="sb-header">
+                <div class="sb-brand">
+                  <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="9" r="7"/></svg>
+                  <span class="sb-brand-name">Notestream</span>
+                </div>
+                <div>
+                  <div class="sb-menu">
+                    <div class="sb-menu-item">
+                      <button class="sb-menu-button" data-active="true">
+                        <svg class="icon"><use href="#i-home"/></svg>
+                        <span class="row"><span>All Notes</span><span class="sb-menu-badge" style="position: static;">2,138</span></span>
+                      </button>
+                    </div>
+                    <div class="sb-menu-item">
+                      <button class="sb-menu-button">
+                        <svg class="icon"><use href="#i-square-check"/></svg>
+                        <span class="row"><span>To-Do Notes</span><span class="sb-menu-badge" style="position: static;">42</span></span>
+                      </button>
+                    </div>
+                    <div class="sb-menu-item">
+                      <button class="sb-menu-button">
+                        <svg class="icon"><use href="#i-share2"/></svg>
+                        <span class="label">Shared Notes</span>
+                      </button>
+                    </div>
+                    <div class="sb-menu-item">
+                      <button class="sb-menu-button">
+                        <svg class="icon"><use href="#i-globe"/></svg>
+                        <span class="label">Publicly listed notes</span>
+                      </button>
+                    </div>
+                    <div class="sb-menu-item">
+                      <button class="sb-menu-button">
+                        <svg class="icon"><use href="#i-users"/></svg>
+                        <span class="label">Shared with me</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="sb-content">
+                <div class="sb-group" data-open="false">
+                  <div class="sb-group-label">
+                    <span class="label-text">Pinned</span>
+                    <svg class="chev"><use href="#i-chevron-right"/></svg>
+                  </div>
+                </div>
+
+                <div class="sb-group" data-open="true">
+                  <div class="sb-group-label">
+                    <span class="label-text">Folders</span>
+                    <svg class="chev"><use href="#i-chevron-right"/></svg>
+                  </div>
+                  <button class="sb-group-action"><svg><use href="#i-plus"/></svg></button>
+                  <div class="sb-menu">
+                    <div class="sb-menu-item">
+                      <button class="sb-menu-button">
+                        <svg class="icon"><use href="#i-chevron-right"/></svg>
+                        <svg class="icon"><use href="#i-folder"/></svg>
+                        <span class="truncate">Personal</span>
+                      </button>
+                    </div>
+                    <div class="sb-menu-item">
+                      <button class="sb-menu-button">
+                        <svg class="icon"><use href="#i-chevron-right"/></svg>
+                        <svg class="icon"><use href="#i-folder"/></svg>
+                        <span class="truncate">Work</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="sb-group" data-open="true">
+                  <div class="sb-group-label">
+                    <span class="label-text">Hashtags</span>
+                    <svg class="chev"><use href="#i-chevron-right"/></svg>
+                  </div>
+                  <div class="sb-menu">
+                    <div class="sb-menu-item">
+                      <button class="sb-menu-button" style="padding-right: 56px;">
+                        <svg class="icon" style="color: var(--muted-foreground);"><use href="#i-hash"/></svg>
+                        <span style="display: inline-flex; align-items: center; gap: 4px; min-width: 0;">
+                          <span class="truncate">competitor</span>
+                          <!-- the existing "this hashtag is shared" indicator -->
+                          <svg style="width: 12px; height: 12px; color: var(--muted-foreground); flex-shrink: 0;"><use href="#i-globe"/></svg>
+                        </span>
+                      </button>
+                      <span class="sb-menu-badge">46</span>
+                    </div>
+                    <div class="sb-menu-item">
+                      <button class="sb-menu-button" style="padding-right: 56px;">
+                        <svg class="icon" style="color: var(--muted-foreground);"><use href="#i-hash"/></svg>
+                        <span style="display: inline-flex; align-items: center; gap: 4px;">
+                          <span class="truncate">customer</span>
+                          <svg style="width: 12px; height: 12px; color: var(--muted-foreground);"><use href="#i-globe"/></svg>
+                        </span>
+                      </button>
+                      <span class="sb-menu-badge">46</span>
+                    </div>
+                    <div class="sb-menu-item">
+                      <button class="sb-menu-button" style="padding-right: 56px;">
+                        <svg class="icon" style="color: var(--muted-foreground);"><use href="#i-hash"/></svg>
+                        <span class="truncate">design</span>
+                      </button>
+                      <span class="sb-menu-badge">42</span>
+                    </div>
+                    <div class="sb-menu-item">
+                      <button class="sb-menu-button" style="padding-right: 56px;">
+                        <svg class="icon" style="color: var(--muted-foreground);"><use href="#i-hash"/></svg>
+                        <span class="truncate">idea</span>
+                      </button>
+                      <span class="sb-menu-badge">101</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </aside>
+            <main class="main"><div style="padding: 24px; color: var(--muted-foreground); font-size: 13px;">(note stream)</div></main>
+          </div>
+        </div>
+
+        <!-- WITH GROUPS -->
+        <div class="col">
+          <span class="col-label after">With Groups</span>
+          <div class="app">
+            <aside class="sb">
+              <div class="sb-header">
+                <div class="sb-brand">
+                  <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="9" r="7"/></svg>
+                  <span class="sb-brand-name">Notestream</span>
+                </div>
+                <div>
+                  <div class="sb-menu">
+                    <div class="sb-menu-item">
+                      <button class="sb-menu-button">
+                        <svg class="icon"><use href="#i-home"/></svg>
+                        <span class="row"><span>All Notes</span><span class="sb-menu-badge" style="position: static;">2,138</span></span>
+                      </button>
+                    </div>
+                    <div class="sb-menu-item">
+                      <button class="sb-menu-button">
+                        <svg class="icon"><use href="#i-square-check"/></svg>
+                        <span class="row"><span>To-Do Notes</span><span class="sb-menu-badge" style="position: static;">42</span></span>
+                      </button>
+                    </div>
+                    <div class="sb-menu-item">
+                      <button class="sb-menu-button">
+                        <svg class="icon"><use href="#i-share2"/></svg>
+                        <span class="label">Shared Notes</span>
+                      </button>
+                    </div>
+                    <div class="sb-menu-item">
+                      <button class="sb-menu-button">
+                        <svg class="icon"><use href="#i-globe"/></svg>
+                        <span class="label">Publicly listed notes</span>
+                      </button>
+                    </div>
+                    <div class="sb-menu-item">
+                      <button class="sb-menu-button">
+                        <svg class="icon"><use href="#i-users"/></svg>
+                        <span class="label">Shared with me</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="sb-content">
+
+                <!-- NEW: Groups section, inserted ABOVE Pinned -->
+                <div class="sb-group" data-open="true">
+                  <div class="sb-group-label">
+                    <span class="label-text">Groups</span>
+                    <svg class="chev"><use href="#i-chevron-right"/></svg>
+                  </div>
+                  <button class="sb-group-action"><svg><use href="#i-plus"/></svg></button>
+                  <div class="sb-menu">
+
+                    <div class="sb-menu-item">
+                      <button class="sb-menu-button" data-active="true" style="padding-right: 56px;">
+                        <svg class="icon"><use href="#i-chevron-right"/></svg>
+                        <span class="gico ideaflow">IF</span>
+                        <span class="truncate">IdeaFlow Team</span>
+                      </button>
+                      <span class="sb-menu-badge">214</span>
+                    </div>
+                    <div class="sb-menu-sub">
+                      <div class="sb-menu-sub-button" data-active="true">
+                        <svg><use href="#i-hash"/></svg>
+                        <span class="truncate">competitor</span>
+                        <span class="count">46</span>
+                      </div>
+                      <div class="sb-menu-sub-button">
+                        <svg><use href="#i-hash"/></svg>
+                        <span class="truncate">customer</span>
+                        <span class="count">46</span>
+                      </div>
+                      <div class="sb-menu-sub-button">
+                        <svg><use href="#i-hash"/></svg>
+                        <span class="truncate">design</span>
+                        <span class="count">42</span>
+                      </div>
+                      <div class="sb-menu-sub-button">
+                        <svg><use href="#i-hash"/></svg>
+                        <span class="truncate">userstory</span>
+                        <span class="count">43</span>
+                      </div>
+                      <div class="sb-menu-sub-button" style="color: var(--muted-foreground); font-style: italic;">
+                        <span class="truncate">+ 40 more</span>
+                      </div>
+                    </div>
+
+                    <div class="sb-menu-item">
+                      <button class="sb-menu-button" style="padding-right: 56px;">
+                        <svg class="icon"><use href="#i-chevron-right"/></svg>
+                        <span class="avatar-stack">
+                          <span class="av sa">S</span><span class="av da">D</span><span class="av ja">J</span>
+                        </span>
+                        <span class="truncate" style="margin-left: 4px;">Sarah, David, James</span>
+                      </button>
+                      <span class="sb-menu-badge">3</span>
+                    </div>
+
+                    <div class="sb-menu-item">
+                      <button class="sb-menu-button" style="padding-right: 56px;">
+                        <svg class="icon"><use href="#i-chevron-right"/></svg>
+                        <span class="gico family">F</span>
+                        <span class="truncate">Family</span>
+                      </button>
+                      <span class="sb-menu-badge">8</span>
+                    </div>
+
+                    <div class="sb-menu-item">
+                      <button class="sb-menu-button" style="padding-right: 56px;">
+                        <svg class="icon"><use href="#i-chevron-right"/></svg>
+                        <span class="gico book">BC</span>
+                        <span class="truncate">Book Club</span>
+                      </button>
+                      <span class="sb-menu-badge">12</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="sb-group" data-open="false">
+                  <div class="sb-group-label">
+                    <span class="label-text">Pinned</span>
+                    <svg class="chev"><use href="#i-chevron-right"/></svg>
+                  </div>
+                </div>
+
+                <div class="sb-group" data-open="false">
+                  <div class="sb-group-label">
+                    <span class="label-text">Folders</span>
+                    <svg class="chev"><use href="#i-chevron-right"/></svg>
+                  </div>
+                </div>
+
+                <div class="sb-group" data-open="true">
+                  <div class="sb-group-label">
+                    <span class="label-text">Hashtags</span>
+                    <svg class="chev"><use href="#i-chevron-right"/></svg>
+                  </div>
+                  <div class="sb-menu">
+                    <div class="sb-menu-item">
+                      <button class="sb-menu-button" style="padding-right: 56px;">
+                        <svg class="icon" style="color: var(--muted-foreground);"><use href="#i-hash"/></svg>
+                        <span style="display: inline-flex; align-items: center; gap: 4px; min-width: 0;">
+                          <span class="truncate">competitor</span>
+                          <!-- NEW: when tag has defaultGroupId, show group glyph INSTEAD of Globe -->
+                          <span class="gico ideaflow" style="width: 12px; height: 12px; font-size: 7px; border-radius: 2px;">IF</span>
+                        </span>
+                      </button>
+                      <span class="sb-menu-badge">46</span>
+                    </div>
+                    <div class="sb-menu-item">
+                      <button class="sb-menu-button" style="padding-right: 56px;">
+                        <svg class="icon" style="color: var(--muted-foreground);"><use href="#i-hash"/></svg>
+                        <span style="display: inline-flex; align-items: center; gap: 4px;">
+                          <span class="truncate">customer</span>
+                          <span class="gico ideaflow" style="width: 12px; height: 12px; font-size: 7px; border-radius: 2px;">IF</span>
+                        </span>
+                      </button>
+                      <span class="sb-menu-badge">46</span>
+                    </div>
+                    <div class="sb-menu-item">
+                      <button class="sb-menu-button" style="padding-right: 56px;">
+                        <svg class="icon" style="color: var(--muted-foreground);"><use href="#i-hash"/></svg>
+                        <span class="truncate">design</span>
+                      </button>
+                      <span class="sb-menu-badge">42</span>
+                    </div>
+                    <div class="sb-menu-item">
+                      <button class="sb-menu-button" style="padding-right: 56px;">
+                        <svg class="icon" style="color: var(--muted-foreground);"><use href="#i-hash"/></svg>
+                        <span class="truncate">idea</span>
+                      </button>
+                      <span class="sb-menu-badge">101</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </aside>
+            <main class="main"><div style="padding: 24px; color: var(--muted-foreground); font-size: 13px;">(IdeaFlow Team stream)</div></main>
+          </div>
+        </div>
+
+      </div>
+      <div style="padding: 14px 20px; background: var(--muted); border-top: 1px solid var(--border); font-size: 12.5px; color: var(--muted-foreground); line-height: 1.55;">
+        <strong style="color: var(--foreground);">Δ from today:</strong> one new <code>NavGroups</code> section above Pinned (same Collapsible pattern as NavFolders / NavHashtags). Existing Globe-icon indicator on hashtag rows changes to the owning group's icon if the tag has <code>defaultGroupId</code>; tags without a group keep the Globe (when shared) or nothing (when private). Nav-main, Folders, Pinned, Mentions sections unchanged.
+      </div>
+    </div>
+
+    <!-- ================================================================
+         02 — Share dialog
+    ================================================================= -->
+    <div class="frame" id="f02">
+      <div class="frame-head">
+        <span class="frame-tag">02</span>
+        <span class="frame-title">Share dialog · today → with Groups picker</span>
+        <span class="frame-note">Real dialog title "Share this document" · Avatar rows · Select role · Switch for List publicly</span>
+      </div>
+      <div class="split">
+
+        <div class="col">
+          <span class="col-label before">Today</span>
+          <div class="dialog-bg">
+            <div class="dialog">
+              <div class="dialog-header">
+                <div class="dialog-title">Share this document</div>
+                <div class="dialog-desc">Only people with access can open this document.</div>
+              </div>
+              <div class="dialog-body">
+
+                <div class="link-row">
+                  <input class="input" value="https://notestream.cloud/shared/note/0193abc…" readonly>
+                  <button class="btn sm"><svg><use href="#i-link"/></svg>Copy Link</button>
+                </div>
+
+                <div class="dialog-sep"></div>
+
+                <input class="input" placeholder="Add people by email...">
+
+                <div>
+                  <div class="dialog-section-label">People with access</div>
+                  <div style="margin-top: 6px;">
+                    <div class="person-row">
+                      <div class="av sa">S</div>
+                      <div class="info">
+                        <span class="name">Sarah Kim</span>
+                        <span class="email">sarah@ideaflow.io</span>
+                      </div>
+                      <select class="role-select">
+                        <option>Can edit</option>
+                        <option>Can view</option>
+                      </select>
+                      <button class="x"><svg><use href="#i-x"/></svg></button>
+                    </div>
+                    <div class="person-row">
+                      <div class="av da">D</div>
+                      <div class="info">
+                        <span class="name">David Liu</span>
+                        <span class="email">david@ideaflow.io</span>
+                      </div>
+                      <select class="role-select">
+                        <option>Can view</option>
+                        <option>Can edit</option>
+                      </select>
+                      <button class="x"><svg><use href="#i-x"/></svg></button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="dialog-sep"></div>
+
+                <div>
+                  <div class="dialog-section-label">General access</div>
+                  <div class="general-row" style="margin-top: 6px;">
+                    <select class="access-select"><option>Restricted</option><option>Anyone with the link</option></select>
+                  </div>
+                </div>
+
+                <div class="dialog-sep"></div>
+
+                <button class="save-btn-full">Save</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="col-label after">With Groups</span>
+          <div class="dialog-bg">
+            <div class="dialog">
+              <div class="dialog-header">
+                <div class="dialog-title">Share this document</div>
+                <div class="dialog-desc">Only people with access can open this document.</div>
+              </div>
+              <div class="dialog-body">
+
+                <div class="link-row">
+                  <input class="input" value="https://notestream.cloud/shared/note/0193abc…" readonly>
+                  <button class="btn sm"><svg><use href="#i-link"/></svg>Copy Link</button>
+                </div>
+
+                <div class="dialog-sep"></div>
+
+                <!-- NEW: input for groups OR people (combobox style) -->
+                <input class="input" placeholder="Add people or groups...">
+
+                <!-- NEW: Groups with access (new section, above People) -->
+                <div>
+                  <div class="dialog-section-label">Groups with access</div>
+                  <div style="margin-top: 6px;">
+                    <div class="person-row">
+                      <span class="gico ideaflow lg">IF</span>
+                      <div class="info">
+                        <span class="name">IdeaFlow Team</span>
+                        <span class="email">8 members · you're an owner</span>
+                      </div>
+                      <select class="role-select">
+                        <option>Can edit</option>
+                        <option>Can view</option>
+                      </select>
+                      <button class="x"><svg><use href="#i-x"/></svg></button>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="dialog-section-label">People with access</div>
+                  <div style="margin-top: 6px;">
+                    <div class="person-row">
+                      <div class="av sa">S</div>
+                      <div class="info">
+                        <span class="name">Sarah Kim</span>
+                        <span class="email">sarah@ideaflow.io · via IdeaFlow Team</span>
+                      </div>
+                      <span class="invited-tag">Inherited</span>
+                      <button class="x" style="opacity: 0.4;"><svg><use href="#i-x"/></svg></button>
+                    </div>
+                    <div class="person-row">
+                      <div class="av da">D</div>
+                      <div class="info">
+                        <span class="name">David Liu</span>
+                        <span class="email">david@ideaflow.io · via IdeaFlow Team</span>
+                      </div>
+                      <span class="invited-tag">Inherited</span>
+                      <button class="x" style="opacity: 0.4;"><svg><use href="#i-x"/></svg></button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="dialog-sep"></div>
+
+                <div>
+                  <div class="dialog-section-label">General access</div>
+                  <div class="general-row" style="margin-top: 6px;">
+                    <select class="access-select"><option>Restricted</option><option>Anyone with the link</option></select>
+                  </div>
+                </div>
+
+                <div class="dialog-sep"></div>
+
+                <button class="save-btn-full">Save</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div style="padding: 14px 20px; background: var(--muted); border-top: 1px solid var(--border); font-size: 12.5px; color: var(--muted-foreground); line-height: 1.55;">
+        <strong style="color: var(--foreground);">Δ:</strong> input placeholder changes from "Add people by email..." to "Add people or groups..." — typing a name fuzzy-matches both. New "Groups with access" section above the People section. People who gain access transitively via a group show with an "Inherited" tag in place of the Select; X is muted (can't remove without changing the group). Everything else is unchanged.
+      </div>
+    </div>
+
+    <!-- ================================================================
+         03 — Note rendering
+    ================================================================= -->
+    <div class="frame" id="f03">
+      <div class="frame-head">
+        <span class="frame-tag">03</span>
+        <span class="frame-title">Note rendering · today → with group attribution</span>
+        <span class="frame-note">Real: purple hashtags · flat rows with <code>border-t</code> · <code>bg-blue-50/65</code> tint when shared</span>
+      </div>
+      <div class="split">
+
+        <div class="col">
+          <span class="col-label before">Today</span>
+          <div style="padding: 20px;">
+            <div class="stream">
+              <div class="note-row">
+                <div class="note-meta">
+                  <span class="av jc">J</span><span class="author">Jacob Cole</span><span class="you-badge">YOU</span>
+                  <span class="time">2 hours ago</span>
+                </div>
+                <div class="note-body">
+                  <p>Sprint review moved to Thursday — board prep conflict.</p>
+                </div>
+              </div>
+
+              <div class="note-row tinted">
+                <div class="note-meta">
+                  <span class="av jc">J</span><span class="author">Jacob Cole</span><span class="you-badge">YOU</span>
+                  <span class="time">2 hours ago</span>
+                </div>
+                <div class="note-body">
+                  <p>Lattice intro call. They build the same hashtag capture as us, but scoped to HR. <span class="hashtag">#competitor</span> for sure — they pitched at SHRM. Could also be <span class="hashtag">#customer</span> for OEM-ing the editor.</p>
+                </div>
+              </div>
+
+              <div class="note-row">
+                <div class="note-meta">
+                  <span class="av sa">S</span><span class="author">Sarah Kim</span>
+                  <span class="time">yesterday</span>
+                </div>
+                <div class="note-body">
+                  <p>Pushed sprint review to Thursday. Pinged <span class="mention">@jacob</span> + <span class="mention">@david</span> to confirm. <span class="hashtag">#design</span></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col">
+          <span class="col-label after">With Groups</span>
+          <div style="padding: 20px;">
+            <div class="stream">
+              <div class="note-row">
+                <div class="note-meta">
+                  <span class="av jc">J</span><span class="author">Jacob Cole</span><span class="you-badge">YOU</span>
+                  <span class="time">2 hours ago</span>
+                </div>
+                <div class="note-body">
+                  <p>Sprint review moved to Thursday — board prep conflict.</p>
+                </div>
+              </div>
+
+              <div class="note-row tinted">
+                <div class="note-meta">
+                  <span class="av jc">J</span><span class="author">Jacob Cole</span><span class="you-badge">YOU</span>
+                  <span class="time">2 hours ago</span>
+                </div>
+                <div class="note-body">
+                  <p>Lattice intro call. They build the same hashtag capture as us, but scoped to HR. <span class="hashtag team"><span class="gico ideaflow">IF</span>#competitor</span> for sure — they pitched at SHRM. Could also be <span class="hashtag team"><span class="gico ideaflow">IF</span>#customer</span> for OEM-ing the editor.</p>
+                </div>
+                <!-- NEW: foot row appears only on tinted (shared) notes -->
+                <div class="note-foot">
+                  <span class="foot-pill"><span class="gico ideaflow">IF</span>IdeaFlow Team</span>
+                  <span>·</span>
+                  <span class="foot-pill">via <code>#competitor</code>, <code>#customer</code></span>
+                </div>
+              </div>
+
+              <div class="note-row">
+                <div class="note-meta">
+                  <span class="av sa">S</span><span class="author">Sarah Kim</span>
+                  <span class="time">yesterday</span>
+                </div>
+                <div class="note-body">
+                  <p>Pushed sprint review to Thursday. Pinged <span class="mention">@jacob</span> + <span class="mention">@david</span> to confirm. <span class="hashtag team"><span class="gico ideaflow">IF</span>#design</span></p>
+                </div>
+                <div class="note-foot">
+                  <span class="foot-pill"><span class="gico ideaflow">IF</span>IdeaFlow Team</span>
+                  <span>·</span>
+                  <span class="foot-pill">via <code>#design</code></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div style="padding: 14px 20px; background: var(--muted); border-top: 1px solid var(--border); font-size: 12.5px; color: var(--muted-foreground); line-height: 1.55;">
+        <strong style="color: var(--foreground);">Δ:</strong> hashtags stay purple (real <code>--mention-text</code>). For team-owned hashtags, a 10×10px group glyph is prepended via inline-flex — no color change to the tag itself. Tint stays exactly as commit <code>bb2747a</code> shipped it (<code>bg-blue-50/65</code>). New <code>note-foot</code> row appears ONLY on tinted notes, showing which groups and which hashtags drive the share. Untinted notes (private) look identical to today.
+      </div>
+    </div>
+
+    <!-- ================================================================
+         04 — NavGroups · all interaction states
+    ================================================================= -->
+    <div class="frame" id="f04">
+      <div class="frame-head">
+        <span class="frame-tag">04</span>
+        <span class="frame-title">NavGroups · interaction states (closed, expanded, action menu, empty)</span>
+        <span class="frame-note">Same Collapsible + SidebarGroup pattern as NavFolders / NavPinnedNotes</span>
+      </div>
+      <div style="padding: 24px; background: var(--muted); display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px;">
+
+        <div style="background: var(--sidebar); border: 1px solid var(--border); border-radius: 10px; padding: 8px; min-height: 320px;">
+          <div style="font-size: 10px; color: var(--muted-foreground); letter-spacing: 0.06em; text-transform: uppercase; padding: 6px 10px;">Section closed</div>
+          <div class="sb-group" data-open="false">
+            <div class="sb-group-label">
+              <span class="label-text">Groups</span>
+              <svg class="chev"><use href="#i-chevron-right"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <div style="background: var(--sidebar); border: 1px solid var(--border); border-radius: 10px; padding: 8px; min-height: 320px;">
+          <div style="font-size: 10px; color: var(--muted-foreground); letter-spacing: 0.06em; text-transform: uppercase; padding: 6px 10px;">Section open + groups collapsed</div>
+          <div class="sb-group" data-open="true">
+            <div class="sb-group-label">
+              <span class="label-text">Groups</span>
+              <svg class="chev"><use href="#i-chevron-right"/></svg>
+            </div>
+            <div class="sb-menu">
+              <div class="sb-menu-item">
+                <button class="sb-menu-button" style="padding-right: 56px;">
+                  <svg class="icon"><use href="#i-chevron-right"/></svg>
+                  <span class="gico ideaflow">IF</span>
+                  <span class="truncate">IdeaFlow Team</span>
+                </button>
+                <span class="sb-menu-badge">214</span>
+              </div>
+              <div class="sb-menu-item">
+                <button class="sb-menu-button" style="padding-right: 56px;">
+                  <svg class="icon"><use href="#i-chevron-right"/></svg>
+                  <span class="gico family">F</span>
+                  <span class="truncate">Family</span>
+                </button>
+                <span class="sb-menu-badge">8</span>
+              </div>
+              <div class="sb-menu-item">
+                <button class="sb-menu-button" style="padding-right: 56px;">
+                  <svg class="icon"><use href="#i-chevron-right"/></svg>
+                  <span class="gico book">BC</span>
+                  <span class="truncate">Book Club</span>
+                </button>
+                <span class="sb-menu-badge">12</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="background: var(--sidebar); border: 1px solid var(--border); border-radius: 10px; padding: 8px; min-height: 320px; position: relative;">
+          <div style="font-size: 10px; color: var(--muted-foreground); letter-spacing: 0.06em; text-transform: uppercase; padding: 6px 10px;">Hover · action menu visible</div>
+          <div class="sb-group" data-open="true">
+            <div class="sb-group-label">
+              <span class="label-text">Groups</span>
+              <svg class="chev"><use href="#i-chevron-right"/></svg>
+            </div>
+            <div class="sb-menu">
+              <div class="sb-menu-item">
+                <button class="sb-menu-button" data-active="true" style="padding-right: 56px;">
+                  <svg class="icon"><use href="#i-chevron-right"/></svg>
+                  <span class="gico ideaflow">IF</span>
+                  <span class="truncate">IdeaFlow Team</span>
+                </button>
+                <!-- Action menu visible (hover state) -->
+                <button class="sb-menu-action" style="opacity: 1; right: 28px;"><svg><use href="#i-ellipsis"/></svg></button>
+                <span class="sb-menu-badge">214</span>
+              </div>
+            </div>
+          </div>
+          <!-- Dropdown menu popover -->
+          <div style="position: absolute; top: 72px; left: 220px; background: var(--background); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); padding: 4px; min-width: 180px; font-size: 13px;">
+            <button class="ac-item"><svg><use href="#i-settings"/></svg><span>Group settings</span></button>
+            <button class="ac-item"><svg><use href="#i-users"/></svg><span>Manage members</span></button>
+            <button class="ac-item"><svg><use href="#i-share2"/></svg><span>Invite</span></button>
+            <div style="height: 1px; background: var(--border); margin: 4px 0;"></div>
+            <button class="ac-item" style="color: oklch(0.577 0.245 27.325);"><svg style="color: oklch(0.577 0.245 27.325);"><use href="#i-x"/></svg><span>Leave group</span></button>
+          </div>
+        </div>
+
+        <div style="background: var(--sidebar); border: 1px solid var(--border); border-radius: 10px; padding: 8px; min-height: 320px;">
+          <div style="font-size: 10px; color: var(--muted-foreground); letter-spacing: 0.06em; text-transform: uppercase; padding: 6px 10px;">Empty</div>
+          <div class="sb-group" data-open="true">
+            <div class="sb-group-label">
+              <span class="label-text">Groups</span>
+              <svg class="chev"><use href="#i-chevron-right"/></svg>
+            </div>
+            <button class="sb-group-action" style="opacity: 1;"><svg><use href="#i-plus"/></svg></button>
+            <p class="sb-empty">Create a group to share streams of notes with people</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ================================================================
+         05 — Group settings page
+    ================================================================= -->
+    <div class="frame" id="f05">
+      <div class="frame-head">
+        <span class="frame-tag">05</span>
+        <span class="frame-title">Group settings · uses real Notestream shadcn primitives</span>
+        <span class="frame-note">Inputs, Labels, Selects, Switch, Avatar — all matching what's in note-share-dialog.tsx + nav-folders.tsx</span>
+      </div>
+      <div style="background: var(--background); min-height: 720px;">
+        <div class="settings-page">
+          <div class="settings-header">
+            <div class="gico ideaflow xl">IF</div>
+            <div style="flex: 1;">
+              <div class="name">IdeaFlow Team</div>
+              <div class="sub">8 members · 44 hashtags · 214 notes shared</div>
+            </div>
+            <button class="btn">View stream</button>
+          </div>
+
+          <div class="settings-card">
+            <div class="settings-card-head">
+              <div class="settings-card-title">Identity</div>
+              <div class="settings-card-sub">How this group appears to members.</div>
+            </div>
+            <div style="padding: 16px 18px; display: grid; grid-template-columns: 1fr; gap: 12px;">
+              <div>
+                <label style="font-size: 14px; font-weight: 500; display: block; margin-bottom: 6px;">Name</label>
+                <input class="input" value="IdeaFlow Team" style="width: 100%; height: 32px;">
+              </div>
+              <div>
+                <label style="font-size: 14px; font-weight: 500; display: block; margin-bottom: 6px;">Description</label>
+                <input class="input" value="Internal knowledge stream — product, customers, competitive, hires." style="width: 100%; height: 32px;">
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-card">
+            <div class="settings-card-head" style="display: flex; align-items: center;">
+              <div style="flex: 1;">
+                <div class="settings-card-title">Members</div>
+                <div class="settings-card-sub">8 people · 1 owner, 5 editors, 2 viewers</div>
+              </div>
+              <button class="btn primary sm">Invite</button>
+            </div>
+            <div class="settings-card-body">
+              <div class="member-row">
+                <div class="av jc">J</div>
+                <div>
+                  <div class="name">Jacob Cole</div>
+                  <div class="email">jacob@ideaflow.io · you</div>
+                </div>
+                <select class="role-select" style="width: 110px;"><option>Owner</option></select>
+                <button class="x" style="background: transparent; border: 0; cursor: pointer; color: var(--muted-foreground);"><svg style="width: 14px; height: 14px;"><use href="#i-more-h"/></svg></button>
+              </div>
+              <div class="member-row">
+                <div class="av sa">S</div>
+                <div>
+                  <div class="name">Sarah Kim</div>
+                  <div class="email">sarah@ideaflow.io</div>
+                </div>
+                <select class="role-select" style="width: 110px;"><option>Editor</option><option>Viewer</option></select>
+                <button class="x" style="background: transparent; border: 0; cursor: pointer; color: var(--muted-foreground);"><svg style="width: 14px; height: 14px;"><use href="#i-more-h"/></svg></button>
+              </div>
+              <div class="member-row">
+                <div class="av da">D</div>
+                <div>
+                  <div class="name">David Liu</div>
+                  <div class="email">david@ideaflow.io</div>
+                </div>
+                <select class="role-select" style="width: 110px;"><option>Editor</option></select>
+                <button class="x" style="background: transparent; border: 0; cursor: pointer; color: var(--muted-foreground);"><svg style="width: 14px; height: 14px;"><use href="#i-more-h"/></svg></button>
+              </div>
+              <div class="member-row">
+                <div class="av km">K</div>
+                <div>
+                  <div class="name">Kim Mendez</div>
+                  <div class="email">kim@startup.io · invite pending</div>
+                </div>
+                <span class="invited-tag" style="grid-column: 3;">Invited</span>
+                <button class="x" style="background: transparent; border: 0; cursor: pointer; color: var(--muted-foreground);"><svg style="width: 14px; height: 14px;"><use href="#i-x"/></svg></button>
+              </div>
+            </div>
+            <div style="padding: 14px 18px; border-top: 1px solid var(--border); display: flex; gap: 8px;">
+              <input class="input" placeholder="Invite by email…" style="flex: 1;">
+              <select class="role-select" style="width: 110px;"><option>Editor</option><option>Viewer</option></select>
+              <button class="btn primary">Send invites</button>
+            </div>
+          </div>
+
+          <div class="settings-card">
+            <div class="settings-card-head">
+              <div class="settings-card-title">Hashtags owned by this group</div>
+              <div class="settings-card-sub">Tags with <code style="font-family: 'JetBrains Mono', monospace; font-size: 11.5px;">defaultGroupId</code> set to this group. Notes you write with these auto-share to IdeaFlow Team.</div>
+            </div>
+            <div style="padding: 14px 18px; display: flex; flex-wrap: wrap; gap: 6px;">
+              <span style="display: inline-flex; align-items: center; gap: 4px; background: var(--muted); border: 1px solid var(--border); padding: 4px 8px 4px 6px; border-radius: 4px; font-size: 12px;">
+                <span class="gico ideaflow" style="width: 10px; height: 10px; font-size: 7px;">IF</span>
+                <span style="color: var(--mention-text); font-weight: 500;">#competitor</span>
+                <svg style="width: 10px; height: 10px; color: var(--muted-foreground); cursor: pointer;"><use href="#i-x"/></svg>
+              </span>
+              <span style="display: inline-flex; align-items: center; gap: 4px; background: var(--muted); border: 1px solid var(--border); padding: 4px 8px 4px 6px; border-radius: 4px; font-size: 12px;">
+                <span class="gico ideaflow" style="width: 10px; height: 10px; font-size: 7px;">IF</span>
+                <span style="color: var(--mention-text); font-weight: 500;">#customer</span>
+                <svg style="width: 10px; height: 10px; color: var(--muted-foreground); cursor: pointer;"><use href="#i-x"/></svg>
+              </span>
+              <span style="display: inline-flex; align-items: center; gap: 4px; background: var(--muted); border: 1px solid var(--border); padding: 4px 8px 4px 6px; border-radius: 4px; font-size: 12px;">
+                <span class="gico ideaflow" style="width: 10px; height: 10px; font-size: 7px;">IF</span>
+                <span style="color: var(--mention-text); font-weight: 500;">#design</span>
+                <svg style="width: 10px; height: 10px; color: var(--muted-foreground); cursor: pointer;"><use href="#i-x"/></svg>
+              </span>
+              <span style="font-size: 11.5px; color: var(--muted-foreground); padding: 4px 0;">+ 41 more · <a>manage</a></span>
+            </div>
+          </div>
+
+          <div class="settings-card" style="border-color: oklch(0.577 0.245 27.325 / 30%);">
+            <div class="settings-card-head" style="background: oklch(0.577 0.245 27.325 / 5%); border-color: oklch(0.577 0.245 27.325 / 20%);">
+              <div class="settings-card-title" style="color: oklch(0.577 0.245 27.325);">Danger zone</div>
+            </div>
+            <div style="padding: 14px 18px; display: flex; flex-direction: column; gap: 10px;">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="flex: 1;">
+                  <div style="font-weight: 500; font-size: 14px;">Leave group</div>
+                  <div style="color: var(--muted-foreground); font-size: 12px; margin-top: 1px;">You'll lose access to group-shared notes you didn't author.</div>
+                </div>
+                <button class="btn">Leave</button>
+              </div>
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="flex: 1;">
+                  <div style="font-weight: 500; font-size: 14px; color: oklch(0.577 0.245 27.325);">Delete group</div>
+                  <div style="color: var(--muted-foreground); font-size: 12px; margin-top: 1px;">All members lose access. Notes revert to private.</div>
+                </div>
+                <button class="btn destructive">Delete</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ================================================================
+         06 — Hashtag autocomplete · real dropdown style
+    ================================================================= -->
+    <div class="frame" id="f06">
+      <div class="frame-head">
+        <span class="frame-tag">06</span>
+        <span class="frame-title">Hashtag autocomplete · matching the real HashtagDropdownList</span>
+        <span class="frame-note">Plain shadcn-popover style · light + dark</span>
+      </div>
+      <div style="padding: 32px; background: linear-gradient(180deg, var(--muted), var(--background)); display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+
+        <div class="editor-mock">
+          <div class="editor-text">
+            Just talked to Acme — their existing tool burned them. #comp<span class="cursor"></span>
+          </div>
+          <div class="ac-dropdown">
+            <button class="ac-item hl">
+              <svg style="color: var(--mention-text);"><use href="#i-hash"/></svg>
+              <span class="name" style="color: var(--mention-text); font-weight: 500;">competitor</span>
+              <span class="gico ideaflow">IF</span>
+              <span class="meta">46</span>
+            </button>
+            <button class="ac-item">
+              <svg style="color: var(--mention-text);"><use href="#i-hash"/></svg>
+              <span class="name" style="color: var(--mention-text); font-weight: 500;">competitive-research</span>
+              <span class="gico ideaflow">IF</span>
+              <span class="meta">8</span>
+            </button>
+            <button class="ac-item">
+              <svg style="color: var(--muted-foreground);"><use href="#i-hash"/></svg>
+              <span class="name">compose</span>
+              <span class="meta">3</span>
+            </button>
+            <button class="ac-item">
+              <svg style="color: var(--mention-text);"><use href="#i-hash"/></svg>
+              <span class="name" style="color: var(--mention-text); font-weight: 500;">completed-read</span>
+              <span class="gico book">BC</span>
+              <span class="meta">12</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="dark-frame" style="background: var(--background); padding: 16px; border-radius: 12px;">
+          <div class="editor-mock" style="margin: 0;">
+            <div class="editor-text" style="color: var(--foreground);">
+              Reading list for next month — #book<span class="cursor"></span>
+            </div>
+            <div class="ac-dropdown">
+              <button class="ac-item hl">
+                <svg style="color: var(--mention-text);"><use href="#i-hash"/></svg>
+                <span class="name" style="color: var(--mention-text); font-weight: 500;">bookclub-may</span>
+                <span class="gico book">BC</span>
+                <span class="meta">4</span>
+              </button>
+              <button class="ac-item">
+                <svg style="color: var(--mention-text);"><use href="#i-hash"/></svg>
+                <span class="name" style="color: var(--mention-text); font-weight: 500;">book</span>
+                <span class="gico ideaflow">IF</span>
+                <span class="meta">44</span>
+              </button>
+              <button class="ac-item">
+                <svg style="color: var(--muted-foreground);"><use href="#i-hash"/></svg>
+                <span class="name">bookmark</span>
+                <span class="meta">9</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="padding: 14px 20px; background: var(--muted); border-top: 1px solid var(--border); font-size: 12.5px; color: var(--muted-foreground); line-height: 1.55;">
+        <strong style="color: var(--foreground);">Δ:</strong> dropdown item adds a 14×14 group glyph between name and count, ONLY if the tag has <code>defaultGroupId</code>. Tag name itself stays purple (real <code>--mention-text</code>). Private tags (no group) get a grey Hash icon instead of purple — visual signal that they're not shared anywhere.
+      </div>
+    </div>
+
+    <!-- ================================================================
+         07 — Phone · Sheet pattern
+    ================================================================= -->
+    <div class="frame" id="f07">
+      <div class="frame-head">
+        <span class="frame-tag">07</span>
+        <span class="frame-title">Phone · Sheet sidebar (real Notestream mobile pattern)</span>
+        <span class="frame-note">Sidebar component renders as <code>Sheet</code> on mobile (sidebar.tsx:207). Width 18rem.</span>
+      </div>
+      <div class="phone-stage">
+
+        <!-- Phone 1: Sheet sidebar open -->
+        <div class="phone">
+          <div class="phone-notch"></div>
+          <div class="phone-screen with-sheet">
+            <div class="phone-bar"><span>9:41</span><span>📶 🔋</span></div>
+            <div class="phone-content" style="filter: blur(1px);">
+              <!-- ghost of underlying view -->
+              <div style="font-size: 12px; color: var(--muted-foreground);">(stream view)</div>
+            </div>
+            <!-- Sheet drawer from left -->
+            <div class="phone-sheet">
+              <div class="sb-header">
+                <div class="sb-brand">
+                  <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="9" r="7"/></svg>
+                  <span class="sb-brand-name">Notestream</span>
+                </div>
+                <div class="sb-menu">
+                  <div class="sb-menu-item">
+                    <button class="sb-menu-button" data-active="true">
+                      <svg class="icon"><use href="#i-home"/></svg>
+                      <span class="label">All Notes</span>
+                    </button>
+                  </div>
+                  <div class="sb-menu-item">
+                    <button class="sb-menu-button">
+                      <svg class="icon"><use href="#i-square-check"/></svg>
+                      <span class="label">To-Do Notes</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="sb-content">
+                <div class="sb-group" data-open="true">
+                  <div class="sb-group-label">
+                    <span class="label-text">Groups</span>
+                    <svg class="chev"><use href="#i-chevron-right"/></svg>
+                  </div>
+                  <div class="sb-menu">
+                    <div class="sb-menu-item">
+                      <button class="sb-menu-button" style="padding-right: 56px;">
+                        <span class="gico ideaflow">IF</span>
+                        <span class="truncate">IdeaFlow Team</span>
+                      </button>
+                      <span class="sb-menu-badge">214</span>
+                    </div>
+                    <div class="sb-menu-item">
+                      <button class="sb-menu-button" style="padding-right: 56px;">
+                        <span class="gico family">F</span>
+                        <span class="truncate">Family</span>
+                      </button>
+                      <span class="sb-menu-badge">8</span>
+                    </div>
+                    <div class="sb-menu-item">
+                      <button class="sb-menu-button" style="padding-right: 56px;">
+                        <span class="gico book">BC</span>
+                        <span class="truncate">Book Club</span>
+                      </button>
+                      <span class="sb-menu-badge">12</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Phone 2: stream view of IdeaFlow Team -->
+        <div class="phone">
+          <div class="phone-notch"></div>
+          <div class="phone-screen">
+            <div class="phone-bar"><span>9:41</span><span>📶 🔋</span></div>
+            <div style="padding: 10px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px;">
+              <svg style="width: 18px; height: 18px; color: var(--muted-foreground);"><use href="#i-panel-left"/></svg>
+              <span class="gico ideaflow" style="width: 20px; height: 20px; font-size: 9px;">IF</span>
+              <span style="font-size: 14px; font-weight: 600;">IdeaFlow Team</span>
+            </div>
+            <div class="phone-content">
+              <div class="stream" style="padding: 0;">
+                <div class="note-row tinted">
+                  <div class="note-meta">
+                    <span class="av jc">J</span><span class="author">you</span>
+                    <span class="time">2h</span>
+                  </div>
+                  <div class="note-body" style="font-size: 13px;">
+                    <p>Lattice intro. <span class="hashtag team"><span class="gico ideaflow">IF</span>#competitor</span> — could OEM editor.</p>
+                  </div>
+                  <div class="note-foot" style="font-size: 11px;">
+                    <span class="foot-pill">via <code>#competitor</code></span>
+                  </div>
+                </div>
+                <div class="note-row tinted">
+                  <div class="note-meta">
+                    <span class="av sa">S</span><span class="author">Sarah</span>
+                    <span class="time">yday</span>
+                  </div>
+                  <div class="note-body" style="font-size: 13px;">
+                    <p>Sprint review → Thursday. <span class="mention">@jacob</span> confirm. <span class="hashtag team"><span class="gico ideaflow">IF</span>#design</span></p>
+                  </div>
+                  <div class="note-foot" style="font-size: 11px;">
+                    <span class="foot-pill">via <code>#design</code></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================================================================
+         08 — Visual diff
+    ================================================================= -->
+    <div class="frame" id="f08">
+      <div class="frame-head">
+        <span class="frame-tag">08</span>
+        <span class="frame-title">Visual diff · what actually changed in the existing components</span>
+        <span class="frame-note">For each component: today's behavior → with Groups</span>
+      </div>
+      <table class="diff-table">
+        <thead>
+          <tr>
+            <th style="width: 22%;">File / component</th>
+            <th style="width: 32%;">Today</th>
+            <th style="width: 32%;">With Groups</th>
+            <th style="width: 14%;">Δ size</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>app-sidebar.tsx</code></td>
+            <td>5 sections in <code>&lt;SidebarContent&gt;</code> (NavAuthorPublicHashtags, NavPinnedNotes, NavFolders, NavHashtags, NavMentions, NavReferencedNotes)</td>
+            <td><span class="delta">+1 import</span>, <span class="delta">+1 line</span>: <code>&lt;NavGroups /&gt;</code> first child of SidebarContent</td>
+            <td>2 lines</td>
+          </tr>
+          <tr>
+            <td><code>nav-groups.tsx</code> (new)</td>
+            <td>—</td>
+            <td>New component, copies NavFolders pattern: Collapsible + SidebarGroup + sticky label + chevron + plus action + SidebarMenu of GroupRow children</td>
+            <td>~180 lines</td>
+          </tr>
+          <tr>
+            <td><code>nav-hashtags.tsx</code> · row</td>
+            <td>Hash icon + name + (Globe if shared) + count badge + action menu</td>
+            <td>Hash icon + name + (group-glyph if <code>defaultGroupId</code> set, else Globe if shared, else nothing) + count + menu (+ "Add to group" item)</td>
+            <td>~12 lines</td>
+          </tr>
+          <tr>
+            <td><code>note-share-dialog.tsx</code></td>
+            <td>Input "Add people by email" → user-search dropdown → "People with access" list</td>
+            <td>Input "Add people or groups" → unified search (users + groups) → new "Groups with access" section above People → People shows "Inherited" tag for transitive-via-group</td>
+            <td>~80 lines</td>
+          </tr>
+          <tr>
+            <td><code>HashtagMark.ts</code> · render</td>
+            <td><code>renderHTML</code> returns <code>&lt;span class="hashtag"&gt;</code></td>
+            <td>Add optional <code>data-group-id</code> attr; CSS handles glyph injection. ProseMirror renderer extension already supports decorating marks with extra attrs.</td>
+            <td>~10 lines</td>
+          </tr>
+          <tr>
+            <td><code>tiptap.css</code> · .hashtag</td>
+            <td><code>.hashtag { color: var(--mention-text); }</code></td>
+            <td>Add <code>.hashtag[data-group-id]::before</code> rendering a small group icon via background-image (or inline-flex wrapper if we accept HashtagMark refactor)</td>
+            <td>~15 lines</td>
+          </tr>
+          <tr>
+            <td><code>notes.tsx</code> · tint check</td>
+            <td><code>note.isShared || hashtagStore.noteHasSharedHashtag(id)</code></td>
+            <td>Add: <code>|| noteSharingStore.isInAnyGroup(id)</code>. Plus render the new <code>note-foot</code> row showing groups + reasons.</td>
+            <td>~30 lines</td>
+          </tr>
+          <tr>
+            <td><code>schema.prisma</code></td>
+            <td><code>enum PrincipalType { EMAIL ANONYMOUS }</code></td>
+            <td>Add <code>GROUP</code> to enum. New <code>Group</code> + <code>GroupMember</code> models. Add <code>SharedHashtag.defaultGroupId String?</code>.</td>
+            <td>~45 lines</td>
+          </tr>
+          <tr>
+            <td><code>note-sharing-service.ts</code></td>
+            <td>Validates EMAIL + ANONYMOUS principal types</td>
+            <td>Add GROUP branch with comment explaining why <em>this</em> principalType is safe to add (group IDs are server-issued, no race)</td>
+            <td>~25 lines</td>
+          </tr>
+          <tr>
+            <td><code>search-service.ts</code> · getVisibilityWhere</td>
+            <td>Branches on caller's email for direct + hashtag grants</td>
+            <td>Add 3rd branch: caller's <code>GroupMember</code> rows → <code>NoteSharing(GROUP, group_id)</code> matches</td>
+            <td>~40 lines</td>
+          </tr>
+          <tr>
+            <td><code>routes.ts</code></td>
+            <td>Sharing routes mounted</td>
+            <td>Mount new <code>/groups</code> + <code>/groups/:id/members</code> + <code>/groups/:id/notes</code> routes</td>
+            <td>~12 lines</td>
+          </tr>
+          <tr>
+            <td><strong>Total new + modified</strong></td>
+            <td></td>
+            <td>5 new files, ~450 lines added, 12 existing files touched</td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="page-sub" style="text-align: center; margin-top: 24px; padding: 20px;">
+      File: <code class="path" style="background: white;">mockups/groups-v4.html</code> · grounded in the actual app code · v1–v3 untouched.
+    </div>
+  </div>
+
+  <script>
+    document.querySelectorAll('.sb-group-label').forEach(label => {
+      label.addEventListener('click', () => {
+        const grp = label.closest('.sb-group');
+        grp.dataset.open = grp.dataset.open === 'true' ? 'false' : 'true';
+      });
+    });
+  </script>
+</body>
+</html>
