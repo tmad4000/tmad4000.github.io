@@ -1,0 +1,1627 @@
+<!DOCTYPE html>
+<!--
+  BETTERGPT — MULTIPLAYER + CHAT-SHARING WORKFLOW v5
+  ====================================================
+  Built on top of betterGPT's existing visual language
+  (DM Sans + DM Serif Display + warm cream + green accent).
+
+  THE NEW FLOW THIS MOCK INTRODUCES:
+    - A chat starts LOCAL (Claude Code session on your machine)
+    - "Share" promotes it to a SHARED workspace in the cloud
+    - Teammates can view, then prompt the same agent
+    - Optional permission-gated context inheritance
+
+  Frames:
+    01. Hero · the share-a-local-chat promise
+    02. Local Claude session · solo state (before)
+    03. Share dialog · promote local → shared
+    04. Promotion in flight · what gets carried
+    05. Shared workspace · multiple humans + agent
+    06. Mobile · viewer + prompter modes
+    07. Context permission gate · per-resource ACL
+    08. The decision · betterGPT-as-multiplayer vs separate Shared Chats
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>betterGPT — Multiplayer Share v5</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Serif+Display&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary:    #faf9f7;
+      --bg-secondary:  #f5f3ef;
+      --bg-tertiary:   #edeae4;
+      --bg-chat-user:  #e8e5de;
+      --bg-card:       #ffffff;
+
+      --text-primary:   #1a1a1a;
+      --text-secondary: #6b6b6b;
+      --text-tertiary:  #999;
+
+      --accent:        #2d5a27;
+      --accent-light:  #4a8c42;
+      --accent-bg:     rgba(45, 90, 39, 0.08);
+      --accent-soft:   rgba(45, 90, 39, 0.16);
+
+      --warm-orange:   #c2785c;
+      --warm-orange-bg: rgba(194, 120, 92, 0.10);
+
+      --share-blue:    #4a6fa5;
+      --share-blue-bg: rgba(74, 111, 165, 0.08);
+
+      --border:        rgba(0, 0, 0, 0.08);
+      --border-strong: rgba(0, 0, 0, 0.15);
+
+      --shadow-sm:    0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md:    0 4px 12px rgba(0,0,0,0.06);
+      --shadow-lg:    0 8px 32px rgba(0,0,0,0.08);
+      --shadow-xl:    0 18px 60px rgba(0,0,0,0.18);
+
+      --radius-sm:    8px;
+      --radius-md:    12px;
+      --radius-lg:    20px;
+      --radius-full:  9999px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', -apple-system, sans-serif;
+      background: linear-gradient(180deg, #ece8df 0%, #f4f1ea 60%);
+      color: var(--text-primary);
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    .page { max-width: 1440px; margin: 0 auto; padding: 32px 24px 48px; }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+    .page-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 40px;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin-bottom: 8px;
+    }
+    .page-title em {
+      font-style: italic;
+      color: var(--accent);
+    }
+    .page-sub {
+      color: var(--text-secondary);
+      font-size: 16px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .toc {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 18px 24px;
+      margin-bottom: 36px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 4px 24px;
+      font-size: 13.5px;
+      box-shadow: var(--shadow-sm);
+    }
+    .toc a {
+      color: var(--text-primary);
+      text-decoration: none;
+      padding: 4px 0;
+      display: flex; gap: 10px;
+      align-items: baseline;
+    }
+    .toc a:hover { color: var(--accent); }
+    .toc a .num {
+      color: var(--text-tertiary);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+    }
+
+    .frame {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      margin-bottom: 32px;
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+    }
+    .frame-head {
+      padding: 18px 28px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 14px;
+      background: var(--bg-secondary);
+    }
+    .frame-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--accent);
+      background: var(--accent-bg);
+      padding: 3px 10px;
+      border-radius: var(--radius-full);
+      letter-spacing: 0.04em;
+    }
+    .frame-title {
+      font-weight: 500;
+      font-size: 15px;
+    }
+    .frame-note {
+      margin-left: auto;
+      color: var(--text-secondary);
+      font-size: 13px;
+    }
+
+    /* ===== HERO (frame 01) ===== */
+    .hero {
+      padding: 64px 48px;
+      text-align: center;
+      background: linear-gradient(180deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
+    }
+    .hero h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 48px;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin-bottom: 18px;
+      max-width: 760px;
+      margin-left: auto; margin-right: auto;
+    }
+    .hero h1 em { font-style: italic; color: var(--accent); }
+    .hero-sub {
+      font-size: 18px;
+      color: var(--text-secondary);
+      max-width: 580px;
+      margin: 0 auto 36px;
+    }
+    .hero-flow {
+      display: flex; justify-content: center; align-items: center;
+      gap: 24px;
+      margin-top: 36px;
+      flex-wrap: wrap;
+    }
+    .flow-step {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 18px 22px;
+      box-shadow: var(--shadow-sm);
+      min-width: 200px;
+      max-width: 240px;
+      text-align: left;
+    }
+    .flow-step .label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 8px;
+    }
+    .flow-step .title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 20px;
+      margin-bottom: 6px;
+    }
+    .flow-step .desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    .flow-arrow {
+      color: var(--text-tertiary);
+      font-size: 24px;
+    }
+
+    /* ===== LOCAL CLAUDE SESSION (frame 02) ===== */
+    .terminal-frame {
+      padding: 32px;
+      background: var(--bg-secondary);
+    }
+    .terminal {
+      max-width: 920px;
+      margin: 0 auto;
+      background: #1a1a1a;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow-xl);
+    }
+    .terminal-bar {
+      background: #2a2a2a;
+      padding: 10px 14px;
+      display: flex; align-items: center; gap: 10px;
+      border-bottom: 1px solid #000;
+    }
+    .terminal-bar .dot {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+    }
+    .terminal-bar .dot.r { background: #ff5f57; }
+    .terminal-bar .dot.y { background: #febc2e; }
+    .terminal-bar .dot.g { background: #28c840; }
+    .terminal-bar .title {
+      font-family: 'JetBrains Mono', monospace;
+      color: #888;
+      font-size: 11.5px;
+      margin-left: 8px;
+    }
+    .terminal-body {
+      padding: 18px 22px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #e4e4e4;
+      min-height: 420px;
+    }
+    .term-prompt { color: #4a8c42; }
+    .term-user { color: #82d4f5; }
+    .term-claude { color: #f5cb82; }
+    .term-tool { color: #c2785c; font-style: italic; }
+    .term-cursor {
+      display: inline-block;
+      width: 8px; height: 14px;
+      background: #e4e4e4;
+      vertical-align: text-bottom;
+      animation: blink 1s steps(2) infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    .terminal-footer {
+      background: #111;
+      padding: 10px 18px;
+      display: flex; align-items: center; gap: 12px;
+      border-top: 1px solid #2a2a2a;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: #888;
+    }
+    .terminal-footer .badge {
+      background: rgba(255, 255, 255, 0.06);
+      padding: 2px 8px;
+      border-radius: 3px;
+    }
+    .terminal-footer .share-btn {
+      margin-left: auto;
+      background: var(--accent);
+      color: white;
+      border: 0;
+      padding: 5px 14px;
+      border-radius: 6px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .terminal-footer .share-btn:hover { background: var(--accent-light); }
+
+    /* ===== SHARE DIALOG (frame 03) ===== */
+    .dialog-stage {
+      padding: 48px;
+      background: var(--bg-secondary);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+    }
+    .dialog {
+      background: var(--bg-card);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+    }
+    .dialog-head {
+      padding: 20px 24px 4px;
+    }
+    .dialog-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 22px;
+      letter-spacing: -0.01em;
+    }
+    .dialog-sub {
+      color: var(--text-secondary);
+      font-size: 14px;
+      margin-top: 2px;
+    }
+    .dialog-body {
+      padding: 16px 24px 20px;
+    }
+    .dialog-section { margin-top: 14px; }
+    .dialog-section:first-child { margin-top: 4px; }
+    .dialog-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    .url-row {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .url-input {
+      flex: 1;
+      padding: 9px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg-secondary);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--text-primary);
+    }
+    .pill-btn {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      cursor: pointer;
+      font-family: inherit;
+      color: var(--text-primary);
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .pill-btn:hover { background: var(--bg-tertiary); }
+    .pill-btn.primary {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+    .pill-btn.primary:hover { background: var(--accent-light); }
+
+    .ctx-list {
+      display: flex; flex-direction: column;
+      gap: 6px;
+    }
+    .ctx-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg-card);
+    }
+    .ctx-item.checked { background: var(--accent-bg); border-color: var(--accent-soft); }
+    .ctx-item input { margin: 0; accent-color: var(--accent); }
+    .ctx-item .icon {
+      width: 28px; height: 28px;
+      border-radius: 6px;
+      background: var(--bg-secondary);
+      display: grid; place-items: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    .ctx-item.checked .icon { background: rgba(45, 90, 39, 0.15); }
+    .ctx-item .info { flex: 1; min-width: 0; }
+    .ctx-item .name { font-size: 13.5px; font-weight: 500; }
+    .ctx-item .meta { font-size: 11.5px; color: var(--text-secondary); margin-top: 1px; }
+    .ctx-item .lock {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      padding: 2px 7px;
+      background: var(--bg-secondary);
+      border-radius: 3px;
+    }
+    .ctx-item.checked .lock { color: var(--accent); background: rgba(45, 90, 39, 0.12); }
+
+    .invite-row {
+      display: flex; gap: 8px;
+    }
+    .invite-row .url-input { flex: 1; }
+
+    /* ===== PROMOTION IN-FLIGHT (frame 04) ===== */
+    .promotion-stage {
+      padding: 48px;
+      background: linear-gradient(180deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
+    }
+    .promotion {
+      max-width: 720px; margin: 0 auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+    }
+    .promotion-head {
+      padding: 24px 28px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 16px;
+    }
+    .spinner {
+      width: 28px; height: 28px;
+      border: 3px solid var(--bg-tertiary);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .promotion-head h3 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 22px;
+      letter-spacing: -0.01em;
+    }
+    .promotion-head .sub {
+      color: var(--text-secondary);
+      font-size: 13px;
+      margin-top: 2px;
+    }
+    .promotion-steps {
+      padding: 16px 28px 24px;
+    }
+    .promote-step {
+      display: flex; gap: 14px; align-items: flex-start;
+      padding: 10px 0;
+      font-size: 13.5px;
+    }
+    .promote-step + .promote-step { border-top: 1px solid var(--border); }
+    .promote-step .check {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: white;
+      display: grid; place-items: center;
+      font-size: 13px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .promote-step .check.pending {
+      background: var(--bg-tertiary);
+      color: var(--text-tertiary);
+    }
+    .promote-step .check.active {
+      background: var(--accent-bg);
+      color: var(--accent);
+      border: 2px solid var(--accent);
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse { 50% { opacity: 0.6; } }
+    .promote-step .info { flex: 1; }
+    .promote-step .title { font-weight: 500; margin-bottom: 2px; }
+    .promote-step .meta { color: var(--text-secondary); font-size: 12px; font-family: 'JetBrains Mono', monospace; }
+
+    /* ===== SHARED WORKSPACE (frame 05) ===== */
+    .workspace-stage {
+      display: grid;
+      grid-template-columns: 220px 1fr 240px;
+      min-height: 600px;
+    }
+    .ws-sidebar {
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border);
+      padding: 16px 0;
+    }
+    .ws-section-label {
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      padding: 6px 16px;
+      margin-top: 12px;
+    }
+    .ws-section-label:first-of-type { margin-top: 0; }
+    .ws-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 16px;
+      cursor: pointer;
+      font-size: 13.5px;
+      color: var(--text-primary);
+    }
+    .ws-row:hover { background: rgba(0, 0, 0, 0.03); }
+    .ws-row.active {
+      background: var(--accent-bg);
+      color: var(--accent);
+      font-weight: 500;
+    }
+    .ws-row .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+    .ws-row .count {
+      margin-left: auto;
+      font-size: 11px;
+      color: var(--text-tertiary);
+    }
+    .ws-row.active .count { color: var(--accent); }
+
+    .ws-main {
+      display: flex; flex-direction: column;
+      min-width: 0;
+    }
+    .ws-head {
+      padding: 18px 28px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 14px;
+    }
+    .ws-head h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 24px;
+      letter-spacing: -0.01em;
+      flex: 1;
+    }
+    .ws-presence {
+      display: flex; align-items: center; gap: -6px;
+    }
+    .ws-presence > .av {
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      border: 2px solid var(--bg-card);
+      margin-left: -8px;
+      display: grid; place-items: center;
+      font-size: 11px;
+      font-weight: 500;
+      color: white;
+    }
+    .ws-presence > .av:first-child { margin-left: 0; }
+    .av { display: inline-grid; place-items: center; border-radius: 50%; color: white; font-weight: 500; }
+    .av.jc { background: #2d5a27; }
+    .av.sa { background: #c2785c; }
+    .av.da { background: #4a6fa5; }
+    .av.ja { background: #b59b3f; }
+    .av.an { background: #7b4a8c; }
+
+    .ws-conversation {
+      flex: 1; overflow-y: auto;
+      padding: 20px 28px 16px;
+    }
+    .msg {
+      display: flex; gap: 14px;
+      padding: 14px 0;
+    }
+    .msg + .msg { border-top: 1px solid var(--border); }
+    .msg .av { width: 32px; height: 32px; font-size: 13px; flex-shrink: 0; }
+    .msg .body { flex: 1; min-width: 0; }
+    .msg .who {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 4px;
+      font-size: 13px;
+    }
+    .msg .who strong { font-weight: 500; }
+    .msg .who .time { color: var(--text-tertiary); font-size: 11.5px; }
+    .msg .who .you-pill {
+      background: var(--accent-bg);
+      color: var(--accent);
+      font-size: 9.5px;
+      padding: 1px 6px;
+      border-radius: 3px;
+      letter-spacing: 0.04em;
+      font-weight: 500;
+      text-transform: uppercase;
+    }
+    .msg .text {
+      font-size: 14px;
+      line-height: 1.55;
+      color: var(--text-primary);
+    }
+    .msg.agent .av { background: linear-gradient(135deg, var(--accent), var(--accent-light)); }
+    .msg.agent .who strong { color: var(--accent); }
+    .msg.agent .text { font-family: 'DM Sans', sans-serif; }
+    .msg.agent .text code {
+      font-family: 'JetBrains Mono', monospace;
+      background: var(--bg-secondary);
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-size: 12.5px;
+    }
+    .msg .tool-trace {
+      margin-top: 8px;
+      background: var(--bg-secondary);
+      border-left: 3px solid var(--accent-soft);
+      padding: 8px 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    }
+
+    .ws-composer {
+      padding: 16px 28px 24px;
+      border-top: 1px solid var(--border);
+      background: var(--bg-secondary);
+    }
+    .composer {
+      background: var(--bg-card);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      box-shadow: var(--shadow-sm);
+    }
+    .composer-text {
+      font-size: 14.5px;
+      color: var(--text-tertiary);
+      min-height: 28px;
+    }
+    .composer-text strong { color: var(--text-primary); font-weight: normal; }
+    .composer-bar {
+      display: flex; align-items: center; gap: 8px;
+      margin-top: 8px;
+    }
+    .composer-bar .meta {
+      color: var(--text-tertiary);
+      font-size: 11.5px;
+      flex: 1;
+    }
+    .composer-bar .send-btn {
+      background: var(--accent);
+      color: white;
+      border: 0;
+      padding: 7px 18px;
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .ws-detail {
+      background: var(--bg-secondary);
+      border-left: 1px solid var(--border);
+      padding: 18px 16px;
+      font-size: 13px;
+      overflow-y: auto;
+    }
+    .ws-detail h4 {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      margin-top: 16px;
+    }
+    .ws-detail h4:first-child { margin-top: 0; }
+    .ws-detail .row {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 12.5px;
+    }
+    .ws-detail .row:last-child { border-bottom: 0; }
+    .ws-detail .row .av { width: 22px; height: 22px; font-size: 10px; flex-shrink: 0; }
+    .ws-detail .row .name { flex: 1; }
+    .ws-detail .row .role {
+      font-size: 10px;
+      color: var(--text-secondary);
+      padding: 1px 6px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+    }
+    .ws-detail .row .role.you { background: var(--accent-bg); color: var(--accent); border-color: var(--accent-soft); }
+    .ws-detail .ctx-pill {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 8px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-full);
+      font-size: 11.5px;
+      margin: 0 4px 4px 0;
+      color: var(--text-secondary);
+    }
+    .ws-detail .ctx-pill.included {
+      background: var(--accent-bg);
+      border-color: var(--accent-soft);
+      color: var(--accent);
+    }
+    .ws-detail .ctx-pill.private {
+      color: var(--text-tertiary);
+      text-decoration: line-through;
+    }
+
+    /* ===== PHONE FRAMES (frame 06) ===== */
+    .phone-stage {
+      padding: 48px;
+      background: linear-gradient(180deg, var(--bg-secondary), var(--bg-card));
+      display: flex; gap: 36px; justify-content: center; flex-wrap: wrap;
+    }
+    .phone {
+      width: 320px;
+      background: var(--bg-card);
+      border-radius: 36px;
+      border: 8px solid #1a1a1c;
+      box-shadow: var(--shadow-xl);
+      overflow: hidden;
+    }
+    .phone-notch { background: #1a1a1c; height: 28px; display: flex; justify-content: center; align-items: center; }
+    .phone-notch::before { content: ''; width: 88px; height: 22px; background: #050505; border-radius: 0 0 20px 20px; margin-top: -4px; }
+    .phone-screen { height: 580px; overflow-y: auto; position: relative; }
+    .phone-status {
+      padding: 10px 18px 6px;
+      font-size: 12px;
+      display: flex; justify-content: space-between;
+      color: var(--text-primary);
+    }
+    .phone-head {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 10px;
+      background: var(--bg-secondary);
+    }
+    .phone-head .back { font-size: 22px; color: var(--accent); cursor: pointer; }
+    .phone-head h3 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 16px;
+      letter-spacing: -0.01em;
+      flex: 1;
+    }
+    .phone-presence {
+      display: flex;
+    }
+    .phone-presence .av {
+      width: 22px; height: 22px;
+      font-size: 10px;
+      border: 2px solid var(--bg-secondary);
+      margin-left: -6px;
+    }
+    .phone-presence .av:first-child { margin-left: 0; }
+    .phone-content {
+      padding: 14px 16px;
+    }
+    .phone-msg {
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      padding: 10px 12px;
+      margin-bottom: 10px;
+    }
+    .phone-msg.from-agent {
+      background: var(--accent-bg);
+    }
+    .phone-msg .who {
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .phone-msg .who .av { width: 14px; height: 14px; font-size: 8px; }
+    .phone-msg .text { font-size: 13.5px; line-height: 1.45; }
+    .phone-composer {
+      position: sticky;
+      bottom: 0;
+      padding: 10px 16px 14px;
+      background: var(--bg-card);
+      border-top: 1px solid var(--border);
+    }
+    .phone-composer-inner {
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      padding: 9px 14px;
+      display: flex; align-items: center; gap: 8px;
+      font-size: 13px;
+      color: var(--text-tertiary);
+    }
+
+    /* ===== PERMISSION GATE (frame 07) ===== */
+    .perm-stage {
+      padding: 48px;
+      background: var(--bg-secondary);
+    }
+    .perm-card {
+      max-width: 760px;
+      margin: 0 auto;
+      background: var(--bg-card);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+    }
+    .perm-head { padding: 20px 28px; border-bottom: 1px solid var(--border); }
+    .perm-head h3 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 22px;
+      letter-spacing: -0.01em;
+    }
+    .perm-head .sub { color: var(--text-secondary); font-size: 13px; margin-top: 2px; }
+
+    .perm-rows {
+      padding: 8px 0;
+    }
+    .perm-row {
+      padding: 14px 28px;
+      display: grid;
+      grid-template-columns: 36px 1fr 200px;
+      gap: 16px;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .perm-row:last-child { border-bottom: 0; }
+    .perm-row .icon {
+      width: 36px; height: 36px;
+      border-radius: 9px;
+      background: var(--bg-secondary);
+      display: grid; place-items: center;
+      font-size: 16px;
+    }
+    .perm-row .name { font-weight: 500; font-size: 14px; }
+    .perm-row .meta { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+    .perm-options {
+      display: flex; gap: 0;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+    .perm-option {
+      flex: 1;
+      padding: 6px 10px;
+      font-size: 11.5px;
+      background: var(--bg-secondary);
+      border: 0;
+      cursor: pointer;
+      font-family: inherit;
+      color: var(--text-secondary);
+      border-right: 1px solid var(--border);
+    }
+    .perm-option:last-child { border-right: 0; }
+    .perm-option.active {
+      background: var(--accent);
+      color: white;
+    }
+    .perm-option.danger.active {
+      background: var(--warm-orange);
+      color: white;
+    }
+
+    /* ===== DECISION DOC (frame 08) ===== */
+    .decision-stage {
+      padding: 32px 28px;
+      background: var(--bg-card);
+    }
+    .decision-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    .decision-col {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 24px 26px;
+      background: var(--bg-card);
+    }
+    .decision-col.rec { border-color: var(--accent-soft); background: var(--accent-bg); }
+    .decision-col h3 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 24px;
+      letter-spacing: -0.01em;
+      margin-bottom: 6px;
+    }
+    .decision-col .badge {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text-secondary);
+      background: var(--bg-secondary);
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      margin-bottom: 14px;
+      letter-spacing: 0.04em;
+    }
+    .decision-col.rec .badge {
+      background: var(--accent);
+      color: white;
+    }
+    .decision-col p {
+      font-size: 14px;
+      color: var(--text-primary);
+      margin-bottom: 14px;
+    }
+    .decision-col h4 {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-top: 16px;
+      margin-bottom: 8px;
+    }
+    .decision-col ul {
+      padding-left: 18px;
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+    .decision-col ul li.good { color: var(--accent); }
+    .decision-col ul li.bad { color: var(--warm-orange); }
+
+    /* ===== UTILITIES ===== */
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code.path {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      background: var(--bg-secondary);
+      padding: 1px 6px;
+      border-radius: 3px;
+      color: var(--text-secondary);
+    }
+
+    .footer-note {
+      text-align: center;
+      padding: 24px;
+      color: var(--text-tertiary);
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <div class="page-header">
+      <h1 class="page-title">betterGPT · <em>multiplayer share</em></h1>
+      <p class="page-sub">Promote any local Claude session to a shared workspace your team can join. Permission-gated context, real-time multiplayer prompting.</p>
+    </div>
+
+    <div class="toc">
+      <a href="#f01"><span class="num">01</span>Hero · the share-a-chat promise</a>
+      <a href="#f02"><span class="num">02</span>Local Claude session · before share</a>
+      <a href="#f03"><span class="num">03</span>Share dialog · promote local → shared</a>
+      <a href="#f04"><span class="num">04</span>Promotion in flight · what gets carried</a>
+      <a href="#f05"><span class="num">05</span>Shared workspace · humans + agent</a>
+      <a href="#f06"><span class="num">06</span>Phone · viewer and prompter modes</a>
+      <a href="#f07"><span class="num">07</span>Per-resource ACL · context permissions</a>
+      <a href="#f08"><span class="num">08</span>Decision · betterGPT-vs-new-project</a>
+    </div>
+
+    <!-- ============ 01 HERO ============ -->
+    <div class="frame" id="f01">
+      <div class="hero">
+        <h1>Promote any chat into a <em>shared workspace</em></h1>
+        <p class="hero-sub">A Claude session that lives on your machine, with your files and your tools. One click and your team joins — with the context you explicitly choose to share.</p>
+        <div class="hero-flow">
+          <div class="flow-step">
+            <div class="label">step 1</div>
+            <div class="title">Chat locally</div>
+            <div class="desc">Your Claude Code session, on your machine, with your codebase + MCPs.</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">
+            <div class="label">step 2</div>
+            <div class="title">Click share</div>
+            <div class="desc">Choose what context comes along. Generate a link.</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">
+            <div class="label">step 3</div>
+            <div class="title">Team joins</div>
+            <div class="desc">Live conversation with the same agent. Permission-gated.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 02 LOCAL CLAUDE ============ -->
+    <div class="frame" id="f02">
+      <div class="frame-head">
+        <span class="frame-tag">02</span>
+        <span class="frame-title">Local Claude session · before sharing</span>
+        <span class="frame-note">Your machine · your codebase · solo</span>
+      </div>
+      <div class="terminal-frame">
+        <div class="terminal">
+          <div class="terminal-bar">
+            <span class="dot r"></span>
+            <span class="dot y"></span>
+            <span class="dot g"></span>
+            <span class="title">claude — ~/code/cortex — main — claude-sonnet-4-6</span>
+          </div>
+          <div class="terminal-body">
+<span class="term-prompt">▶</span> <span class="term-user">I'm trying to figure out why our shared-hashtag visibility query is missing notes for users who joined the workspace after the share was created. Show me the relevant code.</span>
+
+<span class="term-claude">I'll trace through the visibility resolution. Let me start with <code style="color:#82d4f5">getVisibilityWhere</code>:</span>
+<span class="term-tool">  ⎿ Read server/src/service/search-service.ts (217 lines)</span>
+<span class="term-tool">  ⎿ Read server/src/service/note-sharing-service.ts (278 lines)</span>
+
+<span class="term-claude">Found it. <code style="color:#82d4f5">getHashtagGrantsFor</code> filters by <code style="color:#82d4f5">principal: email</code>. When a user's email changes after a share is granted (e.g. they update their account), they lose access until you re-share. There are 3 ways to fix this...</span>
+
+<span class="term-prompt">▶</span> <span class="term-user">Wait — Sarah just messaged saying she sees this too. Can I share this chat with her so she can pick up where I left off?</span>
+<span class="term-cursor"></span>
+          </div>
+          <div class="terminal-footer">
+            <span class="badge">⌥A · attach context</span>
+            <span class="badge">⌥/ · slash commands</span>
+            <button class="share-btn">⤴ share this chat</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 03 SHARE DIALOG ============ -->
+    <div class="frame" id="f03">
+      <div class="frame-head">
+        <span class="frame-tag">03</span>
+        <span class="frame-title">Share dialog · what comes along when promoting local → shared</span>
+        <span class="frame-note">Conversation history is automatic · everything else is opt-in</span>
+      </div>
+      <div class="dialog-stage">
+
+        <!-- Left: dialog -->
+        <div class="dialog">
+          <div class="dialog-head">
+            <div class="dialog-title">Share this chat</div>
+            <div class="dialog-sub">Promotes the local session to a shared workspace. Conversation history comes automatically; context is per-item.</div>
+          </div>
+          <div class="dialog-body">
+
+            <div class="dialog-section">
+              <div class="dialog-label">Who can join</div>
+              <div class="invite-row">
+                <input class="url-input" placeholder="sarah@ideaflow.io, james@ideaflow.io">
+                <button class="pill-btn primary">Invite</button>
+              </div>
+              <div style="margin-top: 6px; font-size: 12px; color: var(--text-secondary);">
+                Or share the link below — anyone with the link can view (no prompting).
+              </div>
+            </div>
+
+            <div class="dialog-section">
+              <div class="dialog-label">Link</div>
+              <div class="url-row">
+                <input class="url-input" value="bettergpt.ai/c/0a3f-…" readonly>
+                <button class="pill-btn">Copy</button>
+              </div>
+            </div>
+
+            <div class="dialog-section">
+              <div class="dialog-label">Context to share</div>
+              <div class="ctx-list">
+                <label class="ctx-item checked">
+                  <input type="checkbox" checked>
+                  <span class="icon">💬</span>
+                  <div class="info">
+                    <div class="name">Full conversation</div>
+                    <div class="meta">7 turns · 4 tool calls · always shared</div>
+                  </div>
+                </label>
+                <label class="ctx-item checked">
+                  <input type="checkbox" checked>
+                  <span class="icon">📂</span>
+                  <div class="info">
+                    <div class="name">cortex/server/src/service</div>
+                    <div class="meta">2 files read · read-only mount</div>
+                  </div>
+                  <span class="lock">read</span>
+                </label>
+                <label class="ctx-item">
+                  <input type="checkbox">
+                  <span class="icon">🧠</span>
+                  <div class="info">
+                    <div class="name">Noos memory graph</div>
+                    <div class="meta">your private graph · 1,847 nodes</div>
+                  </div>
+                  <span class="lock">private</span>
+                </label>
+                <label class="ctx-item">
+                  <input type="checkbox">
+                  <span class="icon">🔧</span>
+                  <div class="info">
+                    <div class="name">Personal MCP servers</div>
+                    <div class="meta">linear, gmail, calendar · keep private</div>
+                  </div>
+                  <span class="lock">private</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="dialog-section">
+              <div class="dialog-label">Mode</div>
+              <div class="invite-row">
+                <button class="pill-btn primary" style="flex: 1;">Multiplayer · all can prompt</button>
+                <button class="pill-btn" style="flex: 1;">Viewer-only · only you prompt</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Right: explainer panel -->
+        <div style="padding: 8px 8px 8px 8px;">
+          <h3 style="font-family: 'DM Serif Display', serif; font-size: 22px; letter-spacing: -0.01em; margin-bottom: 14px;">What "share" actually does</h3>
+
+          <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 14px;">
+            Promoting a local chat to a shared workspace does <strong style="color: var(--text-primary);">three concrete things</strong>:
+          </p>
+
+          <ol style="font-size: 14px; color: var(--text-primary); line-height: 1.7; padding-left: 18px; margin-bottom: 18px;">
+            <li><strong>Snapshots the conversation</strong> — every turn so far is mirrored to a cloud workspace. Local session keeps running, cloud is the new source of truth for invited users.</li>
+            <li><strong>Projects the context you picked</strong> — files mounted read-only into the cloud sandbox; MCPs you didn't tick stay on your machine.</li>
+            <li><strong>Routes new prompts through the cloud agent</strong> — when you or a teammate prompts, the cloud session responds with the shared context. Your local session pauses.</li>
+          </ol>
+
+          <h4 style="font-size: 11px; color: var(--text-tertiary); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 8px;">What it doesn't do</h4>
+          <ul style="font-size: 13.5px; color: var(--text-secondary); line-height: 1.65; padding-left: 18px;">
+            <li>Doesn't give teammates terminal access on your machine</li>
+            <li>Doesn't share your unticked MCPs (Linear, Gmail, etc.)</li>
+            <li>Doesn't permanently copy your codebase — read-only mount, revoke anytime</li>
+          </ul>
+
+          <div style="margin-top: 20px; padding: 14px 16px; background: var(--accent-bg); border-radius: var(--radius-sm); font-size: 13px; color: var(--accent);">
+            🔒 Revoke at any time. Removes cloud access; conversation history stays in your local session.
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ============ 04 PROMOTION IN FLIGHT ============ -->
+    <div class="frame" id="f04">
+      <div class="frame-head">
+        <span class="frame-tag">04</span>
+        <span class="frame-title">Promotion in flight · what gets carried over</span>
+        <span class="frame-note">Typically ≤ 8 seconds · spinner shows live progress</span>
+      </div>
+      <div class="promotion-stage">
+        <div class="promotion">
+          <div class="promotion-head">
+            <div class="spinner"></div>
+            <div>
+              <h3>Promoting to shared workspace…</h3>
+              <div class="sub">Sharing with Sarah · cortex/server/src/service · multiplayer mode</div>
+            </div>
+          </div>
+          <div class="promotion-steps">
+            <div class="promote-step">
+              <div class="check">✓</div>
+              <div class="info">
+                <div class="title">Created shared workspace</div>
+                <div class="meta">bettergpt.ai/c/0a3f-7d12 · session-id reserved</div>
+              </div>
+            </div>
+            <div class="promote-step">
+              <div class="check">✓</div>
+              <div class="info">
+                <div class="title">Mirrored 7 turns of conversation</div>
+                <div class="meta">14 messages · 4 tool calls · 12,840 tokens carried</div>
+              </div>
+            </div>
+            <div class="promote-step">
+              <div class="check">✓</div>
+              <div class="info">
+                <div class="title">Mounted code context (read-only)</div>
+                <div class="meta">cortex/server/src/service · 28 files · ~/tmp/sandbox-0a3f mounted on GCE VM</div>
+              </div>
+            </div>
+            <div class="promote-step">
+              <div class="check active">●</div>
+              <div class="info">
+                <div class="title">Sent invitation to sarah@ideaflow.io</div>
+                <div class="meta">Email queued · in-app notification dispatched</div>
+              </div>
+            </div>
+            <div class="promote-step">
+              <div class="check pending">○</div>
+              <div class="info">
+                <div class="title">Switching prompt routing to cloud agent</div>
+                <div class="meta">Local session pauses · next prompt goes to shared workspace</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 05 SHARED WORKSPACE ============ -->
+    <div class="frame" id="f05">
+      <div class="frame-head">
+        <span class="frame-tag">05</span>
+        <span class="frame-title">Shared workspace · multiplayer prompting in action</span>
+        <span class="frame-note">3 humans + agent · presence avatars · live typing</span>
+      </div>
+      <div class="workspace-stage">
+
+        <aside class="ws-sidebar">
+          <div class="ws-section-label">This shared chat</div>
+          <div class="ws-row active">
+            <span class="dot"></span>
+            <span>Visibility-bug investigation</span>
+          </div>
+          <div class="ws-row">
+            <span>📂</span>
+            <span>Files (28)</span>
+          </div>
+          <div class="ws-row">
+            <span>🧠</span>
+            <span>Memory (4)</span>
+          </div>
+          <div class="ws-row">
+            <span>📄</span>
+            <span>Published pages (0)</span>
+          </div>
+
+          <div class="ws-section-label">Other shared chats</div>
+          <div class="ws-row">
+            <span style="color: var(--text-tertiary);">○</span>
+            <span>Lattice OEM thread</span>
+          </div>
+          <div class="ws-row">
+            <span style="color: var(--text-tertiary);">○</span>
+            <span>Onboarding rewrite</span>
+          </div>
+
+          <div class="ws-section-label">Solo</div>
+          <div class="ws-row">
+            <span>👤</span>
+            <span>My personal chats</span>
+            <span class="count">12</span>
+          </div>
+        </aside>
+
+        <div class="ws-main">
+          <div class="ws-head">
+            <h2>Visibility-bug investigation</h2>
+            <div class="ws-presence">
+              <span class="av jc" title="Jacob (you)">J</span>
+              <span class="av sa" title="Sarah">S</span>
+              <span class="av da" title="David">D</span>
+              <span class="av" style="background: linear-gradient(135deg, #2d5a27, #4a8c42);" title="Claude (agent)">🦊</span>
+            </div>
+          </div>
+
+          <div class="ws-conversation">
+
+            <div class="msg">
+              <span class="av jc">J</span>
+              <div class="body">
+                <div class="who">
+                  <strong>Jacob</strong>
+                  <span class="you-pill">you</span>
+                  <span class="time">started · 14 min ago</span>
+                </div>
+                <div class="text">I'm trying to figure out why our shared-hashtag visibility query is missing notes for users who joined the workspace after the share was created. Show me the relevant code.</div>
+              </div>
+            </div>
+
+            <div class="msg agent">
+              <span class="av">🦊</span>
+              <div class="body">
+                <div class="who">
+                  <strong>Claude</strong>
+                  <span class="time">13 min ago</span>
+                </div>
+                <div class="text">
+                  Found it. <code>getHashtagGrantsFor</code> filters by <code>principal: email</code>. When a user's email changes after a share is granted, they lose access until re-share.
+                </div>
+                <div class="tool-trace">⎿ Read server/src/service/search-service.ts · 217 lines</div>
+              </div>
+            </div>
+
+            <div class="msg">
+              <span class="av sa">S</span>
+              <div class="body">
+                <div class="who">
+                  <strong>Sarah</strong>
+                  <span class="time">just joined · 2 min ago</span>
+                </div>
+                <div class="text">Oh yeah this is what I was seeing. <strong>@Claude</strong> can you check if there's a similar bug in <code>getDirectShareNoteIdsFor</code>? I think the same email-changes-and-loses-access pattern applies.</div>
+              </div>
+            </div>
+
+            <div class="msg agent">
+              <span class="av">🦊</span>
+              <div class="body">
+                <div class="who">
+                  <strong>Claude</strong>
+                  <span class="time">1 min ago</span>
+                </div>
+                <div class="text">
+                  Yes — same bug pattern. <code>getDirectShareNoteIdsFor</code> at line 80 also queries <code>{ principal: email, principalType: "EMAIL" }</code>. If we want a real fix, we should either:
+                  <br><br>
+                  1. Promote the principal from <code>EMAIL</code> to <code>USER_ID</code> on first sign-in (with a backfill migration)
+                  <br>
+                  2. Store both, prefer <code>USER_ID</code> when present
+                  <br><br>
+                  Option 2 is safer for existing rows. Want me to draft the migration?
+                </div>
+                <div class="tool-trace">⎿ Read server/src/service/note-sharing-service.ts · grep "principal: email"</div>
+              </div>
+            </div>
+
+            <div class="msg">
+              <span class="av da">D</span>
+              <div class="body">
+                <div class="who">
+                  <strong>David</strong>
+                  <span class="time">joined · 30s ago · typing…</span>
+                </div>
+                <div class="text" style="color: var(--text-tertiary); font-style: italic;">draft: option 2 plus we should write a regression test that…</div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="ws-composer">
+            <div class="composer">
+              <div class="composer-text">Reply as <strong>Jacob</strong> · type your message or @Claude…</div>
+              <div class="composer-bar">
+                <span class="meta">⌘↩ send · ⌥A attach · ⌥/ commands</span>
+                <button class="send-btn">Send</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <aside class="ws-detail">
+          <h4>Members · 3</h4>
+          <div class="row">
+            <span class="av jc">J</span>
+            <span class="name">Jacob</span>
+            <span class="role you">Owner</span>
+          </div>
+          <div class="row">
+            <span class="av sa">S</span>
+            <span class="name">Sarah</span>
+            <span class="role">Prompter</span>
+          </div>
+          <div class="row">
+            <span class="av da">D</span>
+            <span class="name">David</span>
+            <span class="role">Prompter</span>
+          </div>
+
+          <h4>Context shared</h4>
+          <div>
+            <span class="ctx-pill included">💬 Conversation</span>
+            <span class="ctx-pill included">📂 service/</span>
+            <span class="ctx-pill private">🧠 Noos</span>
+            <span class="ctx-pill private">🔧 Linear MCP</span>
+          </div>
+
+          <h4>Activity</h4>
+          <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.55;">
+            <div style="padding: 4px 0;">Sarah joined · 2m ago</div>
+            <div style="padding: 4px 0;">David joined · 30s ago</div>
+            <div style="padding: 4px 0;">Claude read 2 files · 1m ago</div>
+          </div>
+
+          <h4>Actions</h4>
+          <button class="pill-btn" style="width: 100%; margin-bottom: 6px;">Manage context</button>
+          <button class="pill-btn" style="width: 100%; margin-bottom: 6px;">Invite more people</button>
+          <button class="pill-btn" style="width: 100%; color: var(--warm-orange); border-color: var(--warm-orange);">End shared session</button>
+        </aside>
+      </div>
+    </div>
+
+    <!-- ============ 06 PHONE ============ -->
+    <div class="frame" id="f06">
+      <div class="frame-head">
+        <span class="frame-tag">06</span>
+        <span class="frame-title">Phone · the shared workspace on iPhone</span>
+        <span class="frame-note">Mobile-first per yesterday's UX audit · stateful controls</span>
+      </div>
+      <div class="phone-stage">
+
+        <!-- Phone 1: shared chat view -->
+        <div class="phone">
+          <div class="phone-notch"></div>
+          <div class="phone-screen">
+            <div class="phone-status"><span>9:41</span><span>📶 🔋</span></div>
+            <div class="phone-head">
+              <span class="back">‹</span>
+              <h3>Visibility bug</h3>
+              <div class="phone-presence">
+                <span class="av jc">J</span>
+                <span class="av sa">S</span>
+                <span class="av da">D</span>
+              </div>
+            </div>
+            <div class="phone-content">
+              <div class="phone-msg">
+                <div class="who"><span class="av jc">J</span><strong>Jacob</strong> · 14m</div>
+                <div class="text">Why is the shared-hashtag query missing notes for users who joined later?</div>
+              </div>
+              <div class="phone-msg from-agent">
+                <div class="who"><strong style="color: var(--accent);">🦊 Claude</strong> · 13m</div>
+                <div class="text">Found it. <code style="font-family: 'JetBrains Mono', monospace; font-size: 11.5px;">getHashtagGrantsFor</code> filters by email — if email changes after share, users lose access.</div>
+              </div>
+              <div class="phone-msg">
+                <div class="who"><span class="av sa">S</span><strong>Sarah</strong> · 2m</div>
+                <div class="text">Same bug in <code style="font-family: 'JetBrains Mono', monospace; font-size: 11.5px;">getDirectShareNoteIdsFor</code>?</div>
+              </div>
+              <div class="phone-msg from-agent">
+                <div class="who"><strong style="color: var(--accent);">🦊 Claude</strong> · 1m</div>
+                <div class="text">Yes. Same pattern at line 80. Two fix options...</div>
+              </div>
+            </div>
+            <div class="phone-composer">
+              <div class="phone-composer-inner">
+                <span>Reply as Jacob…</span>
+                <span style="margin-left: auto; color: var(--accent);">↑</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Phone 2: share dialog on mobile -->
+        <div class="phone">
+          <div class="phone-notch"></div>
+          <div class="phone-screen">
+            <div class="phone-status"><span>9:41</span><span>📶 🔋</span></div>
+            <div class="phone-head">
+              <span class="back">×</span>
+              <h3>Share this chat</h3>
+            </div>
+            <div class="phone-content">
+              <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 14px;">
+                Promote this Claude session to a shared workspace.
+              </div>
+
+              <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; font-weight: 500;">Who joins</div>
+              <input class="url-input" placeholder="email or @handle" style="width: 100%; margin-bottom: 14px;">
+
+              <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; font-weight: 500;">Context</div>
+              <div class="ctx-list" style="margin-bottom: 14px;">
+                <label class="ctx-item checked" style="padding: 8px 10px;">
+                  <input type="checkbox" checked>
+                  <span class="icon" style="width: 24px; height: 24px; font-size: 12px;">💬</span>
+                  <div class="info">
+                    <div class="name" style="font-size: 13px;">Conversation</div>
+                  </div>
+                </label>
+                <label class="ctx-item checked" style="padding: 8px 10px;">
+                  <input type="checkbox" checked>
+                  <span class="icon" style="width: 24px; height: 24px; font-size: 12px;">📂</span>
+                  <div class="info">
+                    <div class="name" style="font-size: 13px;">service/</div>
+                    <div class="meta">read-only</div>
+                  </div>
+                </label>
+                <label class="ctx-item" style="padding: 8px 10px;">
+                  <input type="checkbox">
+                  <span class="icon" style="width: 24px; height: 24px; font-size: 12px;">🧠</span>
+                  <div class="info">
+                    <div class="name" style="font-size: 13px;">Noos memory</div>
+                  </div>
+                  <span class="lock">private</span>
+                </label>
+              </div>
+
+              <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; font-weight: 500;">Mode</div>
+              <button class="pill-btn primary" style="width: 100%; padding: 12px;">Share · multiplayer</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ============ 07 PER-RESOURCE ACL ============ -->
+    <div class="frame" id="f07">
+      <div class="frame-head">
+        <span class="frame-tag">07</span>
+        <span class="frame-title">Per-resource ACL · the differentiator</span>
+        <span class="frame-note">Each context resource has its own permission · the moat against ChatGPT shares</span>
+      </div>
+      <div class="perm-stage">
+        <div class="perm-card">
+          <div class="perm-head">
+            <h3>Context for this shared chat</h3>
+            <div class="sub">Choose what the agent can see, per resource. Default is private — share explicitly.</div>
+          </div>
+          <div class="perm-rows">
+
+            <div class="perm-row">
+              <div class="icon">💬</div>
+              <div>
+                <div class="name">Conversation history (7 turns)</div>
+                <div class="meta">Always shared — that's the whole point of promoting to a workspace.</div>
+              </div>
+              <div class="perm-options">
+                <button class="perm-option">Private</button>
+                <button class="perm-option active">Shared</button>
+              </div>
+            </div>
+
+            <div class="perm-row">
+              <div class="icon">📂</div>
+              <div>
+                <div class="name">cortex/server/src/service</div>
+                <div class="meta">2 files Claude has read · 26 more in directory · mounted read-only on cloud sandbox</div>
+              </div>
+              <div class="perm-options">
+                <button class="perm-option">Private</button>
+                <button class="perm-option active">Read</button>
+                <button class="perm-option">Write</button>
+              </div>
+            </div>
+
+            <div class="perm-row">
+              <div class="icon">🧠</div>
+              <div>
+                <div class="name">Noos memory graph</div>
+                <div class="meta">1,847 nodes · your personal knowledge graph. Stays on your machine unless you specifically share.</div>
+              </div>
+              <div class="perm-options">
+                <button class="perm-option active">Private</button>
+                <button class="perm-option">Query only</button>
+                <button class="perm-option">Full</button>
+              </div>
+            </div>
+
+            <div class="perm-row">
+              <div class="icon">🔧</div>
+              <div>
+                <div class="name">Linear MCP</div>
+                <div class="meta">Your Linear workspace · current sprint, issues, comments. Sensitive — private by default.</div>
+              </div>
+              <div class="perm-options">
+                <button class="perm-option active">Private</button>
+                <button class="perm-option">Read</button>
+                <button class="perm-option">Read+Write</button>
+              </div>
+            </div>
+
+            <div class="perm-row">
+              <div class="icon">🔧</div>
+              <div>
+                <div class="name">Gmail MCP</div>
+                <div class="meta">Personal inbox · always private. Cannot be shared on multiplayer.</div>
+              </div>
+              <div class="perm-options">
+                <button class="perm-option danger active">Locked private</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 08 DECISION ============ -->
+    <div class="frame" id="f08">
+      <div class="frame-head">
+        <span class="frame-tag">08</span>
+        <span class="frame-title">Decision · build inside betterGPT vs new repo</span>
+        <span class="frame-note">Two parallel paths · we're doing both</span>
+      </div>
+      <div class="decision-stage">
+        <div class="decision-grid">
+
+          <div class="decision-col rec">
+            <h3>Path A · inside betterGPT</h3>
+            <span class="badge">primary</span>
+            <p>Continue on <code class="path">bettergpt/prototype-core</code>. Add Story 6 (group/shared workspaces) as the next milestone after solo polish ships. One product, one brand, sequential roadmap.</p>
+            <h4>Pros</h4>
+            <ul>
+              <li class="good">Reuses 30+ commits of prototype momentum</li>
+              <li class="good">Single brand · <code class="path">bettergpt.ai</code> already owned</li>
+              <li class="good">User-stories doc already includes group/sharing in Story 6</li>
+              <li class="good">Solo demos validate the loop before adding complexity</li>
+            </ul>
+            <h4>Cons</h4>
+            <ul>
+              <li class="bad">Inherits Cortex tech debt</li>
+              <li class="bad">Multiplayer is bolted onto solo-first design</li>
+            </ul>
+          </div>
+
+          <div class="decision-col">
+            <h3>Path B · new project</h3>
+            <span class="badge">parallel</span>
+            <p>Stand up <code class="path">~/code/shared-chats/</code> as a separate repo. Multiplayer-first architecture. Fresh choices (Postgres, no god file, Cloud Run on existing GCP). Vendor Cortex's ClaudeSessionEngine.</p>
+            <h4>Pros</h4>
+            <ul>
+              <li class="good">Clean architecture · no inherited debt</li>
+              <li class="good">Multiplayer-first product · different positioning</li>
+              <li class="good">Independent shipping cadence</li>
+              <li class="good">Two-product portfolio (solo + team)</li>
+            </ul>
+            <h4>Cons</h4>
+            <ul>
+              <li class="bad">Two codebases to maintain</li>
+              <li class="bad">Brand fragmentation if not careful</li>
+              <li class="bad">Cortex modules to vendor (3-file lift)</li>
+            </ul>
+          </div>
+
+        </div>
+        <div style="margin-top: 24px; padding: 18px 22px; background: var(--bg-secondary); border-radius: var(--radius-md); font-size: 14px; color: var(--text-primary); line-height: 1.6;">
+          <strong style="color: var(--accent);">Doing both in parallel.</strong> Path A (betterGPT) is the path to a real product fastest. Path B (new project) is a hedge — if betterGPT's solo-first frame blocks multiplayer cleanly, Path B is ready to absorb the design. The mockup above applies to <strong>both</strong> — same UX, different host. The architectural decision can defer; the design doesn't have to.
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-note">
+      <code class="path">mockups/bettergpt-multiplayer-v5.html</code> · v1–v4 (Notestream Groups) untouched · v5 introduces the share-local-chat workflow
+    </div>
+  </div>
+</body>
+</html>
