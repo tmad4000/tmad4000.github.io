@@ -959,6 +959,7 @@
       <a href="#f05"><span class="num">05</span>Shared workspace · humans + agent</a>
       <a href="#f06"><span class="num">06</span>Phone · viewer and prompter modes</a>
       <a href="#f07"><span class="num">07</span>Per-resource ACL · context permissions</a>
+      <a href="#f09"><span class="num">09</span>Agent-first · share via natural language</a>
       <a href="#f08"><span class="num">08</span>Decision · betterGPT-vs-new-project</a>
     </div>
 
@@ -1561,6 +1562,113 @@
             </div>
 
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 09 AGENT-FIRST SHARE ENDPOINT ============ -->
+    <div class="frame" id="f09">
+      <div class="frame-head">
+        <span class="frame-tag">09</span>
+        <span class="frame-title">Agent-first · share via natural language, not just a button</span>
+        <span class="frame-note">One endpoint · four surfaces · the architecture</span>
+      </div>
+      <div style="padding: 36px 48px; background: var(--bg-secondary);">
+
+        <div style="display: grid; grid-template-columns: 1.1fr 1fr; gap: 36px; align-items: start;">
+
+          <!-- LEFT: in-conversation share -->
+          <div>
+            <div style="font-family: 'DM Serif Display', serif; font-size: 22px; letter-spacing: -0.01em; margin-bottom: 14px;">Conversational share</div>
+            <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 18px;">
+              The share isn't just a button — it's a tool the agent can call. You say it, the agent does it.
+            </p>
+
+            <div class="terminal" style="max-width: none; box-shadow: var(--shadow-md);">
+              <div class="terminal-bar">
+                <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+                <span class="title">claude — bettergpt session 0a3f-7d12</span>
+              </div>
+              <div class="terminal-body" style="min-height: 320px; padding: 16px 20px; font-size: 12.5px;">
+<span class="term-prompt">▶</span> <span class="term-user">Hey, share this with sarah@ideaflow.io and david@ideaflow.io. Let them see the service/ files but not my Linear or memory graph.</span>
+
+<span class="term-claude">Sharing this chat to a multiplayer workspace…</span>
+
+<span class="term-tool">  ⎿ share_chat({
+      recipients: ["sarah@ideaflow.io", "david@ideaflow.io"],
+      context: {
+        files: ["cortex/server/src/service"],
+        mcps: [],
+        memory: false
+      },
+      mode: "multiplayer"
+    })</span>
+<span class="term-tool">  ⎿ ✓ Created workspace · 0a3f-7d12</span>
+<span class="term-tool">  ⎿ ✓ Mirrored 7 turns · mounted 28 files read-only</span>
+<span class="term-tool">  ⎿ ✓ Invited 2 people · email + in-app</span>
+
+<span class="term-claude">Done. Shared with Sarah and David in multiplayer mode.</span>
+<span class="term-claude">  Link: bettergpt.ai/c/0a3f-7d12</span>
+<span class="term-claude">  Shared context: 28 files in service/ (read-only)</span>
+<span class="term-claude">  Kept private: Linear MCP, Noos memory, Gmail MCP</span>
+
+<span class="term-claude">They'll get notified now. Your local session pauses while we're</span>
+<span class="term-claude">in the shared workspace.</span>
+<span class="term-cursor"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT: four-surface architecture -->
+          <div>
+            <div style="font-family: 'DM Serif Display', serif; font-size: 22px; letter-spacing: -0.01em; margin-bottom: 14px;">One endpoint · four surfaces</div>
+
+            <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 20px;">
+              <code class="path">POST /api/sessions/:id/share</code> is the single source of truth. Four caller surfaces wrap it.
+            </p>
+
+            <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0; overflow: hidden;">
+
+              <div style="display: grid; grid-template-columns: 100px 1fr; gap: 14px; padding: 14px 18px; border-bottom: 1px solid var(--border);">
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); padding-top: 2px;">1 · UI</div>
+                <div>
+                  <div style="font-weight: 500; font-size: 13.5px;">Share button</div>
+                  <div style="font-size: 12px; color: var(--text-secondary); margin-top: 1px;">User clicks "⤴ share this chat" → dialog → submit</div>
+                </div>
+              </div>
+
+              <div style="display: grid; grid-template-columns: 100px 1fr; gap: 14px; padding: 14px 18px; border-bottom: 1px solid var(--border); background: var(--accent-bg);">
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); padding-top: 2px;">2 · Agent</div>
+                <div>
+                  <div style="font-weight: 500; font-size: 13.5px;">Tool call · share_chat</div>
+                  <div style="font-size: 12px; color: var(--text-secondary); margin-top: 1px;">In-conversation. User asks in natural language, agent invokes the tool.</div>
+                </div>
+              </div>
+
+              <div style="display: grid; grid-template-columns: 100px 1fr; gap: 14px; padding: 14px 18px; border-bottom: 1px solid var(--border);">
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); padding-top: 2px;">3 · MCP</div>
+                <div>
+                  <div style="font-weight: 500; font-size: 13.5px;"><code style="font-family: 'JetBrains Mono', monospace; font-size: 11.5px;">mcp__bettergpt__share_chat</code></div>
+                  <div style="font-size: 12px; color: var(--text-secondary); margin-top: 1px;">External agents (Cursor, Codex, other Claude) discover via <code class="path">.well-known/mcp/server-card.json</code></div>
+                </div>
+              </div>
+
+              <div style="display: grid; grid-template-columns: 100px 1fr; gap: 14px; padding: 14px 18px;">
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); padding-top: 2px;">4 · CLI</div>
+                <div>
+                  <div style="font-weight: 500; font-size: 13.5px;"><code style="font-family: 'JetBrains Mono', monospace; font-size: 11.5px;">bettergpt share --to sarah</code></div>
+                  <div style="font-size: 12px; color: var(--text-secondary); margin-top: 1px;">For scripts, CI, automation. Direct REST also.</div>
+                </div>
+              </div>
+
+            </div>
+
+            <div style="margin-top: 18px; padding: 14px 16px; background: var(--accent-bg); border-radius: var(--radius-sm); font-size: 13px; color: var(--accent); line-height: 1.55;">
+              <strong>Why all four:</strong> conversational share is how users actually want to invoke this. MCP enables cross-session handoff (Codex → betterGPT). CLI enables scripts. One endpoint means one auth path, one audit log, one set of edge cases.
+            </div>
+
+          </div>
+
         </div>
       </div>
     </div>
