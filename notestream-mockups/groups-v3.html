@@ -1,0 +1,1728 @@
+<!DOCTYPE html>
+<!--
+  NOTESTREAM — GROUPS FEATURE v3 MOCK
+  =====================================
+  Iteration on v2 grounded in the codebase recon (2026-05-21).
+
+  Locked from v2 review:
+    - Inline hashtag: variant A on FIRST occurrence per note, variant C
+      (underline) on subsequent uses.
+    - Drop the group-context-bar (v2 frame 13). Sidebar-list is v1 default.
+    - "Hashtags owned by this group" panel in settings (v2 frame 03) IS the
+      inverse of "promote tag" (v2 frame 06). No third state.
+
+  New realities surfaced by the recon:
+    - SharedHashtag is keyed (userId, hashtag) → tag ownership is PER USER,
+      not global. Jacob can promote #competitor → IdeaFlow Team while Sarah
+      keeps her own #competitor private. Frame 08 below shows this.
+    - Principals are EMAIL or ANONYMOUS only — never USER_ID. Invitees may
+      not have accounts yet. Frame 05 shows the invite/accept/promote flow.
+    - Only the note's author can change a note's sharing. Group "owners" do
+      NOT have curate authority in v1. Frame 03 shows the menu variants.
+    - Existing precedent: commit bb2747a tints notes carrying a shared
+      hashtag. Don't invent a new visual treatment — extend that one. Frame
+      12 reconciles.
+    - Eager vs lazy materialization of "auto-shared via tag" is a real
+      decision with consequences. Frame 11 lays it out + recommends eager.
+
+  New frames v2 didn't have:
+    01. App shell · final hashtag-render rule applied (A-then-C)
+    02. Auto-share contract · directly-shared vs tag-shared notes
+    03. Note menu · three viewer-role states (author / member / group owner)
+    04. Multi-group note · one note in 2+ group streams
+    05. Invite + acceptance · full 3-state journey
+    06. Group directory · the public side of discoverable groups
+    07. Promote tag · with concrete backfill preview
+    08. Cross-user tag conflict · per-user SharedHashtag reality
+    09. Real-data stream · populated with actual Slack content
+    10. Phone frames · iPhone-width responsive design
+    11. Decision · eager vs lazy auto-share materialization
+    12. Tint reconciliation · existing shared-hashtag tint + new team-glyph
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Notestream — Groups v3</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:           #ffffff;
+      --bg-muted:     #f7f7f7;
+      --sidebar:      #f5f5f5;
+      --card:         #ffffff;
+      --fg:           #232323;
+      --fg-muted:     #6b6b6b;
+      --fg-faint:     #999;
+      --border:       #e6e6e6;
+      --border-soft:  #efefef;
+      --accent:       #0d9488;
+      --accent-bg:    rgba(13, 148, 136, 0.08);
+      --accent-soft:  rgba(13, 148, 136, 0.16);
+      --accent-fg:    #0b806f;
+      --warn:         #b45309;
+      --warn-bg:      rgba(180, 83, 9, 0.10);
+      --danger:       #b91c1c;
+      --danger-bg:    rgba(185, 28, 28, 0.06);
+      --info:         #1d4ed8;
+      --info-bg:      rgba(29, 78, 216, 0.08);
+      --mention:      #6a00f5;
+      --mention-bg:   rgba(88, 5, 255, 0.05);
+      --success:      #15803d;
+      --success-bg:   rgba(21, 128, 61, 0.10);
+      /* Existing precedent — commit bb2747a tints notes with shared hashtag */
+      --tint-bg:      rgba(13, 148, 136, 0.03);
+      --tint-border:  rgba(13, 148, 136, 0.16);
+      --shadow-sm:    0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md:    0 4px 14px rgba(0,0,0,0.08);
+      --shadow-lg:    0 12px 32px rgba(0,0,0,0.14);
+      --radius:       10px;
+      --radius-sm:    6px;
+      --radius-full:  9999px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #ececef;
+      color: var(--fg);
+      font-size: 14px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page { max-width: 1480px; margin: 0 auto; padding: 24px; }
+    .page-header { margin-bottom: 24px; }
+    .page-title { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
+    .page-sub { color: #4a4a4a; font-size: 13px; margin-top: 4px; }
+
+    .toc {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin-bottom: 28px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px 16px;
+      font-size: 12.5px;
+    }
+    .toc a { color: var(--fg); text-decoration: none; padding: 3px 0; display: flex; gap: 8px; }
+    .toc a:hover { color: var(--accent); }
+    .toc a .num { color: var(--fg-faint); font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+
+    .frame {
+      background: var(--bg);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: var(--shadow-md);
+      margin-bottom: 28px;
+      overflow: hidden;
+    }
+    .frame-head {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border-soft);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--bg-muted);
+    }
+    .frame-tag {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent-fg);
+      background: var(--accent-bg);
+      padding: 3px 8px;
+      border-radius: var(--radius-full);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .frame-title { font-weight: 600; font-size: 13.5px; }
+    .frame-note { margin-left: auto; color: var(--fg-muted); font-size: 12px; }
+
+    /* ========== APP SHELL ========== */
+    .app { display: grid; grid-template-columns: 280px 1fr; min-height: 640px; }
+    .app.with-detail { grid-template-columns: 280px 1fr 320px; }
+    .sidebar { background: var(--sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 8px 0; overflow-y: auto; }
+    .sb-brand { display: flex; align-items: center; gap: 10px; padding: 10px 14px 14px; }
+    .sb-logo { width: 28px; height: 28px; border-radius: 7px; background: linear-gradient(135deg, var(--accent), #0e7490); display: grid; place-items: center; color: white; font-weight: 700; font-size: 13px; }
+    .sb-brand-name { font-weight: 600; }
+    .sb-brand-ver { color: var(--fg-faint); font-size: 11px; margin-left: auto; }
+
+    .sb-section { padding: 4px 8px; margin-top: 4px; }
+    .sb-section-head { display: flex; align-items: center; padding: 6px 10px; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--fg-faint); cursor: pointer; user-select: none; }
+    .sb-section-head:hover { color: var(--fg-muted); }
+    .sb-section-head .chev { width: 12px; height: 12px; margin-right: 6px; transition: transform 0.15s; }
+    .sb-section-head[data-open="true"] .chev { transform: rotate(90deg); }
+    .sb-section-head .plus { margin-left: auto; width: 18px; height: 18px; display: grid; place-items: center; border-radius: 4px; font-size: 16px; color: var(--fg-faint); cursor: pointer; }
+    .sb-section-head .plus:hover { background: var(--accent-bg); color: var(--accent); }
+
+    .sb-item { display: flex; align-items: center; gap: 8px; padding: 6px 10px 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; color: var(--fg); position: relative; }
+    .sb-item:hover { background: rgba(127,127,127,0.08); }
+    .sb-item.active { background: var(--accent-bg); color: var(--accent-fg); font-weight: 500; }
+    .sb-item .icon { width: 16px; height: 16px; display: grid; place-items: center; font-size: 14px; flex-shrink: 0; }
+    .sb-item .count { margin-left: auto; font-size: 11px; color: var(--fg-faint); background: rgba(127,127,127,0.10); padding: 1px 7px; border-radius: var(--radius-full); min-width: 22px; text-align: center; }
+    .sb-item.active .count { background: var(--accent-soft); color: var(--accent-fg); }
+    .sb-item .unread-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--info); flex-shrink: 0; }
+
+    .group-row { padding-left: 8px; }
+    .group-icon { width: 22px; height: 22px; border-radius: 6px; display: grid; place-items: center; font-size: 12px; font-weight: 600; color: white; flex-shrink: 0; }
+    .group-icon.lg { width: 40px; height: 40px; border-radius: 9px; font-size: 16px; }
+    .group-icon.xl { width: 64px; height: 64px; border-radius: 14px; font-size: 22px; }
+    .group-icon.ideaflow { background: linear-gradient(135deg, #0d9488, #0e7490); }
+    .group-icon.family   { background: linear-gradient(135deg, #be185d, #be123c); }
+    .group-icon.book     { background: linear-gradient(135deg, #6d28d9, #5b21b6); }
+    .group-icon.ext      { background: linear-gradient(135deg, #ea580c, #c2410c); }
+    .group-icon.lattice  { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
+    .group-icon.fp       { background: linear-gradient(135deg, #16a34a, #15803d); }
+
+    .avatar-stack { display: flex; align-items: center; flex-shrink: 0; }
+    .avatar-stack > .av { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--sidebar); margin-left: -6px; display: grid; place-items: center; font-size: 9px; font-weight: 600; color: white; }
+    .avatar-stack > .av:first-child { margin-left: 0; }
+    .av { display: inline-grid; place-items: center; border-radius: 50%; color: white; font-weight: 600; }
+    .av.sa { background: #ec4899; }
+    .av.da { background: #6366f1; }
+    .av.ja { background: #f59e0b; }
+    .av.jc { background: #0d9488; }
+    .av.an { background: #14b8a6; }
+    .av.km { background: #84cc16; }
+    .av.mz { background: #f43f5e; }
+    .av.te { background: #8b5cf6; }
+
+    .group-chev { width: 14px; height: 14px; display: grid; place-items: center; color: var(--fg-faint); transition: transform 0.15s, background 0.15s; border-radius: 3px; margin-right: -4px; cursor: pointer; }
+    .group-chev:hover { background: rgba(127,127,127,0.10); }
+    .group-row[data-open="true"] .group-chev { transform: rotate(90deg); }
+    .group-tags { margin-left: 30px; padding-left: 8px; border-left: 1px solid var(--border); display: none; }
+    .group-row[data-open="true"] + .group-tags { display: block; }
+    .tag-row { display: flex; align-items: center; gap: 6px; padding: 4px 8px; border-radius: 4px; font-size: 12.5px; color: var(--fg-muted); cursor: pointer; }
+    .tag-row:hover { background: rgba(127,127,127,0.06); color: var(--fg); }
+    .tag-row.active { background: var(--accent-bg); color: var(--accent-fg); font-weight: 500; }
+    .tag-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+    .tag-row .count { margin-left: auto; font-size: 11px; color: var(--fg-faint); }
+
+    .main { display: flex; flex-direction: column; background: var(--bg); overflow: hidden; min-width: 0; }
+    .main-head { padding: 18px 28px 14px; border-bottom: 1px solid var(--border-soft); display: flex; align-items: center; gap: 14px; }
+    .main-head .titles { min-width: 0; flex: 1; }
+    .stream-title { font-size: 16px; font-weight: 600; letter-spacing: -0.01em; }
+    .stream-meta { color: var(--fg-muted); font-size: 12.5px; margin-top: 2px; }
+    .stream-actions { display: flex; gap: 6px; align-items: center; }
+    .ico-btn { width: 30px; height: 30px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg); display: grid; place-items: center; color: var(--fg-muted); cursor: pointer; font-size: 14px; }
+    .ico-btn:hover { background: var(--bg-muted); color: var(--fg); }
+    .ico-btn.primary { background: var(--accent); border-color: var(--accent); color: white; }
+    .ico-btn.primary:hover { background: var(--accent-fg); }
+
+    .stream-filter-row { padding: 10px 28px; border-bottom: 1px solid var(--border-soft); display: flex; align-items: center; gap: 8px; background: var(--bg-muted); font-size: 12px; color: var(--fg-muted); }
+    .filter-chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px 3px 8px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-full); font-size: 11.5px; color: var(--fg); }
+    .filter-chip .x { color: var(--fg-faint); cursor: pointer; }
+    .filter-chip.scope { background: var(--accent-bg); border-color: var(--accent-soft); color: var(--accent-fg); font-weight: 500; }
+
+    .stream-body { flex: 1; overflow-y: auto; padding: 16px 28px 32px; }
+
+    /* ===== NOTE CARD — with tinted variant for shared-hashtag notes ===== */
+    .note-card { background: var(--card); border: 1px solid var(--border-soft); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 12px; transition: border-color 0.12s, box-shadow 0.12s; position: relative; }
+    .note-card:hover { border-color: var(--border); box-shadow: var(--shadow-sm); }
+    .note-card.tinted { background: var(--tint-bg); border-color: var(--tint-border); }
+    .note-card.tinted::before { content: ''; position: absolute; left: 0; top: 14px; bottom: 14px; width: 3px; background: var(--accent); border-radius: 2px; }
+    .note-head { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--fg-muted); margin-bottom: 8px; }
+    .author-chip { display: inline-flex; align-items: center; gap: 6px; }
+    .author-chip .av { width: 18px; height: 18px; font-size: 9px; }
+    .author-name { color: var(--fg); font-weight: 500; }
+    .you-pill { font-size: 9px; padding: 1px 5px; background: var(--accent-bg); color: var(--accent-fg); border-radius: 3px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
+    .source-chip { display: inline-flex; align-items: center; gap: 4px; font-size: 10.5px; padding: 1px 6px; border-radius: 3px; font-weight: 500; }
+    .source-chip.slack { background: rgba(94, 53, 177, 0.10); color: #7c4dff; }
+    .note-time { margin-left: auto; font-size: 11.5px; color: var(--fg-faint); }
+    .note-actions { display: flex; gap: 2px; opacity: 0; transition: opacity 0.12s; }
+    .note-card:hover .note-actions, .note-card.menu-open .note-actions { opacity: 1; }
+    .note-actions .ico-btn { width: 26px; height: 26px; font-size: 12px; }
+
+    .note-body { font-size: 14px; color: var(--fg); line-height: 1.55; }
+    .note-body p + p { margin-top: 6px; }
+
+    /* Hashtag variants — FINAL RULE: variant A on first occurrence per note, variant C (underline) on repeats */
+    .hashtag { color: var(--accent-fg); font-weight: 500; cursor: pointer; }
+    .hashtag:hover { text-decoration: underline; }
+    .hashtag.team-glyph {
+      background: var(--accent-bg); padding: 1px 5px 1px 4px;
+      border-radius: 4px; display: inline-flex; align-items: center; gap: 4px;
+    }
+    .hashtag.team-glyph .glyph {
+      width: 12px; height: 12px; border-radius: 3px;
+      background: linear-gradient(135deg, #0d9488, #0e7490);
+      display: inline-grid; place-items: center;
+      font-size: 8px; font-weight: 700; color: white;
+    }
+    .hashtag.team-glyph.fam .glyph { background: linear-gradient(135deg, #be185d, #be123c); }
+    .hashtag.team-glyph.book .glyph { background: linear-gradient(135deg, #6d28d9, #5b21b6); }
+    .hashtag.team-underline { border-bottom: 2px solid var(--accent-soft); }
+    .hashtag.private { color: var(--fg-muted); }
+    .mention { color: var(--mention); background: var(--mention-bg); padding: 0 3px; border-radius: 3px; }
+
+    .note-foot { display: flex; align-items: center; gap: 8px; margin-top: 10px; font-size: 11.5px; color: var(--fg-faint); flex-wrap: wrap; }
+    .shared-with { display: inline-flex; align-items: center; gap: 4px; }
+    .shared-with .group-icon { width: 14px; height: 14px; font-size: 8px; border-radius: 3px; }
+    .reason-pill { background: var(--bg-muted); border: 1px solid var(--border); padding: 1px 6px; border-radius: 3px; color: var(--fg-muted); font-size: 10.5px; }
+    .reason-pill code { font-family: 'JetBrains Mono', monospace; color: var(--accent-fg); }
+
+    /* ========== DETAIL PANEL ========== */
+    .detail { background: var(--sidebar); border-left: 1px solid var(--border); padding: 18px 18px; overflow-y: auto; font-size: 13px; }
+    .detail h3 { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg-faint); margin: 14px 0 8px; }
+    .detail h3:first-child { margin-top: 0; }
+    .detail-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; }
+    .detail-row + .detail-row { border-top: 1px solid var(--border-soft); }
+    .detail-row .label { flex: 1; }
+    .detail-row .val { color: var(--fg-muted); font-size: 12.5px; }
+    .role-pill { font-size: 10px; padding: 1px 6px; border-radius: 3px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
+    .role-pill.owner { background: var(--accent-bg); color: var(--accent-fg); }
+    .role-pill.editor { background: var(--info-bg); color: var(--info); }
+    .role-pill.viewer { background: rgba(127,127,127,0.10); color: var(--fg-muted); }
+    .role-pill.pending { background: var(--warn-bg); color: var(--warn); }
+
+    /* ========== GENERIC ========== */
+    .btn { padding: 7px 14px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg); font-size: 13px; font-weight: 500; cursor: pointer; color: var(--fg); font-family: inherit; }
+    .btn:hover { background: var(--bg-muted); }
+    .btn.primary { background: var(--accent); border-color: var(--accent); color: white; }
+    .btn.primary:hover { background: var(--accent-fg); }
+    .btn.danger { background: var(--bg); border-color: var(--danger); color: var(--danger); }
+    .btn.danger:hover { background: var(--danger-bg); }
+    .btn.sm { padding: 4px 10px; font-size: 12px; }
+    .btn.ghost { border-color: transparent; background: transparent; color: var(--fg-muted); }
+    .btn.ghost:hover { background: var(--bg-muted); color: var(--fg); }
+    .kbd { font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 1px 4px; background: var(--bg); border: 1px solid var(--border); border-radius: 3px; }
+
+    /* ========== DIALOGS ========== */
+    .dialog-stage { padding: 32px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; background: linear-gradient(180deg, var(--bg-muted), var(--bg)); }
+    .dialog-stage.single { grid-template-columns: 1fr; }
+    .dialog-stage.triple { grid-template-columns: 1fr 1fr 1fr; }
+    .dialog { background: var(--bg); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow-lg); width: 100%; max-width: 480px; margin: 0 auto; overflow: hidden; }
+    .dlg-head { padding: 16px 20px; border-bottom: 1px solid var(--border-soft); }
+    .dlg-title { font-weight: 600; font-size: 15px; }
+    .dlg-sub { color: var(--fg-muted); font-size: 12.5px; margin-top: 2px; }
+    .dlg-body { padding: 16px 20px; }
+    .dlg-section + .dlg-section { margin-top: 16px; }
+    .dlg-label { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--fg-faint); margin-bottom: 6px; }
+    .dlg-input { width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--fg); font-size: 13px; font-family: inherit; }
+    .dlg-input:focus { border-color: var(--accent); outline: 0; }
+    .dlg-foot { padding: 12px 20px; border-top: 1px solid var(--border-soft); background: var(--bg-muted); display: flex; align-items: center; gap: 8px; }
+    .dlg-foot .grow { flex: 1; font-size: 12px; color: var(--fg-muted); }
+
+    .token-input { min-height: 38px; border: 1px solid var(--border); border-radius: 8px; padding: 5px 8px; display: flex; flex-wrap: wrap; gap: 4px; align-items: center; background: var(--bg); }
+    .token { display: inline-flex; align-items: center; gap: 6px; padding: 3px 4px 3px 6px; border-radius: 6px; background: var(--accent-bg); color: var(--accent-fg); font-size: 12px; font-weight: 500; }
+    .token .group-icon { width: 16px; height: 16px; border-radius: 4px; font-size: 9px; }
+    .token .av { width: 16px; height: 16px; font-size: 9px; }
+    .token.fam { background: rgba(190, 24, 93, 0.08); color: #be185d; }
+    .token.fam .group-icon { background: linear-gradient(135deg, #be185d, #be123c); }
+    .token .x { width: 16px; height: 16px; display: grid; place-items: center; border-radius: 3px; cursor: pointer; color: currentColor; opacity: 0.6; }
+    .token .x:hover { background: rgba(0,0,0,0.06); opacity: 1; }
+    .token-input input { border: 0; outline: 0; padding: 4px 6px; min-width: 120px; flex: 1; font-size: 13px; background: transparent; color: var(--fg); font-family: inherit; }
+
+    /* ========== NOTE MENU POPOVER ========== */
+    .menu-pop { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; box-shadow: var(--shadow-lg); padding: 4px; min-width: 240px; font-size: 13px; }
+    .menu-item { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-radius: 5px; cursor: pointer; }
+    .menu-item:hover { background: var(--accent-bg); color: var(--accent-fg); }
+    .menu-item .ico { width: 16px; display: grid; place-items: center; }
+    .menu-item .meta { margin-left: auto; color: var(--fg-faint); font-size: 11px; }
+    .menu-item.disabled { opacity: 0.5; cursor: not-allowed; }
+    .menu-item.disabled:hover { background: transparent; color: inherit; }
+    .menu-item.danger:hover { background: var(--danger-bg); color: var(--danger); }
+    .menu-sep { height: 1px; background: var(--border-soft); margin: 4px 0; }
+    .menu-sub { padding: 4px 12px; font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--fg-faint); font-weight: 600; }
+    .menu-group-row { display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 5px; cursor: pointer; }
+    .menu-group-row:hover { background: var(--bg-muted); }
+    .menu-group-row .group-icon { width: 20px; height: 20px; font-size: 10px; }
+    .menu-group-row .check { margin-left: auto; color: var(--accent); width: 16px; display: grid; place-items: center; }
+    .menu-group-row .sub { color: var(--fg-faint); font-size: 11px; margin-left: 4px; }
+    .menu-notice { padding: 8px 10px; font-size: 11.5px; color: var(--fg-muted); background: var(--bg-muted); border-radius: 5px; margin: 4px 0; line-height: 1.4; }
+    .menu-notice strong { color: var(--fg); }
+
+    /* ========== MENU 3-UP COMPARISON ========== */
+    .menu-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; padding: 28px; background: linear-gradient(180deg, var(--bg-muted), var(--bg)); align-items: flex-start; }
+    .menu-col { display: flex; flex-direction: column; gap: 12px; }
+    .menu-col-head { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent-fg); }
+    .menu-col-sub { font-size: 12px; color: var(--fg-muted); line-height: 1.5; }
+    .menu-col-sub strong { color: var(--fg); }
+
+    /* ========== DIRECTORY ========== */
+    .directory { padding: 24px 32px; }
+    .dir-head { display: flex; gap: 12px; align-items: center; margin-bottom: 18px; }
+    .dir-search { flex: 1; padding: 9px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; font-family: inherit; }
+    .dir-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .dir-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; display: flex; gap: 12px; }
+    .dir-card .info { flex: 1; min-width: 0; }
+    .dir-card .name { font-weight: 600; font-size: 14px; }
+    .dir-card .desc { color: var(--fg-muted); font-size: 12px; margin-top: 4px; line-height: 1.4; max-height: 34px; overflow: hidden; }
+    .dir-card .meta { font-size: 11.5px; color: var(--fg-faint); margin-top: 8px; display: flex; gap: 10px; }
+
+    /* ========== INVITE FLOW ========== */
+    .invite-stage { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; padding: 24px; background: var(--bg-muted); }
+    .invite-step { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+    .invite-step-head { padding: 10px 14px; background: var(--bg-muted); border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+    .invite-step-head .n { width: 18px; height: 18px; background: var(--accent); color: white; border-radius: 50%; display: grid; place-items: center; font-size: 10px; font-weight: 700; }
+    .invite-step-body { padding: 14px; font-size: 12.5px; }
+
+    .email-mock { background: white; border: 1px solid var(--border); border-radius: 8px; padding: 16px; font-family: -apple-system, sans-serif; box-shadow: var(--shadow-sm); }
+    .email-from { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--fg-muted); margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--border-soft); }
+    .email-from .av { width: 24px; height: 24px; font-size: 11px; }
+    .email-subj { font-weight: 600; font-size: 14px; margin-bottom: 8px; }
+    .email-body { font-size: 13px; line-height: 1.5; color: var(--fg); }
+    .email-cta { background: var(--accent); color: white; padding: 10px 18px; border-radius: 6px; display: inline-block; margin-top: 12px; font-weight: 500; text-decoration: none; font-size: 13px; }
+
+    .notif-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px; display: flex; gap: 12px; box-shadow: var(--shadow-sm); }
+    .notif-card .group-icon { width: 40px; height: 40px; border-radius: 9px; font-size: 14px; flex-shrink: 0; }
+    .notif-card .body { flex: 1; }
+    .notif-card .body p { margin-bottom: 8px; font-size: 13px; line-height: 1.4; }
+    .notif-card .actions { display: flex; gap: 6px; }
+
+    /* ========== MULTI-GROUP NOTE ========== */
+    .multi-stage { display: grid; grid-template-columns: 1fr 1fr; min-height: 540px; }
+    .multi-left { padding: 24px; background: var(--bg-muted); border-right: 1px solid var(--border-soft); }
+    .multi-right { padding: 24px; }
+    .stream-block { border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; margin-bottom: 12px; background: var(--bg); }
+    .stream-block-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid var(--border-soft); }
+    .stream-block-head .group-icon { width: 24px; height: 24px; font-size: 11px; }
+    .stream-block-head strong { font-size: 13px; }
+    .mini-note { padding: 8px 0; font-size: 12.5px; color: var(--fg-muted); border-bottom: 1px dashed var(--border-soft); }
+    .mini-note:last-child { border-bottom: 0; }
+
+    /* ========== DECISION FRAME ========== */
+    .decision-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 24px; background: linear-gradient(180deg, var(--bg-muted), var(--bg)); }
+    .decision-col { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 18px; }
+    .decision-col h3 { font-size: 14px; font-weight: 600; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+    .decision-col h3 .label { background: var(--bg-muted); padding: 1px 8px; border-radius: var(--radius-full); font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--fg-muted); }
+    .decision-col h3 .label.rec { background: var(--accent-bg); color: var(--accent-fg); }
+    .decision-col p { font-size: 13px; color: var(--fg-muted); margin-bottom: 12px; }
+    .decision-col h4 { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--fg-faint); margin-top: 14px; margin-bottom: 6px; }
+    .decision-col ul { padding-left: 18px; font-size: 12.5px; color: var(--fg); line-height: 1.6; }
+    .decision-col ul li.bad { color: var(--danger); }
+    .decision-col ul li.ok { color: var(--success); }
+
+    /* ========== PHONE FRAMES ========== */
+    .phone-stage { display: flex; gap: 24px; padding: 32px; background: linear-gradient(180deg, var(--bg-muted), var(--bg)); justify-content: center; flex-wrap: wrap; }
+    .phone { width: 312px; background: var(--bg); border-radius: 32px; border: 8px solid #1a1a1c; box-shadow: var(--shadow-lg); overflow: hidden; position: relative; }
+    .phone-notch { background: #1a1a1c; height: 28px; display: flex; justify-content: center; align-items: center; }
+    .phone-notch::before { content: ''; width: 90px; height: 22px; background: #050505; border-radius: 0 0 18px 18px; margin-top: -4px; }
+    .phone-status { font-size: 11px; padding: 4px 16px; display: flex; justify-content: space-between; color: var(--fg); }
+    .phone-status .icons { display: flex; gap: 3px; align-items: center; }
+    .phone-screen { height: 540px; overflow-y: auto; background: var(--bg); position: relative; }
+    .phone-head { padding: 12px 14px 10px; border-bottom: 1px solid var(--border-soft); display: flex; align-items: center; gap: 10px; }
+    .phone-head .back { font-size: 18px; color: var(--accent); cursor: pointer; }
+    .phone-head .title { font-size: 14px; font-weight: 600; flex: 1; }
+    .phone-tabbar { position: absolute; bottom: 0; left: 0; right: 0; display: flex; padding: 8px 0 12px; background: var(--bg); border-top: 1px solid var(--border-soft); justify-content: space-around; }
+    .phone-tab { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 9px; color: var(--fg-faint); cursor: pointer; }
+    .phone-tab .icon { font-size: 18px; }
+    .phone-tab.active { color: var(--accent-fg); }
+    .phone-list { padding: 8px; }
+    .phone-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; }
+    .phone-row:hover { background: var(--bg-muted); }
+    .phone-row.active { background: var(--accent-bg); color: var(--accent-fg); }
+    .phone-row .group-icon { width: 32px; height: 32px; font-size: 12px; border-radius: 8px; }
+    .phone-row .body { flex: 1; min-width: 0; }
+    .phone-row .name { font-size: 14px; font-weight: 500; }
+    .phone-row .meta { font-size: 11.5px; color: var(--fg-faint); margin-top: 1px; }
+    .phone-row .count-badge { background: var(--accent); color: white; font-size: 10px; padding: 1px 6px; border-radius: var(--radius-full); }
+
+    /* ========== TINT RECONCILIATION ========== */
+    .tint-stage { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; padding: 24px; background: var(--bg-muted); }
+    .tint-col h4 { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--fg-faint); margin-bottom: 10px; }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code.path { font-family: 'JetBrains Mono', monospace; font-size: 11.5px; background: var(--bg); padding: 2px 5px; border-radius: 3px; border: 1px solid var(--border); }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="page-header">
+      <div class="page-title">Notestream — Groups (v3 mock)</div>
+      <div class="page-sub">Iteration grounded in the schema recon. Locks v2 questions and surfaces architectural realities.</div>
+    </div>
+
+    <div class="toc">
+      <a href="#f01"><span class="num">01</span>App shell · final hashtag rule</a>
+      <a href="#f02"><span class="num">02</span>Auto-share contract</a>
+      <a href="#f03"><span class="num">03</span>Note menu · viewer roles</a>
+      <a href="#f04"><span class="num">04</span>Multi-group note</a>
+      <a href="#f05"><span class="num">05</span>Invite + acceptance</a>
+      <a href="#f06"><span class="num">06</span>Group directory</a>
+      <a href="#f07"><span class="num">07</span>Promote tag · backfill preview</a>
+      <a href="#f08"><span class="num">08</span>Cross-user tag conflict</a>
+      <a href="#f09"><span class="num">09</span>Real Slack data · populated stream</a>
+      <a href="#f10"><span class="num">10</span>Phone · responsive frames</a>
+      <a href="#f11"><span class="num">11</span>Decision · eager vs lazy</a>
+      <a href="#f12"><span class="num">12</span>Tint reconciliation</a>
+    </div>
+
+    <!-- ================================================================
+         01 — App shell with FINAL hashtag rendering rule applied
+    ================================================================= -->
+    <div class="frame" id="f01">
+      <div class="frame-head">
+        <span class="frame-tag">01</span>
+        <span class="frame-title">App shell · final inline-hashtag rule (A on first occurrence, C on repeats)</span>
+        <span class="frame-note">First #competitor gets the IF glyph · second #competitor in the same note shows as underlined only</span>
+      </div>
+      <div class="app with-detail">
+        <aside class="sidebar">
+          <div class="sb-brand">
+            <div class="sb-logo">N</div>
+            <div class="sb-brand-name">Notestream</div>
+            <div class="sb-brand-ver">v3.4.0</div>
+          </div>
+          <div class="sb-section">
+            <div class="sb-item"><span class="icon">📓</span>All notes<span class="count">2.1k</span></div>
+            <div class="sb-item"><span class="icon">📨</span>Shared with me<span class="count">18</span></div>
+          </div>
+          <div class="sb-section">
+            <div class="sb-section-head" data-open="true">
+              <span class="chev">▶</span>Groups<span class="plus">+</span>
+            </div>
+            <div class="sb-item active group-row" data-open="true">
+              <span class="group-chev">▶</span>
+              <span class="group-icon ideaflow">IF</span>
+              <span>IdeaFlow Team</span>
+              <span class="count">214</span>
+            </div>
+            <div class="group-tags">
+              <div class="tag-row"><span class="tag-dot"></span><span>#design</span><span class="count">42</span></div>
+              <div class="tag-row"><span class="tag-dot"></span><span>#competitor</span><span class="count">46</span></div>
+              <div class="tag-row"><span class="tag-dot"></span><span>#customer</span><span class="count">46</span></div>
+            </div>
+            <div class="sb-item group-row" data-open="false">
+              <span class="group-chev">▶</span>
+              <span class="avatar-stack"><span class="av sa">S</span><span class="av da">D</span><span class="av ja">J</span></span>
+              <span>Sarah, David, James</span>
+              <span class="unread-dot"></span>
+              <span class="count">3</span>
+            </div>
+            <div class="sb-item group-row" data-open="false">
+              <span class="group-chev">▶</span><span class="group-icon family">F</span><span>Family</span><span class="count">8</span>
+            </div>
+          </div>
+        </aside>
+
+        <main class="main">
+          <div class="main-head">
+            <div class="group-icon ideaflow lg">IF</div>
+            <div class="titles">
+              <div class="stream-title">IdeaFlow Team</div>
+              <div class="stream-meta">8 members · 214 notes · you are an owner</div>
+            </div>
+            <div class="stream-actions">
+              <button class="ico-btn primary">＋</button>
+              <button class="ico-btn">👥</button>
+              <button class="ico-btn">⚙</button>
+            </div>
+          </div>
+
+          <div class="stream-body">
+
+            <!-- Note 1: shows the A-then-C rule clearly -->
+            <div class="note-card tinted">
+              <div class="note-head">
+                <span class="author-chip"><span class="av jc">J</span><span class="author-name">Jacob Cole</span><span class="you-pill">you</span></span>
+                <span class="note-time">2 hours ago</span>
+                <div class="note-actions"><button class="ico-btn">↗</button><button class="ico-btn">⋯</button></div>
+              </div>
+              <div class="note-body">
+                <p>Lattice intro call. They build the same hashtag capture as us, but scoped to HR. <span class="hashtag team-glyph"><span class="glyph">IF</span>#competitor</span> for sure — they pitched at SHRM. Could also be a <span class="hashtag team-glyph"><span class="glyph">IF</span>#customer</span> for OEM-ing the editor.</p>
+                <p>Their <span class="hashtag team-underline">#competitor</span> angle: they own the HR ops vertical. Our <span class="hashtag team-underline">#competitor</span> angle: we have the better editor primitive. Mutual interest seems real.</p>
+                <p>Action: send API docs to <span class="mention">@sarah</span> review by Tuesday.</p>
+              </div>
+              <div class="note-foot">
+                <span class="shared-with"><span class="group-icon ideaflow">IF</span>IdeaFlow Team</span>
+                <span>·</span><span>2 replies</span>
+                <span>·</span><span class="reason-pill">shared via <code>#competitor</code></span>
+              </div>
+            </div>
+
+            <!-- Note 2: directly shared, no tag -->
+            <div class="note-card">
+              <div class="note-head">
+                <span class="author-chip"><span class="av sa">S</span><span class="author-name">Sarah Kim</span></span>
+                <span class="note-time">yesterday</span>
+                <div class="note-actions"><button class="ico-btn">↗</button><button class="ico-btn">⋯</button></div>
+              </div>
+              <div class="note-body">
+                <p>Heads-up — pushing the sprint review back to Thursday. Conflict with the board prep. <span class="mention">@jacob</span> <span class="mention">@david</span> please confirm.</p>
+              </div>
+              <div class="note-foot">
+                <span class="shared-with"><span class="group-icon ideaflow">IF</span>IdeaFlow Team</span>
+                <span>·</span><span class="reason-pill">shared directly</span>
+              </div>
+            </div>
+
+            <!-- Note 3: Slack imported -->
+            <div class="note-card tinted">
+              <div class="note-head">
+                <span class="author-chip"><span class="av ja">J</span><span class="author-name">James Park</span></span>
+                <span class="source-chip slack">↗ Slack · #biz</span>
+                <span class="note-time">Apr 12 2024</span>
+                <div class="note-actions"><button class="ico-btn">⋯</button></div>
+              </div>
+              <div class="note-body">
+                <p>also <span class="mention">#biz</span> <span class="mention">#wins</span> awesome <span class="hashtag team-glyph"><span class="glyph">IF</span>#customer</span> <span class="hashtag team-glyph"><span class="glyph">IF</span>#userinterview</span> with Founder's Pledge — 70-person org pays $30k/yr for Salesforce. Inline-tag UX was the deciding factor. <span class="hashtag team-underline">#customer</span> wants to expand to <span class="hashtag team-glyph"><span class="glyph">IF</span>#salesforceuser</span> integration.</p>
+              </div>
+              <div class="note-foot">
+                <span class="shared-with"><span class="group-icon ideaflow">IF</span>IdeaFlow Team</span>
+                <span>·</span><span>4 thread replies</span>
+                <span>·</span><span class="reason-pill">shared via <code>#customer</code> + <code>#userinterview</code></span>
+              </div>
+            </div>
+
+          </div>
+        </main>
+
+        <aside class="detail">
+          <h3>This stream</h3>
+          <div class="detail-row"><span class="label">Total notes</span><span class="val">214</span></div>
+          <div class="detail-row"><span class="label">Directly shared</span><span class="val">36</span></div>
+          <div class="detail-row"><span class="label">Auto-shared via tag</span><span class="val">178</span></div>
+
+          <h3>Hashtag rendering</h3>
+          <div style="font-size: 12px; color: var(--fg-muted); line-height: 1.5; margin-bottom: 8px;">
+            First occurrence of a team tag in a note gets the group glyph. Repeats in the same note get a subtle underline only — keeps attribution visible without visual repetition.
+          </div>
+          <div style="background: var(--bg); border: 1px solid var(--border-soft); border-radius: 6px; padding: 8px 10px; font-size: 12px; line-height: 1.5;">
+            "the <span class="hashtag team-glyph"><span class="glyph">IF</span>#competitor</span> in HR · their <span class="hashtag team-underline">#competitor</span> story"
+          </div>
+
+          <h3>Tint legend</h3>
+          <div style="font-size: 12px; color: var(--fg-muted); line-height: 1.5;">
+            Notes carrying any shared hashtag get a left-edge accent + faint tint (existing precedent from commit <code style="font-family: 'JetBrains Mono', monospace;">bb2747a</code>). Notes shared directly have no tint.
+          </div>
+        </aside>
+      </div>
+    </div>
+
+    <!-- ================================================================
+         02 — Auto-share contract
+    ================================================================= -->
+    <div class="frame" id="f02">
+      <div class="frame-head">
+        <span class="frame-tag">02</span>
+        <span class="frame-title">Auto-share contract · directly-shared vs tag-shared notes</span>
+        <span class="frame-note">Distinct note-foot pills make the source of group membership obvious</span>
+      </div>
+      <div style="padding: 28px; background: linear-gradient(180deg, var(--bg-muted), var(--bg)); display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+
+        <div>
+          <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent-fg); margin-bottom: 10px;">A · Directly shared</div>
+          <div class="note-card" style="max-width: none;">
+            <div class="note-head">
+              <span class="author-chip"><span class="av jc">J</span><span class="author-name">Jacob Cole</span><span class="you-pill">you</span></span>
+              <span class="note-time">2h</span>
+            </div>
+            <div class="note-body">
+              <p>Sprint review moved to Thursday — board prep conflict.</p>
+            </div>
+            <div class="note-foot">
+              <span class="shared-with"><span class="group-icon ideaflow">IF</span>IdeaFlow Team</span>
+              <span>·</span>
+              <span class="reason-pill">shared directly</span>
+            </div>
+          </div>
+          <div style="margin-top: 14px; font-size: 12.5px; color: var(--fg-muted); line-height: 1.6;">
+            <strong style="color: var(--fg);">Source:</strong> <code style="font-family: 'JetBrains Mono', monospace;">NoteSharing(GROUP, ideaflow_team)</code><br>
+            <strong style="color: var(--fg);">Created by:</strong> author explicitly picked the group in the share dialog<br>
+            <strong style="color: var(--fg);">Remove from group:</strong> "Remove from IdeaFlow Team" in ⋯ menu — clean detach, note disappears from group stream<br>
+            <strong style="color: var(--fg);">Author control:</strong> only the note's author can attach/detach
+          </div>
+        </div>
+
+        <div>
+          <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent-fg); margin-bottom: 10px;">B · Auto-shared via team tag</div>
+          <div class="note-card tinted" style="max-width: none;">
+            <div class="note-head">
+              <span class="author-chip"><span class="av jc">J</span><span class="author-name">Jacob Cole</span><span class="you-pill">you</span></span>
+              <span class="note-time">2h</span>
+            </div>
+            <div class="note-body">
+              <p>Lattice intro. <span class="hashtag team-glyph"><span class="glyph">IF</span>#competitor</span> for sure.</p>
+            </div>
+            <div class="note-foot">
+              <span class="shared-with"><span class="group-icon ideaflow">IF</span>IdeaFlow Team</span>
+              <span>·</span>
+              <span class="reason-pill">shared via <code>#competitor</code></span>
+            </div>
+          </div>
+          <div style="margin-top: 14px; font-size: 12.5px; color: var(--fg-muted); line-height: 1.6;">
+            <strong style="color: var(--fg);">Source:</strong> author tagged <code style="font-family: 'JetBrains Mono', monospace;">#competitor</code>; tag has <code style="font-family: 'JetBrains Mono', monospace;">defaultGroupId = ideaflow_team</code><br>
+            <strong style="color: var(--fg);">Created by:</strong> eager — <code style="font-family: 'JetBrains Mono', monospace;">NoteSharing(GROUP, ideaflow_team)</code> row written at note save time (see Frame 11)<br>
+            <strong style="color: var(--fg);">Remove from group:</strong> two options in ⋯ menu — "Remove tag #competitor" (clean — removes the cause) OR "Untag from group, keep #competitor" (creates a sticky exclusion row)<br>
+            <strong style="color: var(--fg);">Author control:</strong> only the note's author
+          </div>
+        </div>
+      </div>
+      <div style="padding: 14px 28px; background: var(--bg-muted); border-top: 1px solid var(--border-soft); font-size: 12.5px; color: var(--fg-muted);">
+        <strong style="color: var(--fg);">Why the distinction matters:</strong> the reason pill tells the reader why this note is in the group's stream. Without it, "shared directly" vs "auto-shared via tag" become invisible — and removal UX silently differs. The pill is also the affordance: clicking <code style="font-family: 'JetBrains Mono', monospace;">#competitor</code> in the pill jumps to the tag detail page.
+      </div>
+    </div>
+
+    <!-- ================================================================
+         03 — Note menu · three viewer-role states
+    ================================================================= -->
+    <div class="frame" id="f03">
+      <div class="frame-head">
+        <span class="frame-tag">03</span>
+        <span class="frame-title">Note menu · varies by viewer's relationship to the note</span>
+        <span class="frame-note">Only the note's author can change sharing — group "owners" cannot curate someone else's note in v1</span>
+      </div>
+      <div class="menu-grid">
+
+        <!-- Column 1: I'm the author -->
+        <div class="menu-col">
+          <div class="menu-col-head">A · You wrote this note</div>
+          <div class="menu-col-sub">Full menu. Attach/detach groups, change privacy, delete.</div>
+          <div class="menu-pop">
+            <div class="menu-item"><span class="ico">↗</span>Share…<span class="meta">⌘⇧S</span></div>
+            <div class="menu-item"><span class="ico">📋</span>Copy link</div>
+            <div class="menu-sep"></div>
+            <div class="menu-sub">Shared with</div>
+            <div class="menu-group-row">
+              <span class="group-icon ideaflow">IF</span>
+              <span>IdeaFlow Team</span>
+              <span class="check">✓</span>
+            </div>
+            <div class="menu-group-row">
+              <span class="group-icon family">F</span>
+              <span>Family</span>
+            </div>
+            <div class="menu-group-row">
+              <span class="group-icon" style="background: var(--border); color: var(--fg-muted);">＋</span>
+              <span>New group…</span>
+            </div>
+            <div class="menu-sep"></div>
+            <div class="menu-item"><span class="ico">🔒</span>Make private</div>
+            <div class="menu-item"><span class="ico">🌐</span>Publish publicly</div>
+            <div class="menu-sep"></div>
+            <div class="menu-item"><span class="ico">📌</span>Pin</div>
+            <div class="menu-item danger"><span class="ico">🗑</span>Move to trash</div>
+          </div>
+        </div>
+
+        <!-- Column 2: I'm a group member, not author -->
+        <div class="menu-col">
+          <div class="menu-col-head">B · Group member, not author</div>
+          <div class="menu-col-sub">You can read, reply, copy. Sharing controls are <strong>disabled</strong> with explanation.</div>
+          <div class="menu-pop">
+            <div class="menu-item"><span class="ico">💬</span>Reply</div>
+            <div class="menu-item"><span class="ico">📋</span>Copy link</div>
+            <div class="menu-sep"></div>
+            <div class="menu-sub">Shared with</div>
+            <div class="menu-group-row" style="opacity: 0.5; cursor: not-allowed;">
+              <span class="group-icon ideaflow">IF</span>
+              <span>IdeaFlow Team</span>
+              <span class="check">✓</span>
+            </div>
+            <div class="menu-notice">
+              Only <strong>Jacob</strong> (author) can change this note's sharing. Ask them to add other groups.
+            </div>
+            <div class="menu-sep"></div>
+            <div class="menu-item"><span class="ico">🔕</span>Mute thread</div>
+            <div class="menu-item"><span class="ico">🚫</span>Hide from my stream<span class="meta">local</span></div>
+          </div>
+        </div>
+
+        <!-- Column 3: I'm group OWNER, not note author -->
+        <div class="menu-col">
+          <div class="menu-col-head">C · Group owner, not note author</div>
+          <div class="menu-col-sub">Same as B in v1 — group owners do NOT have curate authority. v2 might add "Request author to remove from group."</div>
+          <div class="menu-pop">
+            <div class="menu-item"><span class="ico">💬</span>Reply</div>
+            <div class="menu-item"><span class="ico">📋</span>Copy link</div>
+            <div class="menu-sep"></div>
+            <div class="menu-sub">Shared with</div>
+            <div class="menu-group-row" style="opacity: 0.5; cursor: not-allowed;">
+              <span class="group-icon ideaflow">IF</span>
+              <span>IdeaFlow Team</span>
+              <span class="check">✓</span>
+            </div>
+            <div class="menu-notice">
+              Owning a group doesn't let you remove notes from it. Only the note's author can. v2 candidate: <em>request removal</em>.
+            </div>
+            <div class="menu-sep"></div>
+            <div class="menu-item"><span class="ico">🔕</span>Mute thread</div>
+            <div class="menu-item"><span class="ico">🚫</span>Hide from my stream<span class="meta">local</span></div>
+          </div>
+        </div>
+
+      </div>
+      <div style="padding: 14px 28px; background: var(--bg-muted); border-top: 1px solid var(--border-soft); font-size: 12.5px; color: var(--fg-muted);">
+        <strong style="color: var(--fg);">Architectural origin:</strong> <code style="font-family: 'JetBrains Mono', monospace;">note-sharing-service.ts:39</code> hard-codes <code style="font-family: 'JetBrains Mono', monospace;">findUnique({ where: { id: noteId, authorId }})</code>. Loosening this for group owners is a meaningful auth-model change. v1 doesn't do it.
+      </div>
+    </div>
+
+    <!-- ================================================================
+         04 — Multi-group note
+    ================================================================= -->
+    <div class="frame" id="f04">
+      <div class="frame-head">
+        <span class="frame-tag">04</span>
+        <span class="frame-title">Multi-group note · one note in multiple group streams</span>
+        <span class="frame-note">Compose left · how the note appears in each group's stream right</span>
+      </div>
+      <div class="multi-stage">
+
+        <div class="multi-left">
+          <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg-faint); margin-bottom: 14px;">Share dialog · 2 groups picked</div>
+          <div class="dialog" style="max-width: none; box-shadow: var(--shadow-sm);">
+            <div class="dlg-head">
+              <div class="dlg-title">Share this note</div>
+            </div>
+            <div class="dlg-body">
+              <div class="dlg-section">
+                <div class="dlg-label">Groups</div>
+                <div class="token-input">
+                  <span class="token"><span class="group-icon ideaflow">IF</span>IdeaFlow Team<span class="x">×</span></span>
+                  <span class="token fam"><span class="group-icon family">F</span>Family<span class="x">×</span></span>
+                  <input placeholder="Add…">
+                </div>
+                <div style="font-size: 11.5px; color: var(--fg-muted); margin-top: 6px;">11 people will see this note (8 in IdeaFlow + 3 in Family, minus 0 overlap).</div>
+              </div>
+              <div class="dlg-section">
+                <div class="dlg-label">People</div>
+                <div class="token-input"><input placeholder="Add by email…"></div>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top: 18px; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg-faint); margin-bottom: 8px;">Schema · what gets written</div>
+          <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; line-height: 1.6; color: var(--fg-muted);">
+            INSERT INTO note_sharing (note_id, principal_type, principal, role)<br>
+            &nbsp;&nbsp;VALUES<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;('0193-abc', 'GROUP', 'ideaflow_team_id', 'VIEWER'),<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;('0193-abc', 'GROUP', 'family_id',&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'VIEWER');<br>
+            <br>
+            UPDATE notes SET is_shared = true WHERE id = '0193-abc';
+          </div>
+        </div>
+
+        <div class="multi-right">
+          <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg-faint); margin-bottom: 14px;">Same note appears in both group streams</div>
+
+          <div class="stream-block">
+            <div class="stream-block-head">
+              <span class="group-icon ideaflow">IF</span>
+              <strong>IdeaFlow Team</strong>
+              <span style="margin-left: auto; color: var(--fg-faint); font-size: 11px;">214 notes</span>
+            </div>
+            <div class="mini-note">… earlier notes …</div>
+            <div class="note-card" style="margin-bottom: 0; box-shadow: none; border-color: var(--border);">
+              <div class="note-head">
+                <span class="author-chip"><span class="av jc" style="width: 16px; height: 16px; font-size: 8px;">J</span><span class="author-name">Jacob</span><span class="you-pill">you</span></span>
+                <span class="note-time">just now</span>
+              </div>
+              <div class="note-body" style="font-size: 13px;">
+                <p>Booked an Airbnb in Lake Tahoe for the offsite weekend. Same place as last year. <span class="hashtag team-glyph fam"><span class="glyph">F</span>#trip</span></p>
+              </div>
+              <div class="note-foot">
+                <span class="shared-with"><span class="group-icon ideaflow">IF</span>IdeaFlow Team</span>
+                <span style="color: var(--fg-muted);">+</span>
+                <span class="shared-with"><span class="group-icon family">F</span>Family</span>
+                <span>·</span><span class="reason-pill">shared directly to both</span>
+              </div>
+            </div>
+            <div class="mini-note">… earlier notes …</div>
+          </div>
+
+          <div class="stream-block">
+            <div class="stream-block-head">
+              <span class="group-icon family">F</span>
+              <strong>Family</strong>
+              <span style="margin-left: auto; color: var(--fg-faint); font-size: 11px;">8 notes</span>
+            </div>
+            <div class="mini-note">… earlier notes …</div>
+            <div class="note-card" style="margin-bottom: 0; box-shadow: none; border-color: var(--border);">
+              <div class="note-head">
+                <span class="author-chip"><span class="av jc" style="width: 16px; height: 16px; font-size: 8px;">J</span><span class="author-name">Jacob</span><span class="you-pill">you</span></span>
+                <span class="note-time">just now</span>
+              </div>
+              <div class="note-body" style="font-size: 13px;">
+                <p>Booked an Airbnb in Lake Tahoe for the offsite weekend. Same place as last year. <span class="hashtag team-glyph fam"><span class="glyph">F</span>#trip</span></p>
+              </div>
+              <div class="note-foot">
+                <span class="shared-with"><span class="group-icon ideaflow">IF</span>IdeaFlow Team</span>
+                <span style="color: var(--fg-muted);">+</span>
+                <span class="shared-with"><span class="group-icon family">F</span>Family</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="font-size: 12px; color: var(--fg-muted); line-height: 1.6; margin-top: 14px;">
+            <strong style="color: var(--fg);">Identical note rendered.</strong> The foot shows both groups regardless of which stream you're viewing — readers always see the full audience. Order: current group first.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================================================================
+         05 — Invite + acceptance
+    ================================================================= -->
+    <div class="frame" id="f05">
+      <div class="frame-head">
+        <span class="frame-tag">05</span>
+        <span class="frame-title">Invite + acceptance · 3-state journey</span>
+        <span class="frame-note">Principals are EMAIL — invitees may not have accounts. Show all three states clearly.</span>
+      </div>
+      <div class="invite-stage">
+
+        <div class="invite-step">
+          <div class="invite-step-head"><span class="n">1</span>Sender adds an email</div>
+          <div class="invite-step-body">
+            <p style="margin-bottom: 10px; color: var(--fg-muted);">Jacob types <code style="font-family: 'JetBrains Mono', monospace;">teresa@startup.io</code> in group invite. Teresa doesn't have a Notestream account yet.</p>
+            <div style="background: var(--bg-muted); border-radius: 6px; padding: 10px 12px; margin-bottom: 10px;">
+              <div style="display: flex; align-items: center; gap: 8px; font-size: 12.5px;">
+                <span class="av te" style="width: 24px; height: 24px; font-size: 11px;">T</span>
+                <div style="flex: 1;">
+                  <div style="font-weight: 500;">teresa@startup.io</div>
+                  <div style="font-size: 11px; color: var(--fg-muted);">no Notestream account</div>
+                </div>
+                <span class="role-pill pending">Pending</span>
+              </div>
+            </div>
+            <p style="font-size: 11.5px; color: var(--fg-muted);">Schema: <code style="font-family: 'JetBrains Mono', monospace;">GroupInvite(EMAIL, "teresa@startup.io")</code> + <code style="font-family: 'JetBrains Mono', monospace;">GroupMember</code> row deferred until acceptance.</p>
+          </div>
+        </div>
+
+        <div class="invite-step">
+          <div class="invite-step-head"><span class="n">2</span>Recipient receives email</div>
+          <div class="invite-step-body">
+            <div class="email-mock">
+              <div class="email-from">
+                <span class="av jc">J</span>
+                <div>
+                  <div style="color: var(--fg); font-weight: 500;">Jacob Cole</div>
+                  <div>via Notestream · to teresa@startup.io</div>
+                </div>
+              </div>
+              <div class="email-subj">You're invited to IdeaFlow Team</div>
+              <div class="email-body">
+                Hey Teresa — added you to our IdeaFlow Team group on Notestream. It's where we share customer interviews, competitor research, and design notes.<br><br>
+                <strong>7 other members · 214 notes</strong>
+                <br>
+                <a class="email-cta">Accept invite →</a>
+                <div style="font-size: 11px; color: var(--fg-muted); margin-top: 14px;">Notestream is a personal note-taking app. You'll create an account in 30 seconds. <a>Learn more</a></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="invite-step">
+          <div class="invite-step-head"><span class="n">3</span>Recipient accepts</div>
+          <div class="invite-step-body">
+            <p style="margin-bottom: 10px; color: var(--fg-muted);">Two flows depending on whether they sign up:</p>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <div style="background: var(--success-bg); border: 1px solid rgba(21,128,61,0.2); border-radius: 6px; padding: 10px 12px; font-size: 12.5px;">
+                <div style="font-weight: 500; color: var(--success); margin-bottom: 4px;">✓ New user signs up</div>
+                <div style="color: var(--fg);">Lands on Notestream sign-up with IdeaFlow Team pre-filled. On first login, <code style="font-family: 'JetBrains Mono', monospace; font-size: 11px;">GroupMember(group, user)</code> row created. EMAIL→USER auto-resolved by matching <code style="font-family: 'JetBrains Mono', monospace; font-size: 11px;">User.email</code>.</div>
+              </div>
+              <div style="background: var(--info-bg); border: 1px solid rgba(29,78,216,0.2); border-radius: 6px; padding: 10px 12px; font-size: 12.5px;">
+                <div style="font-weight: 500; color: var(--info); margin-bottom: 4px;">⇄ Existing user accepts</div>
+                <div style="color: var(--fg);">In-app notification with Accept/Decline:</div>
+                <div class="notif-card" style="margin-top: 8px;">
+                  <span class="group-icon ideaflow">IF</span>
+                  <div class="body">
+                    <p><strong>Jacob</strong> invited you to IdeaFlow Team · 8 members</p>
+                    <div class="actions">
+                      <button class="btn primary sm">Accept</button>
+                      <button class="btn sm">Decline</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p style="font-size: 11.5px; color: var(--fg-muted); margin-top: 12px;"><strong style="color: var(--fg);">Visibility before acceptance:</strong> the EMAIL principal in NoteSharing already grants visibility (matches the existing model — see <code style="font-family: 'JetBrains Mono', monospace;">getVisibilityWhere</code>). So Teresa can <em>see</em> group-shared notes from the moment Jacob invites her. Membership formalizes for sidebar + composer suggestions.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ================================================================
+         06 — Group directory
+    ================================================================= -->
+    <div class="frame" id="f06">
+      <div class="frame-head">
+        <span class="frame-tag">06</span>
+        <span class="frame-title">Group directory · the public side of discoverable groups</span>
+        <span class="frame-note">For groups marked "Discoverable in directory" in create dialog (Frame 04 in v2)</span>
+      </div>
+      <div class="directory">
+        <div class="dir-head">
+          <div>
+            <h1 style="font-size: 22px; font-weight: 600; letter-spacing: -0.01em;">Discover groups</h1>
+            <p style="font-size: 13px; color: var(--fg-muted); margin-top: 2px;">Public groups you can join or follow. Private groups don't appear here.</p>
+          </div>
+          <input class="dir-search" placeholder="Search by name or topic…">
+          <select class="dlg-input" style="width: 140px;">
+            <option>Most active</option>
+            <option>Newest</option>
+            <option>Largest</option>
+          </select>
+        </div>
+
+        <div class="dir-grid">
+
+          <div class="dir-card">
+            <div class="group-icon ideaflow lg">IF</div>
+            <div class="info">
+              <div class="name">IdeaFlow Team</div>
+              <div class="desc">Internal knowledge stream — product, customers, competitive, hires.</div>
+              <div class="meta"><span>8 members</span><span>·</span><span>214 notes</span><span>·</span><span>2h ago</span></div>
+            </div>
+            <button class="btn sm" style="align-self: center;">Joined</button>
+          </div>
+
+          <div class="dir-card">
+            <div class="group-icon lattice lg">L</div>
+            <div class="info">
+              <div class="name">Lattice Eng Talks</div>
+              <div class="desc">Public notes from Lattice engineering — talks, postmortems, architecture decisions.</div>
+              <div class="meta"><span>312 members</span><span>·</span><span>89 notes</span><span>·</span><span>yesterday</span></div>
+            </div>
+            <button class="btn primary sm" style="align-self: center;">Follow</button>
+          </div>
+
+          <div class="dir-card">
+            <div class="group-icon book lg">BC</div>
+            <div class="info">
+              <div class="name">SF Tech Book Club</div>
+              <div class="desc">Reading 1 nonfiction book per month. April: Designing Data-Intensive Apps.</div>
+              <div class="meta"><span>47 members</span><span>·</span><span>156 notes</span><span>·</span><span>3 days ago</span></div>
+            </div>
+            <button class="btn primary sm" style="align-self: center;">Request to join</button>
+          </div>
+
+          <div class="dir-card">
+            <div class="group-icon fp lg">FP</div>
+            <div class="info">
+              <div class="name">Founders Pledge</div>
+              <div class="desc">Effective philanthropy research notes from FP team.</div>
+              <div class="meta"><span>22 members</span><span>·</span><span>78 notes</span><span>·</span><span>5h ago</span></div>
+            </div>
+            <button class="btn primary sm" style="align-self: center;">Follow</button>
+          </div>
+
+          <div class="dir-card">
+            <div class="group-icon ext lg">YC</div>
+            <div class="info">
+              <div class="name">YC W26 Founder Notes</div>
+              <div class="desc">Shared notes from the W26 batch — customer learnings, pivot stories.</div>
+              <div class="meta"><span>184 members</span><span>·</span><span>421 notes</span><span>·</span><span>10m ago</span></div>
+            </div>
+            <button class="btn sm" style="align-self: center;">Invite only</button>
+          </div>
+
+          <div class="dir-card">
+            <div class="group-icon" style="background: linear-gradient(135deg, #db2777, #be185d); width: 40px; height: 40px; border-radius: 9px; font-size: 16px;">DG</div>
+            <div class="info">
+              <div class="name">Design Guild</div>
+              <div class="desc">Designers sharing critique-ready work and process notes.</div>
+              <div class="meta"><span>58 members</span><span>·</span><span>92 notes</span><span>·</span><span>yesterday</span></div>
+            </div>
+            <button class="btn primary sm" style="align-self: center;">Follow</button>
+          </div>
+        </div>
+
+        <div style="margin-top: 18px; padding: 14px 16px; background: var(--bg-muted); border-radius: 8px; font-size: 12.5px; color: var(--fg-muted);">
+          <strong style="color: var(--fg);">Join vs Follow:</strong> "Join" requires owner approval and adds you as a member (you can post). "Follow" gives read-only access if the group allows it — the group stream appears in your sidebar under a "Following" sub-section.
+        </div>
+      </div>
+    </div>
+
+    <!-- ================================================================
+         07 — Promote tag · with concrete backfill preview
+    ================================================================= -->
+    <div class="frame" id="f07">
+      <div class="frame-head">
+        <span class="frame-tag">07</span>
+        <span class="frame-title">Promote tag · backfill preview with histogram + author list</span>
+        <span class="frame-note">Refined from v2 frame 06 · the preview makes "backfill 23 notes" concrete instead of abstract</span>
+      </div>
+      <div class="dialog-stage single">
+        <div class="dialog" style="max-width: 580px;">
+          <div class="dlg-head">
+            <div class="dlg-title">Move <code style="font-family: 'JetBrains Mono', monospace; color: var(--accent-fg); background: var(--accent-bg); padding: 1px 6px; border-radius: 3px;">#strategy</code> to IdeaFlow Team</div>
+            <div class="dlg-sub">This tag is currently private. 23 of your notes use it. Preview below.</div>
+          </div>
+          <div class="dlg-body">
+
+            <div class="dlg-section">
+              <div class="dlg-label">Notes that will be backfilled</div>
+              <div style="background: var(--bg-muted); border-radius: 6px; padding: 12px 14px;">
+                <div style="display: flex; align-items: end; gap: 3px; height: 60px; margin-bottom: 8px;">
+                  <!-- Histogram by quarter -->
+                  <div style="flex: 1; background: var(--accent); height: 12%; border-radius: 2px 2px 0 0;" title="2022 Q4 · 1"></div>
+                  <div style="flex: 1; background: var(--accent); height: 24%; border-radius: 2px 2px 0 0;" title="2023 Q1 · 2"></div>
+                  <div style="flex: 1; background: var(--accent); height: 36%; border-radius: 2px 2px 0 0;" title="2023 Q2 · 3"></div>
+                  <div style="flex: 1; background: var(--accent); height: 60%; border-radius: 2px 2px 0 0;" title="2023 Q3 · 5"></div>
+                  <div style="flex: 1; background: var(--accent); height: 48%; border-radius: 2px 2px 0 0;" title="2023 Q4 · 4"></div>
+                  <div style="flex: 1; background: var(--accent); height: 36%; border-radius: 2px 2px 0 0;" title="2024 Q1 · 3"></div>
+                  <div style="flex: 1; background: var(--accent); height: 72%; border-radius: 2px 2px 0 0;" title="2024 Q2 · 6"></div>
+                  <div style="flex: 1; background: var(--accent); height: 100%; border-radius: 2px 2px 0 0;" title="2024 Q3 · 8"></div>
+                  <div style="flex: 1; background: var(--accent); height: 24%; border-radius: 2px 2px 0 0;" title="2024 Q4 · 2"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 10.5px; color: var(--fg-faint);">
+                  <span>Oct 2022</span><span>spans 24 months</span><span>today</span>
+                </div>
+                <div style="font-size: 12px; color: var(--fg-muted); margin-top: 10px;">
+                  <strong style="color: var(--fg);">23 notes</strong> · oldest from Oct 14 2022 · spike in mid-2024 around the seed raise.
+                </div>
+              </div>
+            </div>
+
+            <div class="dlg-section">
+              <div class="dlg-label">Sample of what will be shared</div>
+              <div style="font-size: 12.5px; max-height: 180px; overflow-y: auto;">
+                <div style="padding: 8px 0; border-bottom: 1px dashed var(--border-soft);">
+                  <span style="font-weight: 500;">Pricing</span> · <span style="color: var(--fg-faint); font-size: 11px;">Aug 12 2024</span>
+                  <p style="margin-top: 2px; color: var(--fg-muted);">Three-tier pricing — Free / Pro $10 / Team $80. <span style="background: var(--accent-bg); color: var(--accent-fg); padding: 0 4px; border-radius: 3px;">#strategy</span></p>
+                </div>
+                <div style="padding: 8px 0; border-bottom: 1px dashed var(--border-soft);">
+                  <span style="font-weight: 500;">Why we're not building a wiki</span> · <span style="color: var(--fg-faint); font-size: 11px;">Jul 4 2024</span>
+                  <p style="margin-top: 2px; color: var(--fg-muted);">Stream-first beats tree-first because tagging defers structure. <span style="background: var(--accent-bg); color: var(--accent-fg); padding: 0 4px; border-radius: 3px;">#strategy</span> <span style="background: var(--accent-bg); color: var(--accent-fg); padding: 0 4px; border-radius: 3px;">#designphilosophy</span></p>
+                </div>
+                <div style="padding: 8px 0; border-bottom: 1px dashed var(--border-soft);">
+                  <span style="font-weight: 500;">Seed raise thesis draft</span> · <span style="color: var(--fg-faint); font-size: 11px;">Jun 18 2024</span>
+                  <p style="margin-top: 2px; color: var(--fg-muted);">Why now — LLM-era unbundling of Notion. <span style="background: var(--accent-bg); color: var(--accent-fg); padding: 0 4px; border-radius: 3px;">#strategy</span> · <span style="color: var(--warn);">⚠ contains @mentions of confidential investors</span></p>
+                </div>
+                <div style="padding: 8px 0;">
+                  <span style="font-weight: 500;">Lattice partnership memo</span> · <span style="color: var(--fg-faint); font-size: 11px;">May 3 2024</span>
+                  <p style="margin-top: 2px; color: var(--fg-muted);">Why OEM-ing the editor unlocks…</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="dlg-section">
+              <div class="dlg-label">Backfill scope</div>
+              <div style="display: flex; flex-direction: column; gap: 6px;">
+                <label class="opt" style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--accent); background: var(--accent-bg); border-radius: 8px; cursor: pointer; font-size: 13px;">
+                  <input type="radio" name="bf" checked style="accent-color: var(--accent);">
+                  <div>
+                    <div style="font-weight: 500;">Share all 23 existing notes</div>
+                    <div style="color: var(--fg-muted); font-size: 11.5px;">Backfill — past + future will be visible to the group</div>
+                  </div>
+                </label>
+                <label class="opt" style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--border); background: var(--bg); border-radius: 8px; cursor: pointer; font-size: 13px;">
+                  <input type="radio" name="bf" style="accent-color: var(--accent);">
+                  <div>
+                    <div style="font-weight: 500;">Only new notes going forward</div>
+                    <div style="color: var(--fg-muted); font-size: 11.5px;">Past notes stay private. Tag will auto-share notes from now on.</div>
+                  </div>
+                </label>
+                <label class="opt" style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--border); background: var(--bg); border-radius: 8px; cursor: pointer; font-size: 13px;">
+                  <input type="radio" name="bf" style="accent-color: var(--accent);">
+                  <div>
+                    <div style="font-weight: 500;">Let me pick which past notes</div>
+                    <div style="color: var(--fg-muted); font-size: 11.5px;">Manual review · select from list (opens next screen)</div>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <div style="background: var(--warn-bg); border: 1px solid rgba(180,83,9,0.20); border-radius: 6px; padding: 10px 12px; font-size: 12px; display: flex; gap: 8px;">
+              <span style="color: var(--warn); font-size: 14px;">⚠</span>
+              <div>
+                <strong>1 note flagged</strong> — "Seed raise thesis draft" mentions confidential investors. Review before backfilling, or exclude.
+              </div>
+            </div>
+
+          </div>
+          <div class="dlg-foot">
+            <span class="grow">8 members will gain access to 23 notes.</span>
+            <button class="btn">Cancel</button>
+            <button class="btn primary">Move tag</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================================================================
+         08 — Cross-user tag conflict
+    ================================================================= -->
+    <div class="frame" id="f08">
+      <div class="frame-head">
+        <span class="frame-tag">08</span>
+        <span class="frame-title">Cross-user tag namespace · per-user SharedHashtag reality</span>
+        <span class="frame-note">`SharedHashtag(userId, hashtag)` is keyed PER USER · each member has their own tag rows</span>
+      </div>
+      <div style="padding: 28px;">
+        <div style="background: var(--bg-muted); padding: 14px 18px; border-radius: 8px; margin-bottom: 18px; font-size: 13px; color: var(--fg-muted); line-height: 1.55;">
+          The schema keys SharedHashtag by <code style="font-family: 'JetBrains Mono', monospace; color: var(--fg);">(userId, hashtag)</code>. Each user has their <em>own</em> SharedHashtag rows. So <code style="font-family: 'JetBrains Mono', monospace; color: var(--fg);">#competitor</code> can have different group attribution depending on which user authored the note. Three concrete cases below.
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px;">
+
+          <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 16px;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+              <span class="av jc" style="width: 26px; height: 26px; font-size: 11px;">J</span>
+              <strong>Jacob's #competitor</strong>
+            </div>
+            <div style="margin-bottom: 12px; padding: 8px 10px; background: var(--accent-bg); border-radius: 6px; font-size: 12.5px;">
+              <code style="font-family: 'JetBrains Mono', monospace; font-size: 11px;">defaultGroupId = ideaflow</code><br>
+              <span style="color: var(--accent-fg); font-weight: 500;">→ IdeaFlow Team</span>
+            </div>
+            <div style="font-size: 12px; color: var(--fg-muted); line-height: 1.55;">
+              Jacob promoted his tag to the team. All his <span class="hashtag team-glyph"><span class="glyph">IF</span>#competitor</span> notes auto-share to IdeaFlow.
+            </div>
+          </div>
+
+          <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 16px;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+              <span class="av sa" style="width: 26px; height: 26px; font-size: 11px;">S</span>
+              <strong>Sarah's #competitor</strong>
+            </div>
+            <div style="margin-bottom: 12px; padding: 8px 10px; background: var(--bg-muted); border-radius: 6px; font-size: 12.5px;">
+              <code style="font-family: 'JetBrains Mono', monospace; font-size: 11px;">defaultGroupId = null</code><br>
+              <span style="color: var(--fg-muted); font-weight: 500;">→ private</span>
+            </div>
+            <div style="font-size: 12px; color: var(--fg-muted); line-height: 1.55;">
+              Sarah kept her version private. Her <span class="hashtag private">#competitor</span> notes don't share to any group.
+            </div>
+          </div>
+
+          <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 16px;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+              <span class="av ja" style="width: 26px; height: 26px; font-size: 11px;">J</span>
+              <strong>James's #competitor</strong>
+            </div>
+            <div style="margin-bottom: 12px; padding: 8px 10px; background: var(--accent-bg); border-radius: 6px; font-size: 12.5px;">
+              <code style="font-family: 'JetBrains Mono', monospace; font-size: 11px;">defaultGroupId = ideaflow</code><br>
+              <span style="color: var(--accent-fg); font-weight: 500;">→ IdeaFlow Team</span>
+            </div>
+            <div style="font-size: 12px; color: var(--fg-muted); line-height: 1.55;">
+              James also promoted. His <span class="hashtag team-glyph"><span class="glyph">IF</span>#competitor</span> notes auto-share. So <strong>14 + 21 = 35 of the 46</strong> total #competitor notes in IdeaFlow Team are from Jacob + James.
+            </div>
+          </div>
+
+        </div>
+
+        <div style="margin-top: 24px;">
+          <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg-faint); margin-bottom: 12px;">Autocomplete when Sarah types #comp</div>
+          <div class="editor-inset" style="background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; max-width: 480px; margin: 0; position: relative;">
+            <div style="font-size: 14px; line-height: 1.6; min-height: 60px;">
+              Just talked to Acme — their existing tool burned them. #comp<span style="display: inline-block; width: 1px; height: 1em; background: var(--fg); vertical-align: text-bottom; animation: blink 1s steps(2) infinite;"></span>
+            </div>
+            <div style="position: absolute; top: 80px; left: 240px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); box-shadow: var(--shadow-lg); width: 320px; overflow: hidden;">
+              <!-- Sarah's own private tag — she's the user, so this is her version -->
+              <div style="display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: var(--accent-bg); cursor: pointer;">
+                <span style="width: 18px; height: 18px; display: grid; place-items: center; color: var(--fg-faint);">🔒</span>
+                <div style="flex: 1;">
+                  <div style="color: var(--fg); font-weight: 500;">#competitor</div>
+                  <div style="color: var(--fg-muted); font-size: 11px; margin-top: 1px;">11 notes · <strong style="color: var(--fg-muted);">private to you</strong></div>
+                </div>
+                <span class="kbd">↵</span>
+              </div>
+              <!-- Note: Jacob+James have promoted it — Sarah COULD adopt their group binding -->
+              <div style="display: flex; align-items: center; gap: 10px; padding: 8px 10px; cursor: pointer; border-top: 1px solid var(--border-soft); background: var(--info-bg);">
+                <span class="group-icon ideaflow" style="width: 18px; height: 18px; font-size: 9px; border-radius: 4px;">IF</span>
+                <div style="flex: 1;">
+                  <div style="color: var(--accent-fg); font-weight: 500;">#competitor</div>
+                  <div style="color: var(--fg-muted); font-size: 11px; margin-top: 1px;">used by IdeaFlow Team · Jacob + James share theirs</div>
+                </div>
+                <button class="btn sm" style="font-size: 10px; padding: 2px 6px;">Join</button>
+              </div>
+              <div style="padding: 6px 10px; border-top: 1px solid var(--border-soft); background: var(--bg-muted); font-size: 10.5px; color: var(--fg-faint);">
+                💡 If you adopt the team binding, your future #competitor notes also share to IdeaFlow.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="background: var(--bg-muted); padding: 14px 18px; border-radius: 8px; margin-top: 20px; font-size: 12.5px; color: var(--fg-muted); line-height: 1.55;">
+          <strong style="color: var(--fg);">UX consequence:</strong> autocomplete should expose <em>both</em> the user's private tag and any group-adopted versions that group members are using. The "Join" affordance is the low-friction path — adopting the group binding writes <code style="font-family: 'JetBrains Mono', monospace; color: var(--fg);">defaultGroupId</code> on Sarah's row without forcing her to navigate to settings.
+        </div>
+      </div>
+    </div>
+
+    <!-- ================================================================
+         09 — Real Slack data populated stream
+    ================================================================= -->
+    <div class="frame" id="f09">
+      <div class="frame-head">
+        <span class="frame-tag">09</span>
+        <span class="frame-title">Real IdeaFlow Slack data · populated stream (post-import)</span>
+        <span class="frame-note">Actual tag-cooccurrence patterns from the export — #bug + #p1, #customer + #userinterview, etc.</span>
+      </div>
+      <div class="app">
+        <aside class="sidebar">
+          <div class="sb-brand">
+            <div class="sb-logo">N</div><div class="sb-brand-name">Notestream</div>
+          </div>
+          <div class="sb-section">
+            <div class="sb-section-head" data-open="true"><span class="chev">▶</span>Groups</div>
+            <div class="sb-item active group-row" data-open="true">
+              <span class="group-chev">▶</span>
+              <span class="group-icon ideaflow">IF</span><span>IdeaFlow Team</span><span class="count">2.8k</span>
+            </div>
+            <div class="group-tags">
+              <div class="tag-row"><span class="tag-dot"></span><span>#bug</span><span class="count">283</span></div>
+              <div class="tag-row"><span class="tag-dot"></span><span>#tweak</span><span class="count">260</span></div>
+              <div class="tag-row"><span class="tag-dot"></span><span>#teamstream</span><span class="count">197</span></div>
+              <div class="tag-row"><span class="tag-dot"></span><span>#idea</span><span class="count">101</span></div>
+              <div class="tag-row"><span class="tag-dot"></span><span>#usecase</span><span class="count">91</span></div>
+              <div class="tag-row"><span class="tag-dot"></span><span>#feature</span><span class="count">65</span></div>
+              <div class="tag-row"><span class="tag-dot"></span><span>#explainingideaflow</span><span class="count">58</span></div>
+              <div class="tag-row"><span class="tag-dot"></span><span>#customer</span><span class="count">46</span></div>
+              <div class="tag-row"><span class="tag-dot"></span><span>#competitor</span><span class="count">46</span></div>
+              <div class="tag-row"><span class="tag-dot"></span><span>#userstory</span><span class="count">43</span></div>
+              <div class="tag-row" style="color: var(--fg-faint); font-style: italic;">+ 237 more</div>
+            </div>
+          </div>
+        </aside>
+
+        <main class="main">
+          <div class="main-head">
+            <div class="group-icon ideaflow lg">IF</div>
+            <div class="titles">
+              <div class="stream-title">IdeaFlow Team</div>
+              <div class="stream-meta">9 members · 2,880 notes (+ 14,302 thread replies) · imported from Slack 2 days ago</div>
+            </div>
+            <div class="stream-actions">
+              <button class="ico-btn primary">＋</button>
+            </div>
+          </div>
+
+          <div class="stream-filter-row">
+            <span class="filter-chip scope">📌 group: IdeaFlow Team <span class="x">×</span></span>
+            <span class="filter-chip">source: Slack · <span class="x">×</span></span>
+            <span style="margin-left: auto;">newest first</span>
+          </div>
+
+          <div class="stream-body">
+
+            <div class="note-card tinted">
+              <div class="note-head">
+                <span class="author-chip"><span class="av jc">J</span><span class="author-name">Jacob Cole</span><span class="you-pill">you</span></span>
+                <span class="source-chip slack">↗ Slack · #biz</span>
+                <span class="note-time">Apr 12 2024</span>
+              </div>
+              <div class="note-body">
+                <p>also <span class="mention">#biz</span> <span class="mention">#wins</span> awesome <span class="hashtag team-glyph"><span class="glyph">IF</span>#customer</span> <span class="hashtag team-glyph"><span class="glyph">IF</span>#userinterview</span> with Founder's Pledge today — 70 person org currently pays $30k/year for salesforce, dropped them after our trial. Deciding factor was the inline-tag UX. <span class="hashtag team-glyph"><span class="glyph">IF</span>#salesforceuser</span></p>
+              </div>
+              <div class="note-foot">
+                <span class="shared-with"><span class="group-icon ideaflow">IF</span>IdeaFlow Team</span>
+                <span>·</span><span>4 thread replies</span>
+                <span>·</span><span class="reason-pill">shared via <code>#customer</code> + <code>#userinterview</code> + <code>#salesforceuser</code></span>
+              </div>
+            </div>
+
+            <div class="note-card tinted">
+              <div class="note-head">
+                <span class="author-chip"><span class="av ja">J</span><span class="author-name">James Park</span></span>
+                <span class="source-chip slack">↗ Slack · #mew-product</span>
+                <span class="note-time">Jul 4 2023</span>
+              </div>
+              <div class="note-body">
+                <p>filed <span class="hashtag team-glyph"><span class="glyph">IF</span>#bug</span> <span class="hashtag team-glyph"><span class="glyph">IF</span>#p1</span> — drag-to-reorder breaks if you drag onto a collapsed parent folder. Need to fix before launch.</p>
+                <p>Repro: collapse Folder A, drag Note B onto A's row. State doesn't update.</p>
+              </div>
+              <div class="note-foot">
+                <span class="shared-with"><span class="group-icon ideaflow">IF</span>IdeaFlow Team</span>
+                <span>·</span><span>3 thread replies</span>
+                <span>·</span><span class="reason-pill">shared via <code>#bug</code></span>
+              </div>
+            </div>
+
+            <div class="note-card tinted">
+              <div class="note-head">
+                <span class="author-chip"><span class="av da">D</span><span class="author-name">David Liu</span></span>
+                <span class="source-chip slack">↗ Slack · #competitors</span>
+                <span class="note-time">Mar 2 2024</span>
+              </div>
+              <div class="note-body">
+                <p>Roam dropped a new "smart blocks" feature this morning. Different framing than ours but solves the same atomic-capture problem. <span class="hashtag team-glyph"><span class="glyph">IF</span>#competitor</span></p>
+              </div>
+              <div class="note-foot">
+                <span class="shared-with"><span class="group-icon ideaflow">IF</span>IdeaFlow Team</span>
+                <span>·</span><span>1 reply</span>
+                <span>·</span><span class="reason-pill">shared via <code>#competitor</code></span>
+              </div>
+            </div>
+
+            <div class="note-card tinted">
+              <div class="note-head">
+                <span class="author-chip"><span class="av sa">S</span><span class="author-name">Sarah Kim</span></span>
+                <span class="source-chip slack">↗ Slack · #general</span>
+                <span class="note-time">Nov 9 2023</span>
+              </div>
+              <div class="note-body">
+                <p>Met Anika at the conference — strong PM background, ex-Notion, looking. Asked great questions about our atomic-capture thesis. <span class="hashtag team-glyph"><span class="glyph">IF</span>#potentialhire</span></p>
+              </div>
+              <div class="note-foot">
+                <span class="shared-with"><span class="group-icon ideaflow">IF</span>IdeaFlow Team</span>
+                <span>·</span><span>2 thread replies</span>
+                <span>·</span><span class="reason-pill">shared via <code>#potentialhire</code></span>
+              </div>
+            </div>
+
+            <div class="note-card tinted">
+              <div class="note-head">
+                <span class="author-chip"><span class="av jc">J</span><span class="author-name">Jacob Cole</span><span class="you-pill">you</span></span>
+                <span class="source-chip slack">↗ Slack · #design</span>
+                <span class="note-time">Jan 18 2024</span>
+              </div>
+              <div class="note-body">
+                <p>v9 sidebar design done — testing the expand-tag pattern. <span class="hashtag team-glyph"><span class="glyph">IF</span>#design</span> <span class="hashtag team-glyph"><span class="glyph">IF</span>#designphilosophy</span></p>
+                <p>Key insight: tree navigation is too rigid for our model. Tags-as-collapsible-streams is the right primitive.</p>
+              </div>
+              <div class="note-foot">
+                <span class="shared-with"><span class="group-icon ideaflow">IF</span>IdeaFlow Team</span>
+                <span>·</span><span>5 thread replies</span>
+                <span>·</span><span class="reason-pill">shared via <code>#design</code></span>
+              </div>
+            </div>
+
+            <div style="text-align: center; color: var(--fg-faint); font-size: 12px; padding: 16px 0;">+ 2,875 more imported notes · spans Jan 2015 → Feb 2026</div>
+
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- ================================================================
+         10 — Phone frames
+    ================================================================= -->
+    <div class="frame" id="f10">
+      <div class="frame-head">
+        <span class="frame-tag">10</span>
+        <span class="frame-title">Phone · responsive frames at iPhone 15 Pro Max width (~390px)</span>
+        <span class="frame-note">Groups become a tab bar item · sidebar collapses to a sheet · note actions become a bottom sheet</span>
+      </div>
+      <div class="phone-stage">
+
+        <!-- Phone 1: Groups list -->
+        <div class="phone">
+          <div class="phone-notch"></div>
+          <div class="phone-status">
+            <span>9:41</span>
+            <div class="icons">📶 🔋</div>
+          </div>
+          <div class="phone-screen">
+            <div class="phone-head">
+              <div class="title">Groups</div>
+              <button class="ico-btn">＋</button>
+            </div>
+            <div class="phone-list">
+              <div class="phone-row active">
+                <span class="group-icon ideaflow">IF</span>
+                <div class="body">
+                  <div class="name">IdeaFlow Team</div>
+                  <div class="meta">2h ago · Jacob: "Lattice intro…"</div>
+                </div>
+                <span class="count-badge">3</span>
+              </div>
+              <div class="phone-row">
+                <span class="avatar-stack" style="width: 36px;">
+                  <span class="av sa" style="width: 18px; height: 18px; font-size: 8px;">S</span>
+                  <span class="av da" style="width: 18px; height: 18px; font-size: 8px;">D</span>
+                  <span class="av ja" style="width: 18px; height: 18px; font-size: 8px;">J</span>
+                </span>
+                <div class="body">
+                  <div class="name">Sarah, David, James</div>
+                  <div class="meta">yesterday · David: "see attached"</div>
+                </div>
+              </div>
+              <div class="phone-row">
+                <span class="group-icon family">F</span>
+                <div class="body">
+                  <div class="name">Family</div>
+                  <div class="meta">3 days ago · Mom: "Sunday dinner?"</div>
+                </div>
+              </div>
+              <div class="phone-row">
+                <span class="group-icon book">BC</span>
+                <div class="body">
+                  <div class="name">Book Club</div>
+                  <div class="meta">last week · 5 new notes</div>
+                </div>
+              </div>
+              <div class="phone-row">
+                <span class="group-icon ext">FP</span>
+                <div class="body">
+                  <div class="name">Founders Pledge (ext)</div>
+                  <div class="meta">2 weeks ago · 1 new</div>
+                </div>
+              </div>
+            </div>
+            <div class="phone-tabbar">
+              <div class="phone-tab"><span class="icon">📓</span><span>Notes</span></div>
+              <div class="phone-tab"><span class="icon">🏷</span><span>Tags</span></div>
+              <div class="phone-tab active"><span class="icon">👥</span><span>Groups</span></div>
+              <div class="phone-tab"><span class="icon">🔍</span><span>Search</span></div>
+              <div class="phone-tab"><span class="icon">⚙</span><span>You</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Phone 2: Group stream -->
+        <div class="phone">
+          <div class="phone-notch"></div>
+          <div class="phone-status">
+            <span>9:41</span>
+            <div class="icons">📶 🔋</div>
+          </div>
+          <div class="phone-screen">
+            <div class="phone-head">
+              <button class="back">‹</button>
+              <span class="group-icon ideaflow" style="width: 24px; height: 24px; font-size: 11px;">IF</span>
+              <div class="title">IdeaFlow Team</div>
+              <button class="ico-btn">＋</button>
+            </div>
+            <div style="padding: 8px 14px; background: var(--bg-muted); font-size: 11.5px; color: var(--fg-muted); display: flex; gap: 8px; align-items: center;">
+              <span class="filter-chip scope" style="font-size: 10.5px;">📌 IdeaFlow <span class="x">×</span></span>
+              <span style="margin-left: auto;">214</span>
+            </div>
+            <div style="padding: 8px 12px;">
+              <div class="note-card tinted" style="margin-bottom: 8px;">
+                <div class="note-head" style="font-size: 11px;">
+                  <span class="author-chip"><span class="av jc" style="width: 16px; height: 16px; font-size: 8px;">J</span><span class="author-name" style="font-size: 11px;">you</span></span>
+                  <span class="note-time" style="font-size: 10.5px;">2h</span>
+                </div>
+                <div class="note-body" style="font-size: 13px;">
+                  <p>Lattice intro. <span class="hashtag team-glyph" style="font-size: 12px;"><span class="glyph">IF</span>#competitor</span> for sure — could OEM the editor.</p>
+                </div>
+                <div class="note-foot" style="font-size: 10.5px;">
+                  <span class="reason-pill">via <code>#competitor</code></span>
+                </div>
+              </div>
+              <div class="note-card" style="margin-bottom: 8px;">
+                <div class="note-head" style="font-size: 11px;">
+                  <span class="author-chip"><span class="av sa" style="width: 16px; height: 16px; font-size: 8px;">S</span><span class="author-name" style="font-size: 11px;">Sarah</span></span>
+                  <span class="note-time" style="font-size: 10.5px;">yday</span>
+                </div>
+                <div class="note-body" style="font-size: 13px;">
+                  <p>Sprint review → Thursday. Board prep conflict. <span class="mention">@jacob</span> confirm.</p>
+                </div>
+              </div>
+              <div class="note-card tinted">
+                <div class="note-head" style="font-size: 11px;">
+                  <span class="author-chip"><span class="av ja" style="width: 16px; height: 16px; font-size: 8px;">J</span><span class="author-name" style="font-size: 11px;">James</span></span>
+                  <span class="source-chip slack" style="font-size: 9.5px;">↗ Slack</span>
+                  <span class="note-time" style="font-size: 10.5px;">'24</span>
+                </div>
+                <div class="note-body" style="font-size: 13px;">
+                  <p>Founder's Pledge interview. <span class="hashtag team-glyph" style="font-size: 12px;"><span class="glyph">IF</span>#customer</span></p>
+                </div>
+                <div class="note-foot" style="font-size: 10.5px;">
+                  <span class="reason-pill">via <code>#customer</code></span>
+                </div>
+              </div>
+            </div>
+            <div class="phone-tabbar">
+              <div class="phone-tab"><span class="icon">📓</span><span>Notes</span></div>
+              <div class="phone-tab"><span class="icon">🏷</span><span>Tags</span></div>
+              <div class="phone-tab active"><span class="icon">👥</span><span>Groups</span></div>
+              <div class="phone-tab"><span class="icon">🔍</span><span>Search</span></div>
+              <div class="phone-tab"><span class="icon">⚙</span><span>You</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Phone 3: Note actions bottom sheet -->
+        <div class="phone">
+          <div class="phone-notch"></div>
+          <div class="phone-status">
+            <span>9:41</span>
+            <div class="icons">📶 🔋</div>
+          </div>
+          <div class="phone-screen" style="position: relative;">
+            <div class="phone-head">
+              <button class="back">‹</button>
+              <div class="title">Note</div>
+              <button class="ico-btn">⋯</button>
+            </div>
+            <div style="padding: 14px; background: var(--bg-muted); height: 100%; position: relative;">
+              <div class="note-card tinted">
+                <div class="note-head">
+                  <span class="author-chip"><span class="av jc" style="width: 18px; height: 18px; font-size: 9px;">J</span><span class="author-name">you</span></span>
+                  <span class="note-time">2h ago</span>
+                </div>
+                <div class="note-body" style="font-size: 13px;">
+                  <p>Lattice intro. <span class="hashtag team-glyph"><span class="glyph">IF</span>#competitor</span> — could OEM.</p>
+                </div>
+                <div class="note-foot">
+                  <span class="reason-pill">shared via <code>#competitor</code></span>
+                </div>
+              </div>
+            </div>
+            <!-- Bottom sheet -->
+            <div style="position: absolute; left: 0; right: 0; bottom: 0; background: var(--bg); border-top-left-radius: 16px; border-top-right-radius: 16px; box-shadow: 0 -8px 24px rgba(0,0,0,0.12); padding: 8px 0 24px;">
+              <div style="width: 32px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 12px;"></div>
+              <div style="padding: 0 12px;">
+                <div class="menu-sub" style="padding-bottom: 8px;">Shared with</div>
+                <div class="menu-group-row" style="padding: 10px 12px;">
+                  <span class="group-icon ideaflow">IF</span>
+                  <span>IdeaFlow Team</span>
+                  <span class="check">✓</span>
+                </div>
+                <div class="menu-group-row" style="padding: 10px 12px;">
+                  <span class="group-icon family">F</span>
+                  <span>Family</span>
+                </div>
+                <div class="menu-sep"></div>
+                <div class="menu-item" style="padding: 12px;"><span class="ico">↗</span>Share…</div>
+                <div class="menu-item" style="padding: 12px;"><span class="ico">📋</span>Copy link</div>
+                <div class="menu-item danger" style="padding: 12px;"><span class="ico">🗑</span>Move to trash</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ================================================================
+         11 — Decision · eager vs lazy auto-share
+    ================================================================= -->
+    <div class="frame" id="f11">
+      <div class="frame-head">
+        <span class="frame-tag">11</span>
+        <span class="frame-title">Decision · eager vs lazy materialization of tag→group sharing</span>
+        <span class="frame-note">Eager writes NoteSharing(GROUP) rows at note save · Lazy joins through SharedHashtag.defaultGroupId at query time</span>
+      </div>
+      <div class="decision-grid">
+
+        <div class="decision-col">
+          <h3>Eager <span class="label rec">recommended</span></h3>
+          <p>At note save time (or tag-add time), if the tag has <code style="font-family: 'JetBrains Mono', monospace;">defaultGroupId</code> set, write a <code style="font-family: 'JetBrains Mono', monospace;">NoteSharing(GROUP, groupId)</code> row immediately.</p>
+          <h4>Pros</h4>
+          <ul>
+            <li class="ok">Visibility resolution is unchanged — <code style="font-family: 'JetBrains Mono', monospace;">getVisibilityWhere</code> already handles principalType branching. Group becomes one more value.</li>
+            <li class="ok">Removing the tag from a note can leave the share intact (or remove it — explicit author choice in ⋯ menu)</li>
+            <li class="ok">"Show what's in this group's stream" = one indexed query against NoteSharing</li>
+            <li class="ok">Audit trail: every share has a row with timestamp</li>
+            <li class="ok">Author retains explicit control — can detach without removing tag</li>
+          </ul>
+          <h4>Cons</h4>
+          <ul>
+            <li class="bad">If group binding changes later (#competitor → demoted to private), existing NoteSharing rows stay stale — need a backfill migration</li>
+            <li class="bad">Slack import writes ~17k NoteSharing rows up front (manageable)</li>
+            <li class="bad">Tag removal needs a UX choice: also remove share, or keep?</li>
+          </ul>
+        </div>
+
+        <div class="decision-col">
+          <h3>Lazy <span class="label">alternative</span></h3>
+          <p>No NoteSharing rows for tag-auto-shares. At query time, <code style="font-family: 'JetBrains Mono', monospace;">getVisibilityWhere</code> joins <code style="font-family: 'JetBrains Mono', monospace;">SearchIndexContent.hashtags</code> ∩ <code style="font-family: 'JetBrains Mono', monospace;">SharedHashtag(defaultGroupId=X)</code> at every read.</p>
+          <h4>Pros</h4>
+          <ul>
+            <li class="ok">Single source of truth — change <code style="font-family: 'JetBrains Mono', monospace;">defaultGroupId</code> and the group stream updates instantly</li>
+            <li class="ok">No backfill needed when binding changes</li>
+            <li class="ok">No NoteSharing row sprawl</li>
+          </ul>
+          <h4>Cons</h4>
+          <ul>
+            <li class="bad">Query path gets harder — adds a 3-way join (SearchIndexContent × SharedHashtag × GroupMember) on every visibility check</li>
+            <li class="bad">Author can't detach a single note from a group without removing the tag</li>
+            <li class="bad">Audit trail: no per-note shared-at timestamp for tag-shares</li>
+            <li class="bad">Sentinel "explicit exclusion" rows still needed for "this note has #competitor but I don't want it shared this once" → adds back complexity eager avoids</li>
+          </ul>
+        </div>
+
+      </div>
+      <div style="padding: 14px 28px; background: var(--bg-muted); border-top: 1px solid var(--border-soft); font-size: 12.5px; color: var(--fg-muted);">
+        <strong style="color: var(--fg);">Verdict:</strong> Eager. Notestream's visibility model is already row-based — going lazy means special-casing the group path. Author control is also clearer with explicit rows. Migration cost (rewriting NoteSharing rows when <code style="font-family: 'JetBrains Mono', monospace;">defaultGroupId</code> changes) is a one-time backfill, handled by a background job. Same model as how Linear / Notion handle "template-derived ACLs."
+      </div>
+    </div>
+
+    <!-- ================================================================
+         12 — Tint reconciliation
+    ================================================================= -->
+    <div class="frame" id="f12">
+      <div class="frame-head">
+        <span class="frame-tag">12</span>
+        <span class="frame-title">Tint reconciliation · existing shared-hashtag tint + new team-glyph</span>
+        <span class="frame-note">Commit bb2747a already tints notes carrying shared hashtags · Groups extend, don't replace</span>
+      </div>
+      <div class="tint-stage">
+
+        <div class="tint-col">
+          <h4>Today (pre-Groups)</h4>
+          <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 14px;">
+            <div class="note-card tinted" style="margin-bottom: 0; box-shadow: none;">
+              <div class="note-head">
+                <span class="author-chip"><span class="av jc" style="width: 16px; height: 16px; font-size: 8px;">J</span><span class="author-name">you</span></span>
+                <span class="note-time">2h</span>
+              </div>
+              <div class="note-body" style="font-size: 13px;">
+                <p>Lattice intro. <span style="color: var(--accent-fg); font-weight: 500;">#competitor</span></p>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top: 10px; font-size: 11.5px; color: var(--fg-muted); line-height: 1.55;">
+            Tint + left-edge stripe = "this note carries a SharedHashtag." No author attribution on the tag itself.
+          </div>
+        </div>
+
+        <div class="tint-col">
+          <h4>Groups v1 (new)</h4>
+          <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 14px;">
+            <div class="note-card tinted" style="margin-bottom: 0; box-shadow: none;">
+              <div class="note-head">
+                <span class="author-chip"><span class="av jc" style="width: 16px; height: 16px; font-size: 8px;">J</span><span class="author-name">you</span></span>
+                <span class="note-time">2h</span>
+              </div>
+              <div class="note-body" style="font-size: 13px;">
+                <p>Lattice intro. <span class="hashtag team-glyph"><span class="glyph">IF</span>#competitor</span></p>
+              </div>
+              <div class="note-foot" style="font-size: 10.5px;">
+                <span class="reason-pill">via <code>#competitor</code></span>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top: 10px; font-size: 11.5px; color: var(--fg-muted); line-height: 1.55;">
+            Same tint (continuity). Adds: (1) team glyph on first tag occurrence (2) reason-pill in foot. Existing users see continuity, new info is additive.
+          </div>
+        </div>
+
+        <div class="tint-col">
+          <h4>Edge case: tag shared to PERSON (not group)</h4>
+          <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 14px;">
+            <div class="note-card tinted" style="margin-bottom: 0; box-shadow: none;">
+              <div class="note-head">
+                <span class="author-chip"><span class="av jc" style="width: 16px; height: 16px; font-size: 8px;">J</span><span class="author-name">you</span></span>
+                <span class="note-time">2h</span>
+              </div>
+              <div class="note-body" style="font-size: 13px;">
+                <p>Recipe for tonight. <span class="hashtag team-underline" style="border-bottom-color: rgba(236, 72, 153, 0.4);">#dinner</span></p>
+              </div>
+              <div class="note-foot" style="font-size: 10.5px;">
+                <span class="reason-pill">shared with <span class="av sa" style="width: 12px; height: 12px; font-size: 7px; display: inline-grid; vertical-align: -2px;">S</span> Sarah</span>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top: 10px; font-size: 11.5px; color: var(--fg-muted); line-height: 1.55;">
+            Tag is shared to a person, not a group. Still tinted (it's a shared hashtag). No team glyph — underline only. Foot shows the human recipient.
+          </div>
+        </div>
+
+      </div>
+      <div style="padding: 14px 28px; background: var(--bg-muted); border-top: 1px solid var(--border-soft); font-size: 12.5px; color: var(--fg-muted);">
+        <strong style="color: var(--fg);">Rule:</strong> Tint = "this note carries any shared hashtag" (unchanged). Team-glyph = "the tag has <code style="font-family: 'JetBrains Mono', monospace;">defaultGroupId</code>" (new, additive). Reason-pill in foot tells you why it's shared. Three independent signals layered cleanly.
+      </div>
+    </div>
+
+    <div class="page-sub" style="text-align: center; margin-top: 24px; padding: 20px;">
+      File: <code class="path" style="background: white;">mockups/groups-v3.html</code> · v1 and v2 untouched.
+    </div>
+  </div>
+
+  <script>
+    document.querySelectorAll('.group-chev').forEach(chev => {
+      chev.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const row = chev.closest('.group-row');
+        row.dataset.open = row.dataset.open === 'true' ? 'false' : 'true';
+      });
+    });
+    document.querySelectorAll('.sb-section-head').forEach(h => {
+      h.addEventListener('click', () => {
+        h.dataset.open = h.dataset.open === 'true' ? 'false' : 'true';
+      });
+    });
+  </script>
+</body>
+</html>

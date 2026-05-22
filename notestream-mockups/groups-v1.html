@@ -1,0 +1,1379 @@
+<!DOCTYPE html>
+<!--
+  NOTESTREAM — GROUPS FEATURE v1 MOCK
+  ====================================
+  Design review artifact. Not production code.
+
+  Decisions locked with Jacob (2026-05-21):
+    - Name: "Groups"
+    - Tag binding: explicit (SharedHashtag.defaultGroupId, manually set)
+    - Slack import scope: tagged messages + reply threads (~2,880 root + replies)
+    - Group stream: explicit shares only (NoteSharing(GROUP, groupId)),
+      NOT the union of "shared with all members"
+
+  This mock shows four surfaces in one page so you can react to each:
+    Scene A — Sidebar with Groups section + IdeaFlow Team stream
+    Scene B — Share dialog with Group picker
+    Scene C — Hashtag autocomplete with team attribution
+    Scene D — Slack import preview / configuration
+
+  Vibe is derived from cortex/mockups/thoughtstream/v9-tag-sidebar-good.html,
+  but adapted to Notestream's existing tokens (Inter font, neutral palette,
+  teal accent) so it reads like the real app, not the Cortex demo.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Notestream — Groups v1</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Notestream tokens (light) — derived from src/renderer/src/assets/index.css */
+      --bg:           #ffffff;
+      --bg-muted:     #f7f7f7;
+      --sidebar:      #f5f5f5;
+      --card:         #ffffff;
+      --fg:           #232323;
+      --fg-muted:     #6b6b6b;
+      --fg-faint:     #999;
+      --border:       #e6e6e6;
+      --border-soft:  #efefef;
+      --accent:       #0d9488; /* teal-600 */
+      --accent-bg:    rgba(13, 148, 136, 0.08);
+      --accent-soft:  rgba(13, 148, 136, 0.16);
+      --warn:         #b45309; /* amber-700 */
+      --warn-bg:      rgba(180, 83, 9, 0.10);
+      --danger:       #b91c1c;
+      --mention:      #6a00f5;
+      --mention-bg:   rgba(88, 5, 255, 0.05);
+      --hash-private: #5b5b5b;
+      --shadow-sm:    0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md:    0 4px 14px rgba(0,0,0,0.08);
+      --shadow-lg:    0 12px 32px rgba(0,0,0,0.14);
+      --radius:       10px;
+      --radius-sm:    6px;
+      --radius-full:  9999px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-muted);
+      color: var(--fg);
+      font-size: 14px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Page chrome */
+    .page {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    .page-header {
+      margin-bottom: 24px;
+    }
+    .page-title {
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+    .page-sub {
+      color: var(--fg-muted);
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    .scene {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: var(--shadow-md);
+      margin-bottom: 28px;
+      overflow: hidden;
+    }
+    .scene-head {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border-soft);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--bg-muted);
+    }
+    .scene-tag {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: var(--accent-bg);
+      padding: 3px 8px;
+      border-radius: var(--radius-full);
+    }
+    .scene-title {
+      font-weight: 600;
+      font-size: 13px;
+    }
+    .scene-note {
+      margin-left: auto;
+      color: var(--fg-muted);
+      font-size: 12px;
+    }
+
+    /* ---------- SCENE A: app shell ---------- */
+    .app {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      min-height: 720px;
+    }
+    .sidebar {
+      background: var(--sidebar);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 8px 0;
+      overflow-y: auto;
+    }
+    .sb-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px 14px;
+    }
+    .sb-logo {
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      background: linear-gradient(135deg, var(--accent), #0e7490);
+      display: grid; place-items: center;
+      color: white; font-weight: 700; font-size: 13px;
+    }
+    .sb-brand-name { font-weight: 600; }
+    .sb-brand-ver { color: var(--fg-faint); font-size: 11px; margin-left: auto; }
+
+    .sb-section {
+      padding: 4px 8px;
+      margin-top: 4px;
+    }
+    .sb-section-head {
+      display: flex;
+      align-items: center;
+      padding: 6px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--fg-faint);
+      cursor: pointer;
+      user-select: none;
+    }
+    .sb-section-head:hover { color: var(--fg-muted); }
+    .sb-section-head .chev {
+      width: 12px; height: 12px;
+      margin-right: 6px;
+      transition: transform 0.15s;
+    }
+    .sb-section-head[data-open="true"] .chev { transform: rotate(90deg); }
+    .sb-section-head .plus {
+      margin-left: auto;
+      width: 18px; height: 18px;
+      display: grid; place-items: center;
+      border-radius: 4px;
+      font-size: 16px;
+      color: var(--fg-faint);
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.15s, background 0.15s;
+    }
+    .sb-section:hover .plus { opacity: 1; }
+    .sb-section-head .plus:hover { background: var(--accent-bg); color: var(--accent); }
+
+    .sb-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--fg);
+      position: relative;
+    }
+    .sb-item:hover { background: rgba(0,0,0,0.04); }
+    .sb-item.active { background: var(--accent-bg); color: var(--accent); font-weight: 500; }
+    .sb-item .icon {
+      width: 16px; height: 16px;
+      display: grid; place-items: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    .sb-item .count {
+      margin-left: auto;
+      font-size: 11px;
+      color: var(--fg-faint);
+      background: rgba(0,0,0,0.05);
+      padding: 1px 7px;
+      border-radius: var(--radius-full);
+      min-width: 22px;
+      text-align: center;
+    }
+    .sb-item.active .count { background: var(--accent-soft); color: var(--accent); }
+
+    /* Group rows */
+    .group-row {
+      padding-left: 8px;
+    }
+    .group-row .row-flex {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+    }
+    .group-icon {
+      width: 22px; height: 22px;
+      border-radius: 6px;
+      display: grid; place-items: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: white;
+      flex-shrink: 0;
+    }
+    .group-icon.ideaflow { background: linear-gradient(135deg, #0d9488, #0e7490); }
+    .group-icon.family   { background: linear-gradient(135deg, #be185d, #be123c); }
+    .group-icon.book     { background: linear-gradient(135deg, #6d28d9, #5b21b6); }
+
+    .avatar-stack {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+      width: 36px;
+    }
+    .avatar-stack > .av {
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: var(--fg-faint);
+      border: 2px solid var(--sidebar);
+      margin-left: -6px;
+      display: grid; place-items: center;
+      font-size: 9px;
+      font-weight: 600;
+      color: white;
+    }
+    .avatar-stack > .av:first-child { margin-left: 0; }
+    .av.sa { background: #ec4899; }
+    .av.da { background: #6366f1; }
+    .av.ja { background: #f59e0b; }
+
+    .group-chev {
+      width: 14px; height: 14px;
+      display: grid; place-items: center;
+      color: var(--fg-faint);
+      transition: transform 0.15s, background 0.15s;
+      border-radius: 3px;
+      margin-right: -4px;
+      cursor: pointer;
+    }
+    .group-chev:hover { background: rgba(0,0,0,0.06); }
+    .group-row[data-open="true"] .group-chev { transform: rotate(90deg); }
+
+    .group-tags {
+      margin-left: 30px;
+      padding-left: 8px;
+      border-left: 1px solid var(--border);
+      display: none;
+    }
+    .group-row[data-open="true"] + .group-tags { display: block; }
+
+    .tag-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12.5px;
+      color: var(--fg-muted);
+      cursor: pointer;
+    }
+    .tag-row:hover { background: rgba(0,0,0,0.04); color: var(--fg); }
+    .tag-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+    .tag-row .count {
+      margin-left: auto;
+      font-size: 11px;
+      color: var(--fg-faint);
+    }
+
+    /* Main content */
+    .main {
+      display: flex;
+      flex-direction: column;
+      background: var(--bg);
+      overflow: hidden;
+    }
+    .main-head {
+      padding: 18px 28px 14px;
+      border-bottom: 1px solid var(--border-soft);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .stream-icon {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #0d9488, #0e7490);
+      display: grid; place-items: center;
+      color: white;
+      font-weight: 700;
+      font-size: 14px;
+    }
+    .stream-title { font-size: 16px; font-weight: 600; letter-spacing: -0.01em; }
+    .stream-meta { color: var(--fg-muted); font-size: 12.5px; margin-top: 2px; }
+    .stream-actions { margin-left: auto; display: flex; gap: 6px; }
+    .ico-btn {
+      width: 30px; height: 30px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      display: grid; place-items: center;
+      color: var(--fg-muted);
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .ico-btn:hover { background: var(--bg-muted); color: var(--fg); }
+
+    .stream-filter-row {
+      padding: 10px 28px;
+      border-bottom: 1px solid var(--border-soft);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-muted);
+      font-size: 12px;
+      color: var(--fg-muted);
+    }
+    .filter-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 9px 3px 8px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-full);
+      font-size: 11.5px;
+      color: var(--fg);
+    }
+    .filter-chip .x {
+      color: var(--fg-faint);
+      cursor: pointer;
+    }
+    .filter-chip.scope {
+      background: var(--accent-bg);
+      border-color: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .stream-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 28px 32px;
+    }
+
+    .note-card {
+      background: var(--card);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      margin-bottom: 12px;
+      transition: border-color 0.12s, box-shadow 0.12s;
+    }
+    .note-card:hover {
+      border-color: var(--border);
+      box-shadow: var(--shadow-sm);
+    }
+    .note-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--fg-muted);
+      margin-bottom: 8px;
+    }
+    .author-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .author-chip .av {
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      display: grid; place-items: center;
+      font-size: 9px;
+      font-weight: 600;
+      color: white;
+    }
+    .author-name { color: var(--fg); font-weight: 500; }
+    .you-pill {
+      font-size: 9px;
+      padding: 1px 5px;
+      background: var(--accent-bg);
+      color: var(--accent);
+      border-radius: 3px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .source-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10.5px;
+      padding: 1px 6px;
+      background: var(--warn-bg);
+      color: var(--warn);
+      border-radius: 3px;
+      font-weight: 500;
+    }
+    .source-chip.slack { background: rgba(94, 53, 177, 0.08); color: #5e35b1; }
+    .note-time { margin-left: auto; font-size: 11.5px; color: var(--fg-faint); }
+
+    .note-body {
+      font-size: 14px;
+      color: var(--fg);
+      line-height: 1.55;
+    }
+    .note-body p + p { margin-top: 6px; }
+    .hashtag {
+      color: var(--accent);
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .hashtag:hover { text-decoration: underline; }
+    .hashtag.team {
+      background: var(--accent-bg);
+      padding: 1px 5px 1px 4px;
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .hashtag.team .team-glyph {
+      width: 12px; height: 12px;
+      border-radius: 3px;
+      background: linear-gradient(135deg, #0d9488, #0e7490);
+      display: inline-grid; place-items: center;
+      font-size: 8px; font-weight: 700; color: white;
+    }
+    .hashtag.private {
+      color: var(--hash-private);
+    }
+    .mention {
+      color: var(--mention);
+      background: var(--mention-bg);
+      padding: 0 3px;
+      border-radius: 3px;
+    }
+
+    .note-foot {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      font-size: 11.5px;
+      color: var(--fg-faint);
+    }
+    .shared-with {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .shared-with .group-icon { width: 14px; height: 14px; font-size: 8px; border-radius: 3px; }
+
+    /* ---------- SCENE B: Share dialog ---------- */
+    .dialog-stage {
+      padding: 32px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      background: linear-gradient(180deg, var(--bg-muted), var(--bg));
+    }
+    .dialog {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: var(--shadow-lg);
+      width: 100%;
+      max-width: 480px;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+    .dlg-head {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-soft);
+    }
+    .dlg-title { font-weight: 600; font-size: 15px; }
+    .dlg-sub { color: var(--fg-muted); font-size: 12.5px; margin-top: 2px; }
+    .dlg-body { padding: 16px 20px; }
+    .dlg-section + .dlg-section { margin-top: 16px; }
+    .dlg-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--fg-faint);
+      margin-bottom: 6px;
+    }
+    .token-input {
+      min-height: 38px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 5px 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      align-items: center;
+      background: var(--bg);
+    }
+    .token-input:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-bg); }
+    .token {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 4px 3px 6px;
+      border-radius: 6px;
+      background: var(--accent-bg);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .token .group-icon { width: 16px; height: 16px; border-radius: 4px; font-size: 9px; }
+    .token .av { width: 16px; height: 16px; border-radius: 50%; font-size: 9px; }
+    .token.email { background: var(--bg-muted); color: var(--fg); border: 1px solid var(--border); }
+    .token .x {
+      width: 16px; height: 16px;
+      display: grid; place-items: center;
+      border-radius: 3px;
+      cursor: pointer;
+      color: currentColor;
+      opacity: 0.6;
+    }
+    .token .x:hover { background: rgba(0,0,0,0.06); opacity: 1; }
+    .token-input input {
+      border: 0;
+      outline: 0;
+      padding: 4px 6px;
+      min-width: 120px;
+      flex: 1;
+      font-size: 13px;
+      background: transparent;
+      color: var(--fg);
+      font-family: inherit;
+    }
+    .picker-pop {
+      margin-top: 4px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg);
+      box-shadow: var(--shadow-md);
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .picker-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .picker-row:hover, .picker-row.hl { background: var(--accent-bg); }
+    .picker-row .group-icon { width: 22px; height: 22px; }
+    .picker-row .meta { color: var(--fg-muted); font-size: 11.5px; }
+    .picker-section {
+      padding: 6px 12px 4px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--fg-faint);
+      border-top: 1px solid var(--border-soft);
+    }
+    .picker-section:first-child { border-top: 0; }
+
+    .dlg-foot {
+      padding: 12px 20px;
+      border-top: 1px solid var(--border-soft);
+      background: var(--bg-muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .dlg-foot .grow { flex: 1; font-size: 12px; color: var(--fg-muted); }
+    .btn {
+      padding: 7px 14px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      color: var(--fg);
+      font-family: inherit;
+    }
+    .btn:hover { background: var(--bg-muted); }
+    .btn.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+    .btn.primary:hover { background: #0b806f; }
+
+    /* Editor-with-autocomplete inset */
+    .editor-inset {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: var(--shadow-sm);
+      padding: 16px 20px;
+      width: 100%;
+      max-width: 520px;
+      margin: 0 auto;
+      position: relative;
+    }
+    .editor-text {
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 100px;
+      color: var(--fg);
+    }
+    .cursor {
+      display: inline-block;
+      width: 1px;
+      height: 1em;
+      background: var(--fg);
+      vertical-align: text-bottom;
+      animation: blink 1s steps(2) infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+    .ac-pop {
+      position: absolute;
+      top: 80px;
+      left: 240px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg);
+      box-shadow: var(--shadow-lg);
+      width: 280px;
+      overflow: hidden;
+      z-index: 2;
+    }
+    .ac-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .ac-row.hl { background: var(--accent-bg); }
+    .ac-row .group-icon { width: 18px; height: 18px; font-size: 9px; border-radius: 4px; }
+    .ac-row .private-mark {
+      width: 18px; height: 18px;
+      display: grid; place-items: center;
+      color: var(--fg-faint);
+      font-size: 12px;
+    }
+    .ac-row .tag-name { color: var(--accent); font-weight: 500; }
+    .ac-row .tag-private { color: var(--fg); font-weight: 500; }
+    .ac-row .meta-row {
+      display: flex; align-items: center; gap: 6px;
+      color: var(--fg-muted);
+      font-size: 11px;
+      margin-top: 1px;
+    }
+    .ac-row .meta-row .sep::before { content: "·"; padding: 0 3px; }
+    .ac-row .name-block { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+    .ac-foot {
+      padding: 6px 10px;
+      border-top: 1px solid var(--border-soft);
+      background: var(--bg-muted);
+      font-size: 10.5px;
+      color: var(--fg-faint);
+      display: flex;
+      gap: 10px;
+    }
+    .kbd {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      padding: 1px 4px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+    }
+
+    /* ---------- SCENE D: Import preview ---------- */
+    .import {
+      display: grid;
+      grid-template-columns: 1fr 1.4fr;
+      min-height: 480px;
+    }
+    .import-config {
+      padding: 22px 26px;
+      border-right: 1px solid var(--border-soft);
+      background: var(--bg-muted);
+    }
+    .import-preview {
+      padding: 22px 26px;
+      overflow-y: auto;
+      max-height: 600px;
+    }
+    .import h3 { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+    .import p { font-size: 13px; color: var(--fg-muted); margin-bottom: 14px; }
+    .stat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .stat {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+    .stat .n {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--fg);
+    }
+    .stat .l { color: var(--fg-muted); font-size: 11px; margin-top: 2px; }
+    .opt-list { display: flex; flex-direction: column; gap: 6px; }
+    .opt {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .opt.active { border-color: var(--accent); background: var(--accent-bg); }
+    .opt input { margin: 0; accent-color: var(--accent); }
+    .opt .opt-label { font-weight: 500; }
+    .opt .opt-sub { color: var(--fg-muted); font-size: 11.5px; margin-top: 1px; }
+
+    .preview-row {
+      display: grid;
+      grid-template-columns: 80px 1fr;
+      gap: 12px;
+      align-items: start;
+      padding: 10px 0;
+      border-bottom: 1px dashed var(--border-soft);
+      font-size: 12.5px;
+    }
+    .preview-channel {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--fg-faint);
+      font-size: 11px;
+      padding-top: 2px;
+    }
+    .preview-msg .author { font-weight: 500; }
+    .preview-msg .ts { color: var(--fg-faint); font-size: 11px; margin-left: 4px; }
+
+    /* misc */
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      font-size: 12px;
+      color: var(--fg-muted);
+      padding: 12px 28px;
+      border-top: 1px solid var(--border-soft);
+      background: var(--bg-muted);
+    }
+    .legend .swatch {
+      display: inline-block;
+      width: 10px; height: 10px;
+      border-radius: 2px;
+      vertical-align: middle;
+      margin-right: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="page-header">
+      <div class="page-title">Notestream — Groups (v1 mock)</div>
+      <div class="page-sub">Design surfaces: sidebar, group stream, share dialog, hashtag autocomplete with team attribution, Slack import. Decisions locked 2026-05-21.</div>
+    </div>
+
+    <!-- ============== SCENE A ============== -->
+    <div class="scene">
+      <div class="scene-head">
+        <span class="scene-tag">A</span>
+        <span class="scene-title">Sidebar with Groups section · IdeaFlow Team stream selected</span>
+        <span class="scene-note">Click name = filter to group · click chevron = expand to tags · gear on hover</span>
+      </div>
+      <div class="app">
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+          <div class="sb-brand">
+            <div class="sb-logo">N</div>
+            <div class="sb-brand-name">Notestream</div>
+            <div class="sb-brand-ver">v3.4.0</div>
+          </div>
+
+          <!-- Existing top nav (abridged) -->
+          <div class="sb-section">
+            <div class="sb-item">
+              <span class="icon">📓</span>All notes
+              <span class="count">2.1k</span>
+            </div>
+            <div class="sb-item">
+              <span class="icon">☑</span>To-do
+              <span class="count">42</span>
+            </div>
+            <div class="sb-item">
+              <span class="icon">📨</span>Shared with me
+              <span class="count">18</span>
+            </div>
+            <div class="sb-item">
+              <span class="icon">🌐</span>Publicly listed
+              <span class="count">7</span>
+            </div>
+          </div>
+
+          <!-- NEW: Groups section -->
+          <div class="sb-section">
+            <div class="sb-section-head" data-open="true">
+              <span class="chev">▶</span>
+              Groups
+              <span class="plus" title="New group">+</span>
+            </div>
+
+            <!-- Group 1: IdeaFlow Team (currently active, expanded) -->
+            <div class="sb-item active group-row" data-open="true" style="padding-left: 8px;">
+              <span class="group-chev">▶</span>
+              <span class="group-icon ideaflow">IF</span>
+              <span>IdeaFlow Team</span>
+              <span class="count">214</span>
+            </div>
+            <div class="group-tags">
+              <div class="tag-row"><span class="tag-dot"></span><span>#design</span><span class="count">42</span></div>
+              <div class="tag-row"><span class="tag-dot"></span><span>#roadmap</span><span class="count">31</span></div>
+              <div class="tag-row"><span class="tag-dot"></span><span>#customer</span><span class="count">46</span></div>
+              <div class="tag-row"><span class="tag-dot"></span><span>#competitor</span><span class="count">46</span></div>
+              <div class="tag-row"><span class="tag-dot"></span><span>#userstory</span><span class="count">43</span></div>
+              <div class="tag-row"><span class="tag-dot"></span><span>#potentialhire</span><span class="count">14</span></div>
+              <div class="tag-row" style="color: var(--fg-faint); font-style: italic;">+ 38 more</div>
+            </div>
+
+            <!-- Group 2: Ad-hoc (Sarah, David, James) -->
+            <div class="sb-item group-row" data-open="false" style="padding-left: 8px;">
+              <span class="group-chev">▶</span>
+              <span class="avatar-stack">
+                <span class="av sa">S</span>
+                <span class="av da">D</span>
+                <span class="av ja">J</span>
+              </span>
+              <span>Sarah, David, James</span>
+              <span class="count">3</span>
+            </div>
+
+            <!-- Group 3: Family -->
+            <div class="sb-item group-row" data-open="false" style="padding-left: 8px;">
+              <span class="group-chev">▶</span>
+              <span class="group-icon family">F</span>
+              <span>Family</span>
+              <span class="count">8</span>
+            </div>
+
+            <!-- Group 4: Book Club -->
+            <div class="sb-item group-row" data-open="false" style="padding-left: 8px;">
+              <span class="group-chev">▶</span>
+              <span class="group-icon book">BC</span>
+              <span>Book Club</span>
+              <span class="count">12</span>
+            </div>
+          </div>
+
+          <!-- Existing sections (abridged) -->
+          <div class="sb-section">
+            <div class="sb-section-head" data-open="false">
+              <span class="chev">▶</span>
+              Folders
+            </div>
+          </div>
+          <div class="sb-section">
+            <div class="sb-section-head" data-open="false">
+              <span class="chev">▶</span>
+              Hashtags
+            </div>
+          </div>
+          <div class="sb-section">
+            <div class="sb-section-head" data-open="false">
+              <span class="chev">▶</span>
+              Mentions
+            </div>
+          </div>
+        </aside>
+
+        <!-- Main: IdeaFlow Team stream -->
+        <main class="main">
+          <div class="main-head">
+            <div class="stream-icon">IF</div>
+            <div>
+              <div class="stream-title">IdeaFlow Team</div>
+              <div class="stream-meta">8 members · 214 notes shared with this group · you are an owner</div>
+            </div>
+            <div class="stream-actions">
+              <div class="ico-btn" title="Manage members">👥</div>
+              <div class="ico-btn" title="Group settings">⚙</div>
+              <div class="ico-btn" title="New note in group">＋</div>
+            </div>
+          </div>
+
+          <div class="stream-filter-row">
+            <span class="filter-chip scope">📌 group: IdeaFlow Team <span class="x">×</span></span>
+            <span style="color: var(--fg-faint);">+ add filter (tag, author, date)</span>
+            <span style="margin-left: auto;">sorted by newest</span>
+          </div>
+
+          <div class="stream-body">
+
+            <!-- Note 1: native note tagged with team tag -->
+            <div class="note-card">
+              <div class="note-head">
+                <span class="author-chip">
+                  <span class="av" style="background: #0d9488;">J</span>
+                  <span class="author-name">Jacob Cole</span>
+                  <span class="you-pill">you</span>
+                </span>
+                <span class="note-time">2 hours ago</span>
+              </div>
+              <div class="note-body">
+                <p>Met with the team at Lattice today. They're building basically the same hashtag-based capture we are, but for HR. <span class="hashtag team"><span class="team-glyph">IF</span>#competitor</span> <span class="hashtag team"><span class="team-glyph">IF</span>#customer</span> — could be both, they showed interest in OEM-ing the editor.</p>
+                <p>Action items: send them the API doc, follow up Tuesday.</p>
+              </div>
+              <div class="note-foot">
+                <span class="shared-with"><span class="group-icon ideaflow">IF</span>shared with IdeaFlow Team</span>
+                <span>·</span>
+                <span>2 replies</span>
+              </div>
+            </div>
+
+            <!-- Note 2: from another team member -->
+            <div class="note-card">
+              <div class="note-head">
+                <span class="author-chip">
+                  <span class="av" style="background: #ec4899;">S</span>
+                  <span class="author-name">Sarah Kim</span>
+                </span>
+                <span class="note-time">yesterday</span>
+              </div>
+              <div class="note-body">
+                <p>Design review for the new sidebar — see <a>this Figma</a>. Pinged <span class="mention">@jacob</span> + <span class="mention">@david</span> for sign-off. <span class="hashtag team"><span class="team-glyph">IF</span>#design</span></p>
+              </div>
+              <div class="note-foot">
+                <span class="shared-with"><span class="group-icon ideaflow">IF</span>shared with IdeaFlow Team</span>
+              </div>
+            </div>
+
+            <!-- Note 3: imported from Slack -->
+            <div class="note-card">
+              <div class="note-head">
+                <span class="author-chip">
+                  <span class="av" style="background: #f59e0b;">J</span>
+                  <span class="author-name">James Park</span>
+                </span>
+                <span class="source-chip slack">↗ from Slack · #biz</span>
+                <span class="note-time">Apr 12, 2024</span>
+              </div>
+              <div class="note-body">
+                <p>also <span style="color: var(--mention); background: var(--mention-bg); padding: 0 3px; border-radius: 3px;">#biz</span> <span style="color: var(--mention); background: var(--mention-bg); padding: 0 3px; border-radius: 3px;">#wins</span> awesome <span class="hashtag team"><span class="team-glyph">IF</span>#customer</span> <span class="hashtag team"><span class="team-glyph">IF</span>#userinterview</span> with Founder's Pledge today — 70 person org, pays $30k/yr for Salesforce.</p>
+                <p>They said the deciding factor was the inline-tag UX. <span class="hashtag team"><span class="team-glyph">IF</span>#salesforceuser</span></p>
+              </div>
+              <div class="note-foot">
+                <span class="shared-with"><span class="group-icon ideaflow">IF</span>auto-shared via tag</span>
+                <span>·</span>
+                <span>4 thread replies</span>
+              </div>
+            </div>
+
+            <!-- Note 4: imported, with team-tag inline -->
+            <div class="note-card">
+              <div class="note-head">
+                <span class="author-chip">
+                  <span class="av" style="background: #6366f1;">D</span>
+                  <span class="author-name">David Liu</span>
+                </span>
+                <span class="source-chip slack">↗ from Slack · #competitors</span>
+                <span class="note-time">Mar 2, 2024</span>
+              </div>
+              <div class="note-body">
+                <p>Roam dropped a new "smart blocks" feature this morning. Different framing than ours but solves the same atomic-capture problem. <span class="hashtag team"><span class="team-glyph">IF</span>#competitor</span></p>
+              </div>
+              <div class="note-foot">
+                <span class="shared-with"><span class="group-icon ideaflow">IF</span>auto-shared via tag</span>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="legend">
+            <span><span class="swatch" style="background: var(--accent);"></span>team hashtag (defaultGroupId set)</span>
+            <span><span class="swatch" style="background: var(--mention);"></span>@mention</span>
+            <span><span class="swatch" style="background: var(--warn);"></span>imported source</span>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- ============== SCENE B ============== -->
+    <div class="scene">
+      <div class="scene-head">
+        <span class="scene-tag">B</span>
+        <span class="scene-title">Share dialog with Group picker</span>
+        <span class="scene-note">Reuses existing NoteShareDialog; Groups row sits above People row</span>
+      </div>
+      <div class="dialog-stage">
+
+        <!-- Closed state (token chips) -->
+        <div class="dialog">
+          <div class="dlg-head">
+            <div class="dlg-title">Share this note</div>
+            <div class="dlg-sub">Pick groups, people, or a public link.</div>
+          </div>
+          <div class="dlg-body">
+            <div class="dlg-section">
+              <div class="dlg-label">Groups</div>
+              <div class="token-input">
+                <span class="token">
+                  <span class="group-icon ideaflow">IF</span>
+                  IdeaFlow Team
+                  <span class="x">×</span>
+                </span>
+                <input placeholder="Search groups…" />
+              </div>
+            </div>
+            <div class="dlg-section">
+              <div class="dlg-label">People</div>
+              <div class="token-input">
+                <span class="token email">
+                  <span class="av" style="background: #ec4899;">S</span>
+                  sarah@ideaflow.io
+                  <span class="x">×</span>
+                </span>
+                <input placeholder="Add by email or @handle…" />
+              </div>
+            </div>
+            <div class="dlg-section">
+              <div class="dlg-label">Public</div>
+              <div style="display: flex; align-items: center; gap: 8px; padding: 8px 0;">
+                <input type="checkbox" />
+                <span style="font-size: 13px;">List in Discover (public stream)</span>
+              </div>
+            </div>
+          </div>
+          <div class="dlg-foot">
+            <span class="grow">3 people will be notified by email.</span>
+            <button class="btn">Cancel</button>
+            <button class="btn primary">Save</button>
+          </div>
+        </div>
+
+        <!-- Open state (picker popover) -->
+        <div class="dialog">
+          <div class="dlg-head">
+            <div class="dlg-title">Share this note</div>
+            <div class="dlg-sub">Picker open — search "te"</div>
+          </div>
+          <div class="dlg-body">
+            <div class="dlg-section">
+              <div class="dlg-label">Groups</div>
+              <div class="token-input">
+                <input placeholder="te" value="te" autofocus />
+              </div>
+              <div class="picker-pop">
+                <div class="picker-section">Your groups</div>
+                <div class="picker-row hl">
+                  <span class="group-icon ideaflow">IF</span>
+                  <div style="flex: 1;">
+                    <div>IdeaFlow <strong>Te</strong>am</div>
+                    <div class="meta">8 members · you're an owner</div>
+                  </div>
+                  <span class="kbd">↵</span>
+                </div>
+                <div class="picker-row">
+                  <span class="group-icon book">BC</span>
+                  <div style="flex: 1;">
+                    <div>Book Club</div>
+                    <div class="meta">5 members</div>
+                  </div>
+                </div>
+                <div class="picker-section">Create</div>
+                <div class="picker-row">
+                  <span class="group-icon" style="background: var(--border); color: var(--fg-muted);">＋</span>
+                  <div>New group "te"…</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="dlg-foot">
+            <span class="grow"><span class="kbd">↑↓</span> navigate · <span class="kbd">esc</span> close</span>
+            <button class="btn">Cancel</button>
+            <button class="btn primary">Save</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ============== SCENE C ============== -->
+    <div class="scene">
+      <div class="scene-head">
+        <span class="scene-tag">C</span>
+        <span class="scene-title">Hashtag autocomplete with team attribution</span>
+        <span class="scene-note">Team-owned tags show the group glyph; private tags show no badge (or a 🔒)</span>
+      </div>
+      <div class="dialog-stage" style="grid-template-columns: 1fr;">
+        <div class="editor-inset">
+          <div class="editor-text">
+            Just talked to a prospect at Acme Robotics. They were burned by their last knowledge tool — they want something that&rsquo;s <em>not</em> a giant wiki. Going to follow up Friday. #comp<span class="cursor"></span>
+          </div>
+
+          <div class="ac-pop">
+            <!-- Team tag (team owner) -->
+            <div class="ac-row hl">
+              <span class="group-icon ideaflow">IF</span>
+              <div class="name-block">
+                <span class="tag-name">#competitor</span>
+                <span class="meta-row">
+                  <span>46 uses</span>
+                  <span class="sep"></span>
+                  <span>IdeaFlow Team</span>
+                </span>
+              </div>
+              <span class="kbd">↵</span>
+            </div>
+            <!-- Team tag -->
+            <div class="ac-row">
+              <span class="group-icon ideaflow">IF</span>
+              <div class="name-block">
+                <span class="tag-name">#competitive-research</span>
+                <span class="meta-row">
+                  <span>8 uses</span>
+                  <span class="sep"></span>
+                  <span>IdeaFlow Team</span>
+                </span>
+              </div>
+            </div>
+            <!-- Private tag -->
+            <div class="ac-row">
+              <span class="private-mark">🔒</span>
+              <div class="name-block">
+                <span class="tag-private">#compose</span>
+                <span class="meta-row">
+                  <span>3 uses</span>
+                  <span class="sep"></span>
+                  <span>private to you</span>
+                </span>
+              </div>
+            </div>
+            <!-- Different team tag (Book Club) -->
+            <div class="ac-row">
+              <span class="group-icon book">BC</span>
+              <div class="name-block">
+                <span class="tag-name">#completed-read</span>
+                <span class="meta-row">
+                  <span>12 uses</span>
+                  <span class="sep"></span>
+                  <span>Book Club</span>
+                </span>
+              </div>
+            </div>
+            <div class="ac-foot">
+              <span><span class="kbd">↑↓</span> nav</span>
+              <span><span class="kbd">↵</span> insert</span>
+              <span><span class="kbd">⇥</span> jump</span>
+              <span style="margin-left: auto;">team glyph = auto-shares to group</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============== SCENE D ============== -->
+    <div class="scene">
+      <div class="scene-head">
+        <span class="scene-tag">D</span>
+        <span class="scene-title">Slack import — pre-populate IdeaFlow Team</span>
+        <span class="scene-note">Source: ~/Downloads/slack-export · 110,083 messages · 2,880 hashtagged · 1,202 distinct tags</span>
+      </div>
+      <div class="import">
+
+        <div class="import-config">
+          <h3>Source</h3>
+          <p><code style="font-family: 'JetBrains Mono', monospace; font-size: 11.5px; background: var(--bg); padding: 2px 5px; border-radius: 3px; border: 1px solid var(--border);">~/Downloads/slack-export/</code><br>
+            <span style="color: var(--fg-faint); font-size: 11.5px;">Slack official zip · Jan 31 2015 → Feb 3 2026</span></p>
+
+          <div class="stat-grid">
+            <div class="stat"><div class="n">110,083</div><div class="l">messages scanned</div></div>
+            <div class="stat"><div class="n">2,880</div><div class="l">have hashtags</div></div>
+            <div class="stat"><div class="n">~14k</div><div class="l">+ thread replies</div></div>
+            <div class="stat"><div class="n">1,202</div><div class="l">distinct hashtags</div></div>
+          </div>
+
+          <h3 style="margin-top: 18px;">Target group</h3>
+          <div class="opt active" style="margin-bottom: 14px;">
+            <span class="group-icon ideaflow">IF</span>
+            <div style="flex: 1;">
+              <div class="opt-label">IdeaFlow Team</div>
+              <div class="opt-sub">Notes attributed to this group · 8 members</div>
+            </div>
+          </div>
+
+          <h3>Scope</h3>
+          <div class="opt-list">
+            <label class="opt">
+              <input type="radio" name="scope" />
+              <div>
+                <div class="opt-label">Tags only</div>
+                <div class="opt-sub">Create 247 SharedHashtag rows · zero notes</div>
+              </div>
+            </label>
+            <label class="opt active">
+              <input type="radio" name="scope" checked />
+              <div>
+                <div class="opt-label">Tagged messages + reply threads</div>
+                <div class="opt-sub">≈ 2,880 root notes + their thread replies. Recommended.</div>
+              </div>
+            </label>
+            <label class="opt">
+              <input type="radio" name="scope" />
+              <div>
+                <div class="opt-label">Everything (110k)</div>
+                <div class="opt-sub">Full archive · floods the stream</div>
+              </div>
+            </label>
+          </div>
+
+          <h3 style="margin-top: 18px;">Author mapping</h3>
+          <p style="margin-bottom: 8px;">7 of 9 Slack users matched to Notestream accounts by email.</p>
+          <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; font-size: 12px;">
+            <div>✓ jacob@ideaflow.io → Jacob Cole</div>
+            <div>✓ sarah@ideaflow.io → Sarah Kim</div>
+            <div>✓ james@ideaflow.io → James Park</div>
+            <div style="color: var(--warn);">⚠ alex.bot — no match (skip or attribute to "Slack import")</div>
+          </div>
+
+          <div style="display: flex; gap: 8px; margin-top: 20px;">
+            <button class="btn primary" style="flex: 1;">Run import</button>
+            <button class="btn">Dry run</button>
+          </div>
+        </div>
+
+        <div class="import-preview">
+          <h3>Preview · top tags by frequency</h3>
+          <p>Top 12 of 1,202 — see <a>full taxonomy</a> for tail. Tags with count ≥ 3 (≈ 247) become SharedHashtag rows owned by IdeaFlow Team.</p>
+
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 18px; font-size: 12px;">
+            <div style="background: var(--accent-bg); color: var(--accent); padding: 5px 9px; border-radius: 4px;">#bug · 283</div>
+            <div style="background: var(--accent-bg); color: var(--accent); padding: 5px 9px; border-radius: 4px;">#tweak · 260</div>
+            <div style="background: var(--accent-bg); color: var(--accent); padding: 5px 9px; border-radius: 4px;">#teamstream · 197</div>
+            <div style="background: var(--accent-bg); color: var(--accent); padding: 5px 9px; border-radius: 4px;">#idea · 101</div>
+            <div style="background: var(--accent-bg); color: var(--accent); padding: 5px 9px; border-radius: 4px;">#usecase · 91</div>
+            <div style="background: var(--accent-bg); color: var(--accent); padding: 5px 9px; border-radius: 4px;">#tradle · 79</div>
+            <div style="background: var(--accent-bg); color: var(--accent); padding: 5px 9px; border-radius: 4px;">#feature · 65</div>
+            <div style="background: var(--accent-bg); color: var(--accent); padding: 5px 9px; border-radius: 4px;">#explainingideaflow · 58</div>
+            <div style="background: var(--accent-bg); color: var(--accent); padding: 5px 9px; border-radius: 4px;">#customer · 46</div>
+            <div style="background: var(--accent-bg); color: var(--accent); padding: 5px 9px; border-radius: 4px;">#competitor · 46</div>
+            <div style="background: var(--accent-bg); color: var(--accent); padding: 5px 9px; border-radius: 4px;">#userstory · 43</div>
+            <div style="background: var(--accent-bg); color: var(--accent); padding: 5px 9px; border-radius: 4px;">#book · 44</div>
+          </div>
+
+          <h3>Sample messages that will become notes</h3>
+
+          <div class="preview-row">
+            <div class="preview-channel">#biz</div>
+            <div class="preview-msg">
+              <span class="author">James Park</span><span class="ts">Apr 12 2024 · 1 reply</span>
+              <p>also #biz #wins awesome <strong>#customer #userinterview</strong> with Founder's Pledge — 70 person org pays $30k/yr for Salesforce …</p>
+            </div>
+          </div>
+
+          <div class="preview-row">
+            <div class="preview-channel">#competitors</div>
+            <div class="preview-msg">
+              <span class="author">David Liu</span><span class="ts">Mar 2 2024</span>
+              <p>Roam dropped "smart blocks" — different framing, same atomic-capture problem. <strong>#competitor</strong></p>
+            </div>
+          </div>
+
+          <div class="preview-row">
+            <div class="preview-channel">#design</div>
+            <div class="preview-msg">
+              <span class="author">Sarah Kim</span><span class="ts">Jan 18 2024 · 4 replies</span>
+              <p>v9 sidebar mock done — testing the expand-tag pattern. <strong>#design</strong> <strong>#designphilosophy</strong></p>
+            </div>
+          </div>
+
+          <div class="preview-row">
+            <div class="preview-channel">#general</div>
+            <div class="preview-msg">
+              <span class="author">Jacob Cole</span><span class="ts">Nov 9 2023 · 2 replies</span>
+              <p>Met Anika at the conference — strong PM background, ex-Notion, looking. <strong>#potentialhire</strong></p>
+            </div>
+          </div>
+
+          <div class="preview-row">
+            <div class="preview-channel">#mew-product</div>
+            <div class="preview-msg">
+              <span class="author">James Park</span><span class="ts">Jul 4 2023</span>
+              <p>filed <strong>#bug</strong> <strong>#p1</strong> — drag-to-reorder breaks if you drag onto a collapsed parent. Need to fix before launch.</p>
+            </div>
+          </div>
+
+          <p style="margin-top: 14px; color: var(--fg-faint); font-size: 11.5px;">+ 2,875 more messages with hashtags, each becoming a note with author, timestamp, channel attribution, and thread replies as note children.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-sub" style="text-align: center; margin-top: 24px; padding: 20px;">
+      File: <code style="font-family: 'JetBrains Mono', monospace; font-size: 11.5px;">mockups/groups-v1.html</code> ·
+      Open in browser to interact (the chevrons on groups are clickable in a real build).
+    </div>
+  </div>
+
+  <script>
+    // Toggle expand/collapse for group rows
+    document.querySelectorAll('.group-chev').forEach(chev => {
+      chev.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const row = chev.closest('.group-row');
+        row.dataset.open = row.dataset.open === 'true' ? 'false' : 'true';
+      });
+    });
+    // Section headers
+    document.querySelectorAll('.sb-section-head').forEach(h => {
+      h.addEventListener('click', () => {
+        h.dataset.open = h.dataset.open === 'true' ? 'false' : 'true';
+      });
+    });
+  </script>
+</body>
+</html>

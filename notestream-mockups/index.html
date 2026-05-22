@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Notestream — Groups feature mockups</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f7f7f7;
+      color: #232323;
+      line-height: 1.55;
+      padding: 48px 24px;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap { max-width: 720px; margin: 0 auto; }
+    h1 { font-size: 28px; font-weight: 600; letter-spacing: -0.015em; margin-bottom: 8px; }
+    .sub { color: #6b6b6b; font-size: 15px; margin-bottom: 32px; }
+    .card {
+      background: white;
+      border: 1px solid #e6e6e6;
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-bottom: 14px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      text-decoration: none;
+      color: inherit;
+      transition: border-color 0.12s, box-shadow 0.12s, transform 0.12s;
+    }
+    .card:hover {
+      border-color: #0d9488;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+      transform: translateY(-1px);
+    }
+    .card .v {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 22px;
+      font-weight: 600;
+      color: #0d9488;
+      background: rgba(13, 148, 136, 0.08);
+      padding: 8px 14px;
+      border-radius: 8px;
+      flex-shrink: 0;
+    }
+    .card .body { flex: 1; min-width: 0; }
+    .card .title { font-weight: 600; font-size: 15px; }
+    .card .desc { color: #6b6b6b; font-size: 13px; margin-top: 4px; }
+    .card .arrow { color: #999; font-size: 18px; }
+    .card.latest .v { background: #0d9488; color: white; }
+    .card.latest::before {
+      content: 'LATEST';
+      position: absolute;
+      background: #0d9488;
+      color: white;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-left: -8px;
+      margin-top: -12px;
+    }
+    .card.latest { position: relative; }
+    .meta {
+      margin-top: 36px;
+      padding: 18px 22px;
+      background: white;
+      border: 1px solid #e6e6e6;
+      border-radius: 12px;
+      font-size: 13px;
+      color: #6b6b6b;
+      line-height: 1.6;
+    }
+    .meta strong { color: #232323; }
+    a.inline { color: #0d9488; text-decoration: none; }
+    a.inline:hover { text-decoration: underline; }
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      background: #f0f0f0;
+      padding: 1px 5px;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Notestream — Groups feature</h1>
+    <div class="sub">Design exploration for adding Groups (shared note streams) to Notestream. Three iterations.</div>
+
+    <a class="card latest" href="groups-v3.html">
+      <div class="v">v3</div>
+      <div class="body">
+        <div class="title">v3 · 12 frames · codebase-grounded</div>
+        <div class="desc">Auto-share contract, viewer-role menu states, multi-group notes, invite acceptance flow, group directory, cross-user tag namespace, real Slack data, phone frames, eager-vs-lazy decision, tint reconciliation.</div>
+      </div>
+      <span class="arrow">→</span>
+    </a>
+
+    <a class="card" href="groups-v2.html">
+      <div class="v">v2</div>
+      <div class="body">
+        <div class="title">v2 · 15 frames · comprehensive</div>
+        <div class="desc">App shell (light + dark), group settings page, create dialog, tag detail, promote tag flow, note action menu, autocomplete variations, hashtag rendering A/B/C, Slack import 4 states, empty states, compact sidebar, notification preferences, onboarding.</div>
+      </div>
+      <span class="arrow">→</span>
+    </a>
+
+    <a class="card" href="groups-v1.html">
+      <div class="v">v1</div>
+      <div class="body">
+        <div class="title">v1 · 4 scenes · original</div>
+        <div class="desc">Sidebar with Groups section, IdeaFlow Team stream, share dialog with group picker, hashtag autocomplete with team attribution, Slack import config.</div>
+      </div>
+      <span class="arrow">→</span>
+    </a>
+
+    <div class="meta">
+      <strong>About:</strong> Mocks for a "Groups" feature in <a class="inline" href="https://notestream.cloud">Notestream</a> — letting users share entire streams of notes with teams, families, book clubs. Includes a Slack importer that pulls historical tagged messages into a team group. Designed against the existing Notestream codebase, so the proposed schema and UI integrates with how sharing already works today.
+      <br><br>
+      <strong>Locked design decisions:</strong> name = "Groups", tag binding = explicit via <code>SharedHashtag.defaultGroupId</code>, Slack import scope = tagged messages + reply threads, group stream = explicit shares only.
+      <br><br>
+      <strong>Source:</strong> <code>github.com/tmad4000/tmad4000.github.io/tree/main/notestream-mockups</code>
+    </div>
+  </div>
+</body>
+</html>
