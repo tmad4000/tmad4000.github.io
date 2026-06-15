@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude SDK Interactive Use Petition - Jacob Cole</title>
+    <meta name="description" content="A petition asking Anthropic to move the policy line from SDK transport to usage pattern: autonomous automation vs. human-in-the-loop interactive use.">
+    <style>
+        :root {
+            --bg: #f7f5ef;
+            --paper: #fffef9;
+            --ink: #25211b;
+            --muted: #6f695f;
+            --faint: #d8d0c1;
+            --accent: #8f3d22;
+            --accent-ink: #fff7f0;
+            --link: #7d341d;
+            --note: #f0eadf;
+            --shadow: rgba(46, 34, 20, 0.08);
+        }
+
+        [data-theme="dark"] {
+            --bg: #1f211f;
+            --paper: #292925;
+            --ink: #eee8dc;
+            --muted: #aaa196;
+            --faint: #464036;
+            --accent: #d27b53;
+            --accent-ink: #211915;
+            --link: #f0a47d;
+            --note: #33312b;
+            --shadow: rgba(0, 0, 0, 0.26);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background:
+                linear-gradient(90deg, rgba(143, 61, 34, 0.05) 1px, transparent 1px),
+                linear-gradient(180deg, rgba(143, 61, 34, 0.04) 1px, transparent 1px),
+                var(--bg);
+            background-size: 48px 48px;
+            color: var(--ink);
+            font-family: ui-serif, Georgia, "Times New Roman", serif;
+            line-height: 1.62;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            border: 1px solid var(--faint);
+            background: var(--paper);
+            color: var(--muted);
+            border-radius: 999px;
+            width: 2rem;
+            height: 2rem;
+            cursor: pointer;
+            box-shadow: 0 2px 10px var(--shadow);
+        }
+
+        .wrap {
+            width: min(760px, calc(100% - 2rem));
+            margin: 0 auto;
+            padding: 2rem 0 4rem;
+        }
+
+        .back {
+            display: inline-flex;
+            color: var(--muted);
+            text-decoration: none;
+            font: 0.84rem -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            margin: 0.5rem 0 1.25rem;
+        }
+
+        .back:hover {
+            color: var(--link);
+        }
+
+        article {
+            background: var(--paper);
+            border: 1px solid var(--faint);
+            box-shadow: 0 18px 60px var(--shadow);
+            padding: clamp(1.25rem, 4vw, 3.4rem);
+        }
+
+        .eyebrow {
+            color: var(--accent);
+            font: 700 0.72rem -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            margin-bottom: 0.75rem;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 6vw, 4rem);
+            line-height: 0.96;
+            letter-spacing: -0.03em;
+            margin: 0 0 1rem;
+            max-width: 12ch;
+        }
+
+        .dek {
+            color: var(--muted);
+            font-size: 1.1rem;
+            max-width: 62ch;
+            margin: 0 0 1.5rem;
+        }
+
+        .source-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            margin: 1.25rem 0 2rem;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            font-size: 0.82rem;
+        }
+
+        .source-bar a,
+        .source-bar span {
+            border: 1px solid var(--faint);
+            color: var(--link);
+            background: var(--note);
+            padding: 0.45rem 0.7rem;
+            text-decoration: none;
+        }
+
+        .source-bar a:hover {
+            border-color: var(--accent);
+        }
+
+        .tldr {
+            background: var(--ink);
+            color: var(--paper);
+            padding: clamp(1.1rem, 3vw, 1.75rem);
+            margin: 2rem 0;
+            border-left: 6px solid var(--accent);
+        }
+
+        .tldr h2 {
+            color: var(--accent);
+            font: 800 0.78rem -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            margin: 0 0 0.8rem;
+        }
+
+        .tldr p {
+            margin: 0 0 1rem;
+        }
+
+        .tldr p:last-child {
+            margin-bottom: 0;
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin: 1.4rem 0 2.2rem;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        .button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 2.7rem;
+            padding: 0.72rem 1rem;
+            background: var(--accent);
+            color: var(--accent-ink);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .button.secondary {
+            background: transparent;
+            color: var(--link);
+            border: 1px solid var(--faint);
+        }
+
+        h2 {
+            font-size: 1.55rem;
+            line-height: 1.15;
+            margin: 2.4rem 0 0.9rem;
+        }
+
+        p {
+            margin: 0 0 1rem;
+        }
+
+        ul {
+            padding-left: 1.3rem;
+            margin: 0 0 1rem;
+        }
+
+        li {
+            margin: 0 0 0.6rem;
+        }
+
+        a {
+            color: var(--link);
+        }
+
+        .note {
+            background: var(--note);
+            border-left: 4px solid var(--accent);
+            padding: 0.9rem 1rem;
+            color: var(--muted);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            font-size: 0.9rem;
+            margin: 1.5rem 0;
+        }
+
+        .signature {
+            margin-top: 2rem;
+        }
+
+        .footnote {
+            border-top: 1px solid var(--faint);
+            margin-top: 2rem;
+            padding-top: 1rem;
+            color: var(--muted);
+            font-size: 0.95rem;
+        }
+
+        @media (max-width: 600px) {
+            .theme-toggle {
+                position: absolute;
+            }
+
+            article {
+                border-left: 0;
+                border-right: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme"></button>
+
+    <main class="wrap">
+        <a href="index.html" class="back">&larr; Jacob Cole</a>
+
+        <article>
+            <div class="eyebrow">Petition draft</div>
+            <h1>Move the line, not the goal.</h1>
+            <p class="dek">A request to Anthropic: keep the anti-arbitrage line intact, but draw it around autonomous usage patterns rather than SDK transport.</p>
+
+            <div class="source-bar" aria-label="Sources">
+                <span>Last pulled from Proof: June 15, 2026</span>
+                <a href="https://www.proofeditor.ai/d/0vpgwtnc" target="_blank" rel="noopener">Proof draft</a>
+                <a href="https://anthropic.worldissuetracker.com/issue/do-not-charge-separately-for-claude-p-programmatic-sdk-usage-keep-it-under-the-subscription-quota" target="_blank" rel="noopener">World Issue Tracker petition</a>
+            </div>
+
+            <section class="tldr" aria-labelledby="tldr-heading">
+                <h2 id="tldr-heading">TL;DR</h2>
+                <p>We support ending subscription arbitrage by 24/7 autonomous agents. That's not what this petition asks Anthropic to reverse, and honest prices on genuinely scarce compute are not what we object to. The problem is that the June 15 policy draws its line at the transport layer: Agent SDK vs. first-party terminal, when its stated target is the usage pattern: autonomous vs. human-in-the-loop. The result: a human typing into a mobile client, a voice interface, or an assistive-tech wrapper, usage identical in pattern and identical in cost to serve, gets billed as automation at API rates, with disabled users who depend on hands-free interfaces hit hardest.</p>
+                <p>That price difference tracks no real limit; it's a policy choice dressed as physics. It also quietly makes Anthropic's own surfaces the only affordable way to have a human-paced conversation with Claude, the kind of by-default interface concentration Anthropic itself warns against, and the opposite of the vendor-neutral, community-driven ecosystem it donated MCP to the Linux Foundation to protect.</p>
+                <p>The fix isn't reversal. It's moving the line. We ask for: (1) a capped Personal Interactive bucket inside Pro/Max for user-initiated, OAuth-bound SDK sessions, with no service accounts and no scheduled jobs; (2) a verified interactive-client pilot for assistive tech and interactive apps, with attestation and revocation; and (3) transition credits now for the accessibility users caught in the blast radius. Move the line, not the goal.</p>
+            </section>
+
+            <div class="actions">
+                <a class="button" href="https://anthropic.worldissuetracker.com/issue/do-not-charge-separately-for-claude-p-programmatic-sdk-usage-keep-it-under-the-subscription-quota" target="_blank" rel="noopener">Open petition on WIT</a>
+                <a class="button secondary" href="https://www.proofeditor.ai/d/0vpgwtnc" target="_blank" rel="noopener">Read source draft</a>
+            </div>
+
+            <h2>Letter</h2>
+            <p>Dear Anthropic team,</p>
+
+            <p>I am a heavy Claude Code user with a documented disability that makes it difficult to use my hands. For users such as myself, and for quadriplegic patients I have worked with, physically hitting a dictation button is painful or impossible. We rely heavily on hands-free solutions such as Omnara.com, which has provided niche innovations around fully hands-free voice-to-voice communication and control of agents.</p>
+
+            <p>The upcoming changes in billing to move Claude SDK and print mode to extra usage make it financially infeasible for us to continue to use your software. My monthly bill for fully interactive usage would exceed $5,000, whereas I can afford only the $200 Claude Max subscription. The issue with not being able to build affordable customizations on top of your interface is that the longtail of users do not get supported by the design choices of mainstream providers. This includes users with disabilities.</p>
+
+            <p>I would like to propose a few options that would mitigate this issue, while also helping prevent abuse of the subscription. We love Anthropic and its mission, and would like to see it succeed. Many of our friends work there. I am not asking for unlimited free automation; the ask is to preserve affordable interactive use while drawing a clear line against non-interactive abuse.</p>
+
+            <p>As a preface, the consensus from both the developer community we have spoken with and several leading VCs is that this billing switch may not be a good business decision for Anthropic. Competing model providers, such as Codex, have improved radically in the last few months, and this billing change may be a trigger for a large amount of your user base, acquired through your first-mover advantage with Claude Code, to try them out. Codex has several advantages over Claude Code, and we believe a large fraction of your strongest power users may switch.</p>
+
+            <p>In our perspective, Claude's unique advantage lies in how natural it is to converse with it in the early stages of a software design process, and how pleasant it is to make decisions interactively. If Codex is a gritty engineer, Claude is a vibey product designer / PM and an easier thought partner.</p>
+
+            <p>Scheduled use of Claude is not even where your product has a unique advantage, and many developers in our group have switched all scheduled-use tasks onto another provider without a noticeable loss.</p>
+
+            <h2>The proposals are as follows</h2>
+
+            <p>First, for all of the below, modify the terms of service to make a clear distinction between interactive use of the API and scheduled or programmatically triggered use.</p>
+
+            <p>Then, depending on the economics of this situation, we suspect that the terms of service and legal risk alone may be sufficient for companies that are large enough to be a significant source of revenue for your API billing to avoid violating them.</p>
+
+            <p>Second, if that is infeasible, another proposal could be to offer API credits to companies that are explicitly building interactive interfaces on top of Claude Code: a UX innovation grant, or assistive technology grant. These grants would encourage a plethora of creative exploration on top of your platform. Otherwise, this exploration will happen on other AI platforms.</p>
+
+            <p>A variant on this could be to offer a means for specific apps like Omnara to insert a signature into every API request, so it is evident when users are using their own Claude subscriptions through Omnara itself. It could be easily verified by your own team that Omnara does not abuse this. If Omnara were to add a feature to run agents every hour, 24 hours a day, and your team did not condone that behavior, you could test whether Omnara is faithfully abiding by appropriate use of the special signature key for interactive-mode usage only.</p>
+
+            <p>A fourth alternative, maybe preferred, that we could do to prevent subscription abuse that's actually remarkably simple is just have stricter session limits around monthly use, for example daily limits, weekly limits, etc. so that people who are running a giant task every hour on the hour get rate limited. Ultimately this seems like a reasonable sustainable solution to prevent abuse because it wouldn't trouble people working fairly normal human work hours with the occasional 3-day power sprint, but it would curb excessive consistent scheduled agent usage.</p>
+
+            <p>These measures are not theoretically impossible to work around, but a dedicated hacker has many other ways to abuse a subscription. I think the combination of inconvenience and legal deterrence would be sufficient to prevent egregious subscription abuse.</p>
+
+            <p>This could be terrific press for Anthropic as a public benefit corporation: supporting disabled users. And disabled users are also the tip of the iceberg of creative users and developers, who are the lifeblood of a flourishing user ecosystem.</p>
+
+            <p>I've talked to a lot of people about this and the pulse on the ground from the community in SF is that it's more generally a missed opportunity to not market as the most developer-friendly platform that all the kids with a gleam in their eye are creating cool innovations off of, keeping the original scrappy Silicon Valley ethos of being what smart people are hacking with on the weekends.</p>
+
+            <p>Fixing assistive technology is just a corner of this.</p>
+
+            <p>Thanks for considering this and best wishes,</p>
+
+            <p class="signature">Jacob Cole<br>CEO, Ideaflow.io, prev. MIT Media Lab, and many friends.</p>
+
+            <p class="note">Public copy note: the direct petition contact email is redacted here. Use the contact links on Jacob's homepage or include the requested Anthropic Petition subject if you already have the address.</p>
+
+            <p class="footnote"><strong>Omnara.com</strong> is effectively a voice-based terminal that supports interactive voice-to-voice control of agents. It uses the SDK. It's a small three-person YC startup that is open source. They have done an incredible job fine-tuning the audio experience for all sorts of hands-free use cases.</p>
+        </article>
+    </main>
+
+    <script>
+        (function() {
+            var btn = document.getElementById('theme-toggle');
+            var root = document.documentElement;
+
+            function getSystemTheme() {
+                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            }
+
+            function applyTheme() {
+                var saved = localStorage.getItem('theme');
+                root.setAttribute('data-theme', saved || getSystemTheme());
+                btn.textContent = root.getAttribute('data-theme') === 'dark' ? '\u2600\uFE0F' : '\uD83C\uDF19';
+            }
+
+            btn.addEventListener('click', function() {
+                var systemTheme = getSystemTheme();
+                if (!localStorage.getItem('theme')) {
+                    localStorage.setItem('theme', systemTheme === 'dark' ? 'light' : 'dark');
+                } else if (localStorage.getItem('theme') !== systemTheme) {
+                    localStorage.removeItem('theme');
+                } else {
+                    localStorage.setItem('theme', root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+                }
+                applyTheme();
+            });
+
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() {
+                if (!localStorage.getItem('theme')) applyTheme();
+            });
+
+            applyTheme();
+        })();
+    </script>
+</body>
+</html>
