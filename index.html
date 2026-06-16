@@ -449,6 +449,214 @@
         .filter-empty.show {
             display: block;
         }
+
+        /* Kitsune — quiet floating doorway + side panel chat */
+        .kitsune-doorway {
+            position: fixed;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: none;
+            border: none;
+            color: var(--archive-btn);
+            font-size: 0.75rem;
+            cursor: pointer;
+            padding: 0.25rem 0.5rem;
+            transition: color 0.2s;
+            z-index: 30;
+            font-family: inherit;
+        }
+
+        .kitsune-doorway:hover {
+            color: var(--archive-btn-hover);
+        }
+
+        .kitsune-doorway .fox {
+            font-style: normal;
+            margin-right: 0.25rem;
+        }
+
+        .kitsune-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.25);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+            z-index: 40;
+        }
+
+        .kitsune-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .kitsune-panel {
+            position: fixed;
+            top: 0;
+            right: 0;
+            height: 100vh;
+            width: min(400px, 100vw);
+            background: var(--archive-bg);
+            border-left: 1px solid var(--archive-border);
+            box-shadow: -8px 0 28px var(--archive-shadow);
+            transform: translateX(100%);
+            transition: transform 0.28s ease;
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .kitsune-panel.open {
+            transform: translateX(0);
+        }
+
+        .kitsune-head {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 1.1rem 0.75rem;
+            border-bottom: 1px solid var(--archive-border);
+        }
+
+        .kitsune-head .title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--heading);
+        }
+
+        .kitsune-head .fox {
+            font-size: 1.1rem;
+        }
+
+        .kitsune-close {
+            margin-left: auto;
+            background: none;
+            border: none;
+            color: var(--archive-btn);
+            font-size: 1.1rem;
+            line-height: 1;
+            cursor: pointer;
+            padding: 0.25rem;
+            transition: color 0.2s;
+        }
+
+        .kitsune-close:hover {
+            color: var(--archive-btn-hover);
+        }
+
+        .kitsune-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem 1.1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
+        }
+
+        .kitsune-msg {
+            max-width: 88%;
+            border-radius: 14px;
+            padding: 0.6rem 0.8rem;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+
+        .kitsune-msg.user {
+            align-self: flex-end;
+            background: var(--quote-border);
+            color: var(--link-hover-text);
+        }
+
+        [data-theme="dark"] .kitsune-msg.user {
+            background: var(--inline-link-hover);
+            color: var(--bg-end);
+        }
+
+        .kitsune-msg.assistant {
+            align-self: flex-start;
+            background: var(--sub-link-bg);
+            border: 1px solid var(--archive-border);
+            color: var(--text);
+        }
+
+        .kitsune-msg.system {
+            align-self: flex-start;
+            color: var(--inline-link);
+            font-size: 0.8rem;
+            font-style: italic;
+        }
+
+        .kitsune-form {
+            border-top: 1px solid var(--archive-border);
+            display: flex;
+            gap: 0.5rem;
+            padding: 0.8rem;
+        }
+
+        .kitsune-form textarea {
+            flex: 1;
+            resize: none;
+            height: 2.5rem;
+            max-height: 7rem;
+            border: 1px solid var(--archive-border);
+            border-radius: 12px;
+            padding: 0.55rem 0.7rem;
+            font: inherit;
+            font-size: 0.85rem;
+            color: var(--text);
+            background: var(--link-bg);
+            outline: none;
+        }
+
+        .kitsune-form textarea:focus {
+            border-color: var(--inline-link-hover);
+        }
+
+        .kitsune-form button {
+            border: 1px solid var(--archive-border);
+            border-radius: 12px;
+            padding: 0 0.9rem;
+            font: inherit;
+            font-size: 0.8rem;
+            color: var(--link-hover-text);
+            background: var(--link-bg);
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .kitsune-form button:hover {
+            border-color: var(--inline-link-hover);
+        }
+
+        .kitsune-form button[disabled] {
+            opacity: 0.5;
+            cursor: progress;
+        }
+
+        .kitsune-fine {
+            padding: 0 1.1rem 0.85rem;
+            font-size: 0.68rem;
+            color: var(--inline-link);
+        }
+
+        @media (max-width: 560px) {
+            .kitsune-panel {
+                top: auto;
+                bottom: 0;
+                height: 82vh;
+                width: 100vw;
+                border-left: none;
+                border-top: 1px solid var(--archive-border);
+                border-radius: 18px 18px 0 0;
+                transform: translateY(100%);
+            }
+            .kitsune-panel.open {
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
 <body>
@@ -757,6 +965,25 @@
         </div>
     </div>
 
+    <button class="kitsune-doorway" id="kitsune-open" aria-label="Ask Kitsune, Jacob's public agent">
+        <span class="fox" aria-hidden="true">🦊</span>ask kitsune
+    </button>
+
+    <div class="kitsune-overlay" id="kitsune-overlay"></div>
+    <aside class="kitsune-panel" id="kitsune-panel" role="dialog" aria-modal="true" aria-label="Ask Kitsune">
+        <div class="kitsune-head">
+            <span class="fox" aria-hidden="true">🦊</span>
+            <span class="title">Ask Kitsune</span>
+            <button class="kitsune-close" id="kitsune-close" aria-label="Close">✕</button>
+        </div>
+        <div class="kitsune-messages" id="kitsune-messages"></div>
+        <p class="kitsune-fine">Public agent — no private memory, no account access. <a href="ask-kitsune.html" style="color:inherit;">Open full page →</a></p>
+        <form class="kitsune-form" id="kitsune-form">
+            <textarea id="kitsune-input" placeholder="Ask about Jacob's projects, writing, open asks…" autocomplete="off" required></textarea>
+            <button id="kitsune-send" type="submit">Send</button>
+        </form>
+    </aside>
+
     <script>
         // Theme toggle — cycles: system → light → dark → system
         (function() {
@@ -925,6 +1152,95 @@
             document.getElementById('recent-content').classList.toggle('open');
             document.getElementById('archive-content').classList.remove('open');
         }
+
+        // Kitsune — public agent side panel chat
+        (function() {
+            var openBtn = document.getElementById('kitsune-open');
+            var closeBtn = document.getElementById('kitsune-close');
+            var overlay = document.getElementById('kitsune-overlay');
+            var panel = document.getElementById('kitsune-panel');
+            var messagesEl = document.getElementById('kitsune-messages');
+            var form = document.getElementById('kitsune-form');
+            var input = document.getElementById('kitsune-input');
+            var send = document.getElementById('kitsune-send');
+            var endpoint = window.HERMES_PUBLIC_PROXY_URL || 'https://liz-achievements-disco-helicopter.trycloudflare.com/api/hermes-chat';
+            var history = [];
+            var greeted = false;
+
+            function addMessage(role, text) {
+                var div = document.createElement('div');
+                div.className = 'kitsune-msg ' + role;
+                div.textContent = text;
+                messagesEl.appendChild(div);
+                messagesEl.scrollTop = messagesEl.scrollHeight;
+                return div;
+            }
+
+            function openPanel() {
+                overlay.classList.add('open');
+                panel.classList.add('open');
+                if (!greeted) {
+                    addMessage('system', "Hi — I'm Kitsune 🦊, the guide to Jacob's public work. Ask me about his projects, writing, or open asks.");
+                    greeted = true;
+                }
+                setTimeout(function() { input.focus(); }, 280);
+            }
+
+            function closePanel() {
+                overlay.classList.remove('open');
+                panel.classList.remove('open');
+            }
+
+            openBtn.addEventListener('click', openPanel);
+            closeBtn.addEventListener('click', closePanel);
+            overlay.addEventListener('click', closePanel);
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && panel.classList.contains('open')) closePanel();
+            });
+
+            async function sendMessage(text) {
+                history.push({ role: 'user', content: text });
+                addMessage('user', text);
+                var pending = addMessage('assistant', 'Thinking…');
+                send.disabled = true;
+                try {
+                    var res = await fetch(endpoint, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ messages: history.slice(-12) })
+                    });
+                    if (!res.ok) {
+                        var body = await res.text();
+                        throw new Error(res.status + ' ' + res.statusText + (body ? ' — ' + body.slice(0, 200) : ''));
+                    }
+                    var data = await res.json();
+                    var reply = data.reply || data.message || data.content || 'No reply returned.';
+                    pending.textContent = reply;
+                    history.push({ role: 'assistant', content: reply });
+                } catch (err) {
+                    pending.textContent = "Kitsune is offline right now. You can reach Jacob at jacob@jacobcole.ai in the meantime.";
+                    console.warn('Kitsune proxy error:', err);
+                } finally {
+                    send.disabled = false;
+                    input.focus();
+                }
+            }
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var text = input.value.trim();
+                if (!text || send.disabled) return;
+                input.value = '';
+                sendMessage(text);
+            });
+
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    form.requestSubmit();
+                }
+            });
+        })();
 
         document.addEventListener('click', function(e) {
             var archive = document.querySelector('.archive');

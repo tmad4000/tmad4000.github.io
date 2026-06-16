@@ -53,6 +53,7 @@
         .home-link { text-decoration: none; opacity: 0.78; }
         h1 { margin: 0; font-size: clamp(2rem, 5vw, 3.8rem); line-height: 1; }
         .subtitle { color: var(--muted); max-width: 52rem; margin: 1rem 0 1.5rem; }
+        .fineprint { color: var(--muted); font-size: 0.8rem; margin: 0.9rem 0.25rem 0; opacity: 0.8; }
         .notice {
             border: 1px solid var(--border);
             background: var(--card);
@@ -130,10 +131,7 @@
             <span aria-hidden="true">🦊</span>
         </div>
         <h1>Ask Kitsune</h1>
-        <p class="subtitle">A public, sandboxed Hermes Agent for visitors. It can talk about public projects and general ideas, but it is intentionally separated from private memory, private chats, private files, and private credentials.</p>
-        <div class="notice">
-            Privacy boundary: this page never contains the Hermes API key. The browser sends messages to a server-side proxy, and the proxy calls the public Hermes profile.
-        </div>
+        <p class="subtitle">A public agent that can talk about Jacob's projects, writing, and open asks — and help you figure out how to reach him.</p>
         <section class="chat" aria-label="Chat with Jacob's public Hermes agent">
             <div class="messages" id="messages"></div>
             <form id="chat-form">
@@ -141,6 +139,7 @@
                 <button id="send" type="submit">Send</button>
             </form>
         </section>
+        <p class="fineprint">Public agent — no private memory, no account access. It speaks about Jacob, not as him.</p>
     </main>
 
     <script>
@@ -160,7 +159,7 @@
             return div;
         }
 
-        addMessage('system', 'Hi — I am the public Kitsune/Hermes agent. I can help with public projects and general ideas, while staying separated from private memory, chats, files, and credentials.');
+        addMessage('system', "Hi — I'm Kitsune 🦊, the guide to Jacob's public work. Ask me about his projects, writing, or open asks, and I'll point you in the right direction.");
 
         async function sendMessage(text) {
             history.push({ role: 'user', content: text });
@@ -182,7 +181,8 @@
                 pending.textContent = text;
                 history.push({ role: 'assistant', content: text });
             } catch (err) {
-                pending.textContent = `Proxy unavailable: ${err.message}\n\nThe public-bot profile works locally; deploy the server-side proxy in hermes-public-proxy/ to make this page live without exposing secrets.`;
+                pending.textContent = "Kitsune is offline right now — the public agent isn't reachable from here yet. In the meantime, you can reach Jacob at jacob@jacobcole.ai. (For maintainers: deploy the proxy in hermes-public-proxy/ and point HERMES_PUBLIC_PROXY_URL at it.)";
+                console.warn('Hermes proxy error:', err);
             } finally {
                 send.disabled = false;
                 input.focus();

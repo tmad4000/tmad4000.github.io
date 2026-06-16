@@ -44,6 +44,33 @@ Then route `/api/hermes-chat` on the homepage domain to the Worker, or set this 
 </script>
 ```
 
+## Persona & public context
+
+The agent's persona and public knowledge about Jacob live in
+[`public-agent-context.md`](./public-agent-context.md) (public info only —
+mediator-Kitsune, third person about Jacob, no private data).
+
+Two consumers must stay in sync with that file:
+
+1. The Worker embeds a condensed copy as the `PUBLIC_AGENT_PROMPT` constant in
+   `cloudflare-worker.js` (overridable via a `PUBLIC_AGENT_PROMPT` secret/env).
+2. The local `public-bot` Hermes profile should be seeded with the same context
+   so behavior matches whichever backend answers.
+
+## Deployment status (known gap)
+
+As of this writing the frontend default endpoint is an **ephemeral
+`*.trycloudflare.com` quick-tunnel URL**, which does not survive restarts. When
+it is down, both `ask-kitsune.html` and the homepage Kitsune panel show a quiet
+"Kitsune is offline" message and point visitors to email — no secrets are
+exposed. To make the agent durably live:
+
+1. Deploy this Worker (or an equivalent same-host proxy) per the steps above.
+2. Set a stable URL via `window.HERMES_PUBLIC_PROXY_URL` on the pages, or route
+   `/api/hermes-chat` on the site domain to the Worker.
+3. Replace the hard-coded `trycloudflare.com` fallback in `index.html` and
+   `ask-kitsune.html` with the stable URL.
+
 ## Security checklist
 
 - [ ] `API_SERVER_KEY` is only in server-side Worker/VPS secrets.
