@@ -453,9 +453,8 @@
         /* Kitsune — quiet floating doorway + side panel chat */
         .kitsune-doorway {
             position: fixed;
-            bottom: 1.5rem;
-            left: 50%;
-            transform: translateX(-50%);
+            right: 1.5rem;
+            bottom: 4rem;
             background: none;
             border: none;
             color: var(--archive-btn);
@@ -465,6 +464,8 @@
             transition: color 0.2s;
             z-index: 30;
             font-family: inherit;
+            line-height: 1;
+            white-space: nowrap;
         }
 
         .kitsune-doorway:hover {
@@ -643,6 +644,12 @@
         }
 
         @media (max-width: 560px) {
+            .kitsune-doorway {
+                right: 1.5rem;
+                bottom: 4rem;
+                max-width: calc(100vw - 3rem);
+            }
+
             .kitsune-panel {
                 top: auto;
                 bottom: 0;
@@ -989,48 +996,50 @@
         (function() {
             var btn = document.getElementById('theme-toggle');
             var root = document.documentElement;
+            var modes = ['system', 'light', 'dark'];
+            var mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
             function getSystemTheme() {
-                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                return mediaQuery.matches ? 'dark' : 'light';
+            }
+
+            function getMode() {
+                var saved = localStorage.getItem('theme');
+                return saved === 'light' || saved === 'dark' ? saved : 'system';
             }
 
             function applyTheme() {
-                var saved = localStorage.getItem('theme');
-                if (saved) {
-                    root.setAttribute('data-theme', saved);
-                } else {
-                    root.setAttribute('data-theme', getSystemTheme());
-                }
+                var mode = getMode();
+                var effective = mode === 'system' ? getSystemTheme() : mode;
+                root.setAttribute('data-theme', effective);
+                root.setAttribute('data-theme-mode', mode);
                 updateButton();
             }
 
             function updateButton() {
-                var current = root.getAttribute('data-theme');
-                btn.textContent = current === 'dark' ? '☀️' : '🌙';
+                var mode = getMode();
+                var effective = root.getAttribute('data-theme');
+                btn.textContent = mode === 'system' ? '◐' : (mode === 'dark' ? '☀️' : '🌙');
+                btn.title = mode === 'system'
+                    ? 'Theme: system (' + effective + ')'
+                    : 'Theme: ' + mode;
+                btn.setAttribute('aria-label', btn.title + '. Click to cycle theme.');
             }
 
             btn.addEventListener('click', function() {
-                var current = root.getAttribute('data-theme');
-                var systemTheme = getSystemTheme();
-
-                if (!localStorage.getItem('theme')) {
-                    // Currently following system — switch to opposite
-                    var next = systemTheme === 'dark' ? 'light' : 'dark';
-                    localStorage.setItem('theme', next);
-                } else if (localStorage.getItem('theme') !== systemTheme) {
-                    // Already overridden to opposite — go back to system
+                var mode = getMode();
+                var next = modes[(modes.indexOf(mode) + 1) % modes.length];
+                if (next === 'system') {
                     localStorage.removeItem('theme');
                 } else {
-                    // Overridden but matches system — switch to opposite
-                    var next = current === 'dark' ? 'light' : 'dark';
                     localStorage.setItem('theme', next);
                 }
                 applyTheme();
             });
 
             // Listen for system changes
-            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() {
-                if (!localStorage.getItem('theme')) {
+            mediaQuery.addEventListener('change', function() {
+                if (getMode() === 'system') {
                     applyTheme();
                 }
             });
