@@ -35,6 +35,27 @@ h1 { font-size:1.65rem; font-weight:700; color:var(--heading); margin:0 0 0.15re
 .sub { color:var(--tagline); font-size:0.8rem; margin:0 0 0.6rem; }
 header img { flex:0 0 auto; width:86px; height:86px; background:#fff; padding:5px; border-radius:7px; }
 .guide { font-size:0.82rem; }
+details.sec { margin:0 0 0.5rem; }
+details.sec > summary {
+  cursor:pointer; list-style:none; display:flex; align-items:baseline; gap:0.5rem;
+  padding:0.6rem 0.2rem 0.5rem; font-size:0.95rem; font-weight:600; color:var(--heading);
+  border-bottom:1px solid var(--separator); user-select:none;
+}
+details.sec > summary::-webkit-details-marker { display:none; }
+details.sec > summary::before {
+  content:"\25b8"; font-size:0.75rem; color:var(--section-title); transition:transform .15s; flex:0 0 auto;
+}
+details.sec[open] > summary::before { transform:rotate(90deg); }
+details.sec > summary:hover { color:var(--accent); }
+details.sec > summary .num { color:var(--section-title); font-weight:700; font-size:0.68rem; letter-spacing:0.08em; }
+details.sec > summary .hint { color:var(--desc); font-weight:400; font-size:0.76rem; margin-left:auto; text-align:right; }
+.secbody { padding-top:0.5rem; }
+.toolbar { display:flex; justify-content:flex-end; margin-bottom:0.35rem; }
+.toolbar button {
+  background:none; border:none; cursor:pointer; font-family:inherit; font-size:0.72rem;
+  color:var(--section-title); padding:0.2rem 0.1rem;
+}
+.toolbar button:hover { color:var(--accent); }
 h2 {
   font-size:0.68rem; text-transform:uppercase; letter-spacing:0.09em; color:var(--section-title);
   margin:1.6rem 0 0.5rem; padding-left:0.2rem; font-weight:700;
@@ -96,7 +117,11 @@ footer a { color:var(--section-title); }
   <img src="qr.svg" alt="QR code to jacobcole.ai/memory-workshop">
 </header>
 
-<h2>1 · OpenClaw</h2>
+<div class="toolbar"><button id="toggle-all" type="button">Expand all</button></div>
+
+<details class="sec" open>
+<summary><span class="num">1</span> OpenClaw <span class="hint">install + connect a chat</span></summary>
+<div class="secbody">
 <div class="card">
   <h3>Install <span class="n">— macOS / Linux</span></h3>
   <div class="row">
@@ -159,7 +184,20 @@ footer a { color:var(--section-title); }
   </details>
 </div>
 
-<h2>2 · Ideaflow connector</h2>
+</div></details>
+
+<details class="sec">
+<summary><span class="num">2</span> Ideaflow connector <span class="hint">notes in Claude &amp; ChatGPT</span></summary>
+<div class="secbody">
+<div class="card">
+  <h3>Don't have Ideaflow yet?</h3>
+  <p class="why" style="margin-top:0">A low-friction capture notebook — the memory the connector reads and writes. Free to start.</p>
+  <div class="row">
+    <a class="btn" href="https://ideaflow.app">Open ideaflow.app</a>
+    <a class="btn ghost" href="https://apps.apple.com/us/app/ideaflow-notes/id6463830566">iOS app</a>
+  </div>
+</div>
+
 <div class="card">
   <h3>The endpoint <span class="n">— same for every client</span></h3>
   <div class="row">
@@ -203,7 +241,11 @@ footer a { color:var(--section-title); }
   </div>
 </details>
 
-<h2>3 · Your archives</h2>
+</div></details>
+
+<details class="sec">
+<summary><span class="num">3</span> Your archives <span class="hint">X and Instagram, local</span></summary>
+<div class="secbody">
 <div class="card">
   <h3>Birdclaw <span class="n">— X / Twitter</span></h3>
   <div class="row">
@@ -260,12 +302,18 @@ footer a { color:var(--section-title); }
   </details>
 </div>
 
-<h2>4 · Bonus</h2>
+</div></details>
+
+<details class="sec">
+<summary><span class="num">4</span> Group chats <span class="hint">beta</span></summary>
+<div class="secbody">
 <div class="card">
   <h3>Group chats → durable artifacts <span class="tag">beta</span></h3>
   <p class="why" style="margin-top:0">Point your agent at a group chat and have it write the parts worth keeping out to a wiki. Assembly required.</p>
   <div class="row"><a class="btn ghost" href="https://wikihub.md/@jacobcole/vibe-coding-tutorial/memory-workshop/groupchats-beta">Read the beta guide →</a></div>
 </div>
+
+</div></details>
 
 <footer>
   Guide pages:
@@ -305,10 +353,21 @@ footer a { color:var(--section-title); }
     });
   });
 
+  var toggle = document.getElementById('toggle-all');
+  toggle.addEventListener('click', function () {
+    var secs = document.querySelectorAll('details.sec');
+    var expand = toggle.textContent === 'Expand all';
+    secs.forEach(function (d) { d.open = expand; });
+    toggle.textContent = expand ? 'Collapse all' : 'Expand all';
+  });
+
   // Arriving at #mcp from the wiki: open nothing, just flag the endpoint.
   if (location.hash === '#mcp') {
     var el = document.getElementById('mcp');
-    if (el) { el.scrollIntoView({block: 'center'}); el.style.outline = '2px solid var(--accent)'; }
+    if (el) {
+      var sec = el.closest('details'); while (sec) { sec.open = true; sec = sec.parentElement.closest('details'); }
+      el.scrollIntoView({block: 'center'}); el.style.outline = '2px solid var(--accent)';
+    }
   }
 })();
 </script>
