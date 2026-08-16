@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Memory Workshop</title>
+<meta name="description" content="Set up a personal agent with access to your own memory: Ideaflow connectors, Birdclaw, Gramclaw.">
+<meta property="og:title" content="Memory Workshop">
+<meta property="og:description" content="Give an agent access to your own memory — notes, X archive, Instagram archive, group chats.">
+<style>
+:root {
+  --bg-start:#f5f7fa; --bg-end:#e4e8ec; --text:#333; --heading:#111; --tagline:#888;
+  --section-title:#999; --card-bg:#fff; --shadow:rgba(0,0,0,0.08); --desc:#888;
+  --sub-bg:#f9f9fa; --separator:#ddd; --code-bg:#f4f5f7; --code-text:#24292f;
+  --accent:#2563eb; --ok:#16a34a; --warn:#d97706;
+}
+[data-theme="dark"] {
+  --bg-start:#24272c; --bg-end:#2e3238; --text:#c8c8c8; --heading:#e8e8e8; --tagline:#8a8a8a;
+  --section-title:#6a6a6a; --card-bg:rgba(255,255,255,0.06); --shadow:rgba(0,0,0,0.2);
+  --desc:#808080; --sub-bg:rgba(255,255,255,0.03); --separator:#454545;
+  --code-bg:rgba(255,255,255,0.06); --code-text:#d4d4d4;
+  --accent:#60a5fa; --ok:#4ade80; --warn:#fbbf24;
+}
+* { box-sizing:border-box; min-width:0; }
+body {
+  margin:0; padding:2.5rem 1.1rem 3rem;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  background:linear-gradient(160deg,var(--bg-start),var(--bg-end)); background-attachment:fixed;
+  color:var(--text); line-height:1.5; font-size:15px; -webkit-font-smoothing:antialiased;
+}
+.wrap { max-width:640px; margin:0 auto; }
+header { display:flex; gap:1rem; align-items:flex-start; margin-bottom:1.75rem; }
+header .txt { flex:1 1 auto; }
+h1 { font-size:1.65rem; font-weight:700; color:var(--heading); margin:0 0 0.15rem; letter-spacing:-0.01em; }
+.sub { color:var(--tagline); font-size:0.8rem; margin:0 0 0.6rem; }
+header img { flex:0 0 auto; width:86px; height:86px; background:#fff; padding:5px; border-radius:7px; }
+.guide { font-size:0.82rem; }
+h2 {
+  font-size:0.68rem; text-transform:uppercase; letter-spacing:0.09em; color:var(--section-title);
+  margin:1.6rem 0 0.5rem; padding-left:0.2rem; font-weight:700;
+}
+.card { background:var(--card-bg); border-radius:9px; padding:0.85rem 0.95rem; box-shadow:0 1px 3px var(--shadow); margin-bottom:0.45rem; }
+.card h3 { margin:0 0 0.5rem; font-size:0.92rem; color:var(--heading); font-weight:600; }
+.card h3 .n { color:var(--desc); font-weight:400; }
+.why { font-size:0.78rem; color:var(--desc); margin:0.45rem 0 0; }
+.why a { color:var(--accent); }
+a { color:var(--accent); }
+.row { display:flex; gap:0.4rem; align-items:stretch; margin-top:0.35rem; }
+.row code {
+  flex:1 1 auto; background:var(--code-bg); color:var(--code-text);
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:0.745rem;
+  padding:0.5rem 0.6rem; border-radius:5px; overflow-x:auto; white-space:pre; scrollbar-width:thin;
+}
+button.copy, a.btn {
+  flex:0 0 auto; border:none; border-radius:5px; cursor:pointer; font-family:inherit;
+  font-size:0.745rem; font-weight:600; padding:0.5rem 0.7rem; background:var(--accent);
+  color:#fff; text-decoration:none; display:inline-flex; align-items:center; white-space:nowrap;
+  transition:opacity .15s;
+}
+a.btn.ghost { background:transparent; color:var(--accent); box-shadow:inset 0 0 0 1px currentColor; }
+button.copy:hover, a.btn:hover { opacity:.85; }
+button.copy.done { background:var(--ok); }
+details { margin:0.45rem 0 0.45rem; }
+details > summary {
+  cursor:pointer; list-style:none; font-size:0.78rem; color:var(--desc);
+  padding:0.35rem 0.2rem; user-select:none; display:flex; align-items:center; gap:0.35rem;
+}
+details > summary::-webkit-details-marker { display:none; }
+details > summary::before { content:"▸"; font-size:0.7rem; transition:transform .15s; }
+details[open] > summary::before { transform:rotate(90deg); }
+details > summary:hover { color:var(--accent); }
+details .inner { padding:0.1rem 0 0.2rem 0.55rem; border-left:2px solid var(--separator); margin-left:0.3rem; }
+details .inner p { font-size:0.78rem; color:var(--desc); margin:0.4rem 0 0.2rem; }
+ol.steps { font-size:0.78rem; color:var(--desc); margin:0.45rem 0 0; padding-left:1.05rem; }
+ol.steps li { margin-bottom:0.12rem; }
+.tag {
+  display:inline-block; font-size:0.6rem; font-weight:700; letter-spacing:0.06em;
+  text-transform:uppercase; padding:0.1rem 0.35rem; border-radius:3px; vertical-align:0.12em;
+  margin-left:0.3rem; background:var(--sub-bg); color:var(--desc);
+}
+.tag.warn { color:var(--warn); }
+footer { margin-top:2.25rem; padding-top:1rem; border-top:1px solid var(--separator); font-size:0.76rem; color:var(--section-title); }
+footer a { color:var(--section-title); }
+@media (max-width:430px) { header img { width:70px; height:70px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="txt">
+    <h1>Memory Workshop</h1>
+    <p class="sub">Give an agent access to your own memory.</p>
+    <p class="guide"><a href="https://wikihub.md/@jacobcole/vibe-coding-tutorial/workshop/index">Read the full guide →</a></p>
+  </div>
+  <img src="qr.svg" alt="QR code to jacobcole.ai/memory-workshop">
+</header>
+
+<h2>1 · OpenClaw</h2>
+<div class="card">
+  <h3>Install <span class="n">— macOS / Linux</span></h3>
+  <div class="row">
+    <code>curl -fsSL https://openclaw.ai/install.sh | bash</code>
+    <button class="copy" data-copy="curl -fsSL https://openclaw.ai/install.sh | bash">Copy</button>
+  </div>
+  <div class="row">
+    <code>openclaw onboard --install-daemon</code>
+    <button class="copy" data-copy="openclaw onboard --install-daemon">Copy</button>
+  </div>
+  <p class="why">Onboarding picks your model provider and starts the Gateway. Then DM your bot.</p>
+  <details>
+    <summary>Windows, verifying, troubleshooting</summary>
+    <div class="inner">
+      <p>Windows (PowerShell):</p>
+      <div class="row">
+        <code>iwr -useb https://openclaw.ai/install.ps1 | iex</code>
+        <button class="copy" data-copy="iwr -useb https://openclaw.ai/install.ps1 | iex">Copy</button>
+      </div>
+      <p>Check it came up:</p>
+      <div class="row">
+        <code>openclaw gateway status &amp;&amp; openclaw dashboard</code>
+        <button class="copy" data-copy="openclaw gateway status && openclaw dashboard">Copy</button>
+      </div>
+      <p>When something's wrong:</p>
+      <div class="row">
+        <code>openclaw doctor</code>
+        <button class="copy" data-copy="openclaw doctor">Copy</button>
+      </div>
+      <p>Needs Node 22.22.3+, 24.15+, or 25.9+ and a provider API key.</p>
+    </div>
+  </details>
+</div>
+
+<div class="card">
+  <h3>Connect Telegram <span class="n">— fastest channel</span></h3>
+  <ol class="steps">
+    <li>Message <strong>@BotFather</strong> → <code>/newbot</code> → save the token</li>
+    <li>Put it in your config as <code>channels.telegram.botToken</code></li>
+    <li>Run the commands below and approve yourself</li>
+  </ol>
+  <div class="row">
+    <code>openclaw gateway &amp;&amp; openclaw pairing list telegram</code>
+    <button class="copy" data-copy="openclaw gateway && openclaw pairing list telegram">Copy</button>
+  </div>
+  <details>
+    <summary>WhatsApp instead · safety settings</summary>
+    <div class="inner">
+      <div class="row">
+        <code>openclaw channels add --channel whatsapp</code>
+        <button class="copy" data-copy="openclaw channels add --channel whatsapp">Copy</button>
+      </div>
+      <div class="row">
+        <code>openclaw channels login --channel whatsapp</code>
+        <button class="copy" data-copy="openclaw channels login --channel whatsapp">Copy</button>
+      </div>
+      <p>QR-only login, so have your phone in hand.</p>
+      <p><strong>Before you let anyone else in:</strong> keep <code>dmPolicy</code> on <code>"pairing"</code> or <code>"allowlist"</code>. <code>"open"</code> means anyone who finds your bot gets your files and your shell.</p>
+    </div>
+  </details>
+</div>
+
+<h2>2 · Ideaflow connector</h2>
+<div class="card">
+  <h3>The endpoint <span class="n">— same for every client</span></h3>
+  <div class="row">
+    <code id="mcp">https://prod-api.ideaflow.app/v1/mcp</code>
+    <button class="copy" data-copy="https://prod-api.ideaflow.app/v1/mcp">Copy</button>
+  </div>
+  <p class="why">OAuth — you sign in during setup. Don't open this URL; it's for pasting into a connector.</p>
+</div>
+
+<div class="card">
+  <h3>Claude <span class="n">— web, desktop, mobile</span></h3>
+  <div class="row">
+    <button class="copy" data-copy="https://prod-api.ideaflow.app/v1/mcp" style="flex:1 1 auto; justify-content:center">Copy endpoint</button>
+    <a class="btn ghost" href="https://claude.ai/settings/connectors">Open connector settings</a>
+  </div>
+  <p class="why">Add custom connector → name it Ideaflow → paste → Connect → sign in. Then start a <strong>new</strong> chat.</p>
+</div>
+
+<div class="card">
+  <h3>Claude Code <span class="n">— terminal</span></h3>
+  <div class="row">
+    <code>claude mcp add --transport http ideaflow https://prod-api.ideaflow.app/v1/mcp</code>
+    <button class="copy" data-copy="claude mcp add --transport http ideaflow https://prod-api.ideaflow.app/v1/mcp">Copy</button>
+  </div>
+  <p class="why">Then <code>/mcp</code> inside Claude Code to sign in.</p>
+</div>
+
+<details>
+  <summary>Other clients — Cursor, VS Code, ChatGPT</summary>
+  <div class="inner">
+    <p>Cursor and VS Code support real install links — one click, prefilled:</p>
+    <div class="row">
+      <a class="btn" href="cursor://anysphere.cursor-deeplink/mcp/install?name=ideaflow&amp;config=eyJ1cmwiOiAiaHR0cHM6Ly9wcm9kLWFwaS5pZGVhZmxvdy5hcHAvdjEvbWNwIn0=">Add to Cursor</a>
+      <a class="btn" href="https://vscode.dev/redirect/mcp/install?%7B%22name%22%3A%20%22ideaflow%22%2C%20%22type%22%3A%20%22http%22%2C%20%22url%22%3A%20%22https%3A//prod-api.ideaflow.app/v1/mcp%22%7D">Add to VS Code</a>
+    </div>
+    <p><strong>ChatGPT</strong> <span class="tag warn">Pro / Business+</span> — custom MCP connectors aren't available on Plus. Settings → Connectors → Advanced → Developer mode → Create → paste the endpoint → OAuth.</p>
+    <div class="row">
+      <button class="copy" data-copy="https://prod-api.ideaflow.app/v1/mcp">Copy endpoint</button>
+      <a class="btn ghost" href="https://chatgpt.com/#settings/Connectors">Open ChatGPT settings</a>
+    </div>
+  </div>
+</details>
+
+<h2>3 · Your archives</h2>
+<div class="card">
+  <h3>Birdclaw <span class="n">— X / Twitter</span></h3>
+  <div class="row">
+    <a class="btn" href="https://x.com/settings/download_your_data">Request X archive first</a>
+  </div>
+  <p class="why">X takes hours to days to prepare it — start now, set up the rest while you wait.</p>
+  <div class="row">
+    <code>brew install steipete/tap/birdclaw</code>
+    <button class="copy" data-copy="brew install steipete/tap/birdclaw">Copy</button>
+  </div>
+  <details>
+    <summary>Import, sync, serve, back up</summary>
+    <div class="inner">
+      <div class="row">
+        <code>birdclaw init &amp;&amp; birdclaw import archive --json &amp;&amp; birdclaw serve</code>
+        <button class="copy" data-copy="birdclaw init && birdclaw import archive --json && birdclaw serve">Copy</button>
+      </div>
+      <p>Keep it current (bookmarks especially — the API won't give you all of them):</p>
+      <div class="row">
+        <code>birdclaw sync bookmarks --mode auto --limit 100 --refresh --json</code>
+        <button class="copy" data-copy="birdclaw sync bookmarks --mode auto --limit 100 --refresh --json">Copy</button>
+      </div>
+      <p>Back up to a <strong>private</strong> repo — this contains your DMs. <a href="https://birdclaw.sh/quickstart.html">Full quickstart</a></p>
+    </div>
+  </details>
+</div>
+
+<div class="card">
+  <h3>Gramclaw <span class="n">— Instagram</span></h3>
+  <div class="row">
+    <code>npm install -g https://gramclaw.globalbr.ai/downloads/gramclaw-1.1.0.tgz</code>
+    <button class="copy" data-copy="npm install -g https://gramclaw.globalbr.ai/downloads/gramclaw-1.1.0.tgz">Copy</button>
+  </div>
+  <p class="why">The official build, by <a href="https://github.com/artjing">Art Jing</a>. Site + demo at <a href="https://gramclaw.globalbr.ai">gramclaw.globalbr.ai</a>.</p>
+  <details>
+    <summary>Try it with no login · the fork with Instagram sign-in</summary>
+    <div class="inner">
+      <p>Demo mode — fictional content, no Instagram account needed:</p>
+      <div class="row">
+        <code>gramclaw init --demo &amp;&amp; gramclaw serve --open</code>
+        <button class="copy" data-copy="gramclaw init --demo && gramclaw serve --open">Copy</button>
+      </div>
+      <p>Real archive:</p>
+      <div class="row">
+        <code>gramclaw import archive ~/Downloads/instagram-export.zip --json</code>
+        <button class="copy" data-copy="gramclaw import archive ~/Downloads/instagram-export.zip --json">Copy</button>
+      </div>
+      <p>My <a href="https://github.com/tmad4000/gramclaw">fork</a> adds direct Instagram sign-in. Same <code>gramclaw</code> command, so pick one — installing it replaces the official build:</p>
+      <div class="row">
+        <code>npm install -g https://jacobcole.ai/downloads/gramclaw-fork-1.1.0.tgz</code>
+        <button class="copy" data-copy="npm install -g https://jacobcole.ai/downloads/gramclaw-fork-1.1.0.tgz">Copy</button>
+      </div>
+    </div>
+  </details>
+</div>
+
+<h2>4 · Bonus</h2>
+<div class="card">
+  <h3>Group chats → durable artifacts <span class="tag">beta</span></h3>
+  <p class="why" style="margin-top:0">Point your agent at a group chat and have it write the parts worth keeping out to a wiki. Assembly required.</p>
+  <div class="row"><a class="btn ghost" href="https://wikihub.md/@jacobcole/vibe-coding-tutorial/workshop/groupchats-beta">Read the beta guide →</a></div>
+</div>
+
+<footer>
+  Guide pages:
+  <a href="https://wikihub.md/@jacobcole/vibe-coding-tutorial/workshop/index">workshop</a> ·
+  <a href="https://wikihub.md/@jacobcole/vibe-coding-tutorial/workshop/connectors">connectors</a> ·
+  <a href="https://wikihub.md/@jacobcole/vibe-coding-tutorial/workshop/birdclaw">archives</a> ·
+  <a href="https://wikihub.md/@jacobcole/vibe-coding-tutorial/workshop/groupchats-beta">group chats</a>
+  <br><br><a href="/">← jacobcole.ai</a>
+</footer>
+
+</div>
+<script>
+(function () {
+  var mq = window.matchMedia('(prefers-color-scheme: dark)');
+  function apply() { document.documentElement.setAttribute('data-theme', mq.matches ? 'dark' : 'light'); }
+  apply(); mq.addEventListener('change', apply);
+
+  document.querySelectorAll('button.copy').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var text = btn.getAttribute('data-copy');
+      function done() {
+        var prev = btn.textContent;
+        btn.textContent = 'Copied'; btn.classList.add('done');
+        setTimeout(function () { btn.textContent = prev; btn.classList.remove('done'); }, 1500);
+      }
+      function fallback() {
+        var ta = document.createElement('textarea');
+        ta.value = text; ta.setAttribute('readonly', '');
+        ta.style.position = 'fixed'; ta.style.top = '-1000px';
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); done(); } catch (e) { window.prompt('Copy this:', text); }
+        document.body.removeChild(ta);
+      }
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(done, fallback);
+      } else { fallback(); }
+    });
+  });
+
+  // Arriving at #mcp from the wiki: open nothing, just flag the endpoint.
+  if (location.hash === '#mcp') {
+    var el = document.getElementById('mcp');
+    if (el) { el.scrollIntoView({block: 'center'}); el.style.outline = '2px solid var(--accent)'; }
+  }
+})();
+</script>
+</body>
+</html>
