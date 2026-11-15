@@ -41,6 +41,7 @@
         .see-also a { color: #555; }
         .see-also a:hover { color: #111; }
     </style>
+<link rel="stylesheet" href="../app-assets/release.css">
 </head>
 <body>
     <h1>Brainstorms</h1>
@@ -62,6 +63,11 @@
 
     <p class="back"><a href="/">← Back to home</a></p>
 
-<script defer src="https://worldissuetracker.com/widget/wit-feedback.js" data-tracker-slug="brainstorms-feedback" data-app="Idea List" data-mode="feedback" data-trigger="tab" data-label="Send feedback"></script>
+
+<footer class="app-release">
+  <span id="wit-feedback-mount"></span> · <span data-app-stamp data-show="time" data-src="../version.json"></span>
+</footer>
+<script defer src="../app-assets/app-stamp.js"></script>
+<script defer src="https://worldissuetracker.com/widget/wit-feedback.js" data-mount-selector="#wit-feedback-mount" data-tracker-slug="brainstorms-feedback" data-app="Idea List" data-mode="feedback" data-trigger="tab" data-label="Send feedback"></script>
 </body>
 </html>

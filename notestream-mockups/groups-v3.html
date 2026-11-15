@@ -431,6 +431,7 @@
     a:hover { text-decoration: underline; }
     code.path { font-family: 'JetBrains Mono', monospace; font-size: 11.5px; background: var(--bg); padding: 2px 5px; border-radius: 3px; border: 1px solid var(--border); }
   </style>
+<link rel="stylesheet" href="../app-assets/release.css">
 </head>
 <body>
   <div class="page">
@@ -1725,6 +1726,11 @@
     });
   </script>
 
-<script defer src="https://worldissuetracker.com/widget/wit-feedback.js" data-tracker-slug="notestream-mockups-feedback" data-app="Notestream Mockups" data-mode="feedback" data-trigger="tab" data-label="Send feedback"></script>
+
+<footer class="app-release">
+  <span id="wit-feedback-mount"></span> · <span data-app-stamp data-show="time" data-src="../version.json"></span>
+</footer>
+<script defer src="../app-assets/app-stamp.js"></script>
+<script defer src="https://worldissuetracker.com/widget/wit-feedback.js" data-mount-selector="#wit-feedback-mount" data-tracker-slug="notestream-mockups-feedback" data-app="Notestream Mockups" data-mode="feedback" data-trigger="tab" data-label="Send feedback"></script>
 </body>
 </html>

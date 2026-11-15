@@ -120,6 +120,7 @@
   figure{margin:0}
   figcaption{color:var(--muted);font-size:.82rem;padding:8px 6px 0;text-align:center}
 </style>
+<link rel="stylesheet" href="../app-assets/release.css">
 </head>
 <body>
 
@@ -469,10 +470,14 @@ When someone asks something that needs the above, I DM him and wait for approval
     <a href="https://wikihub.globalbr.ai/@jacobcole/picortex/docs/prd/002-texting-experience">PRD 002 ↗</a>
     <a href="https://wikihub.globalbr.ai/@jacobcole/picortex/docs/plans/2026-04-23-prototype-options">Prototype options ↗</a>
   </div>
-<span id="wit-feedback-mount"></span>
 </footer>
 
 
-<script defer src="https://worldissuetracker.com/widget/wit-feedback.js" data-tracker-slug="picortex-feedback" data-app="Picortex" data-mode="feedback" data-mount-selector="#wit-feedback-mount" data-trigger="tab" data-label="Send feedback"></script>
+
+<footer class="app-release">
+  <span id="wit-feedback-mount"></span> · <span data-app-stamp data-show="time" data-src="../version.json"></span>
+</footer>
+<script defer src="../app-assets/app-stamp.js"></script>
+<script defer src="https://worldissuetracker.com/widget/wit-feedback.js" data-mount-selector="#wit-feedback-mount" data-tracker-slug="picortex-feedback" data-app="Picortex" data-mode="feedback" data-trigger="tab" data-label="Send feedback"></script>
 </body>
 </html>

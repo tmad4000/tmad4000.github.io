@@ -25,6 +25,7 @@
   .changelog p{margin:6px 0}
   code{background:#1e1e1e;padding:1px 6px;border-radius:4px;font-family:ui-monospace,Menlo,monospace;font-size:.9em}
 </style>
+<link rel="stylesheet" href="../app-assets/release.css">
 </head>
 <body>
 <span class="tag">picortex · mockups</span>
@@ -73,9 +74,13 @@
 
 <footer>
   <p><a href="/">&larr; tmad4000.github.io</a> · <a href="https://wikihub.globalbr.ai/@jacobcole/picortex">wiki</a></p>
-<span id="wit-feedback-mount"></span>
 </footer>
 
-<script defer src="https://worldissuetracker.com/widget/wit-feedback.js" data-tracker-slug="picortex-feedback" data-app="Picortex" data-mode="feedback" data-mount-selector="#wit-feedback-mount" data-trigger="tab" data-label="Send feedback"></script>
+
+<footer class="app-release">
+  <span id="wit-feedback-mount"></span> · <span data-app-stamp data-show="time" data-src="../version.json"></span>
+</footer>
+<script defer src="../app-assets/app-stamp.js"></script>
+<script defer src="https://worldissuetracker.com/widget/wit-feedback.js" data-mount-selector="#wit-feedback-mount" data-tracker-slug="picortex-feedback" data-app="Picortex" data-mode="feedback" data-trigger="tab" data-label="Send feedback"></script>
 </body>
 </html>

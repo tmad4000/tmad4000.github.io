@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>tmad4000</title>
+    <title>Jacob Cole</title>
     <style>
         :root {
             --bg-start: #f5f7fa;
@@ -670,8 +670,9 @@
         .links .harmony-project .desc { white-space: normal; margin-left: 0; }
         @media (max-width: 480px) { .harmony-project img { width: 90px; height: 72px; } }
     </style>
+<link rel="stylesheet" href="app-assets/release.css">
 </head>
-<body>
+<body class="has-release-footer">
     <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme"></button>
 
     <div class="container">
@@ -730,7 +731,6 @@
                 <div class="inline-links">
                     <a href="brainstorms/">See also: Idea List</a>
                 </div>
-                <span id="wit-feedback-mount"></span>
             </nav>
         </section>
 
@@ -1286,6 +1286,11 @@
         });
     </script>
 
-<script defer src="https://worldissuetracker.com/widget/wit-feedback.js" data-tracker-slug="jacobcole-ai-feedback" data-app="Jacob Cole website" data-mode="feedback" data-mount-selector="#wit-feedback-mount" data-trigger="tab" data-label="Send feedback"></script>
+
+<footer class="app-release">
+  <span id="wit-feedback-mount"></span> · <span data-app-stamp data-show="time" data-src="version.json"></span>
+</footer>
+<script defer src="app-assets/app-stamp.js"></script>
+<script defer src="https://worldissuetracker.com/widget/wit-feedback.js" data-mount-selector="#wit-feedback-mount" data-tracker-slug="jacobcole-ai-feedback" data-app="Jacob Cole website" data-mode="feedback" data-trigger="tab" data-label="Send feedback"></script>
 </body>
 </html>

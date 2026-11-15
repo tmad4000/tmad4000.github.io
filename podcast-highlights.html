@@ -198,6 +198,7 @@
         .frameworks td:first-child { font-weight: 600; color: var(--heading); white-space: nowrap; }
         .frameworks td:nth-child(2) { font-family: 'SF Mono', 'Menlo', monospace; font-size: 0.75rem; color: var(--ts); white-space: nowrap; }
     </style>
+<link rel="stylesheet" href="app-assets/release.css">
 </head>
 <body>
     <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme"></button>
@@ -227,7 +228,6 @@
                     </ul>
                 </li>
             </ol>
-        <span id="wit-feedback-mount"></span>
 </nav>
 
         <!-- BEYOND PODCAST -->
@@ -453,6 +453,11 @@
         })();
     </script>
 
-<script defer src="https://worldissuetracker.com/widget/wit-feedback.js" data-tracker-slug="jacobcole-ai-feedback" data-app="Jacob Cole website" data-mode="feedback" data-mount-selector="#wit-feedback-mount" data-trigger="tab" data-label="Send feedback"></script>
+
+<footer class="app-release">
+  <span id="wit-feedback-mount"></span> · <span data-app-stamp data-show="time" data-src="version.json"></span>
+</footer>
+<script defer src="app-assets/app-stamp.js"></script>
+<script defer src="https://worldissuetracker.com/widget/wit-feedback.js" data-mount-selector="#wit-feedback-mount" data-tracker-slug="jacobcole-ai-feedback" data-app="Jacob Cole website" data-mode="feedback" data-trigger="tab" data-label="Send feedback"></script>
 </body>
 </html>
