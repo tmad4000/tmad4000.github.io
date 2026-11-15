@@ -11,8 +11,10 @@
   body[data-app-page="brainstorm-document"] #content h1,
   body[data-app-page="brainstorm-document"] #content h2,
   body[data-app-page="brainstorm-document"] #content h3,
+  body[data-app-page="brainstorm-document"] #content strong,
   body[data-app-page="brainstorm-document"] .back:hover { color: #f0f2f6; }
   body[data-app-page="brainstorms"] .subtitle,
+  body[data-app-page="brainstorms"] .see-also,
   body[data-app-page="brainstorms"] .idea .date,
   body[data-app-page="brainstorms"] .idea .desc,
   body[data-app-page="brainstorms"] .back a,
@@ -20,6 +22,8 @@
   body[data-app-page="brainstorm-document"] .back,
   body[data-app-page="brainstorm-document"] .download,
   body[data-app-page="brainstorm-document"] .meta,
+  body[data-app-page="brainstorm-document"] .error,
+  body[data-app-page="brainstorm-document"] #content em,
   body[data-app-page="brainstorm-document"] #content blockquote { color: #b5bdca; }
   body[data-app-page="brainstorm-document"] header,
   body[data-app-page="brainstorm-document"] #content hr { border-color: #434c5c; }
