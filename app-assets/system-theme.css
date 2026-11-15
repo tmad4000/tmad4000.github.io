@@ -1,0 +1,69 @@
+/* App chrome follows the OS. Piano keys and design-reference artwork retain
+   their own palettes; this sheet does not alter audio, controls or mockups. */
+@media (prefers-color-scheme: dark) {
+  body[data-app-page="brainstorms"],
+  body[data-app-page="brainstorm-document"] { background: #191d24; color: #e4e7ed; }
+  body[data-app-page="brainstorms"] .idea,
+  body[data-app-page="brainstorm-document"] #content { background: #242a34; }
+  body[data-app-page="brainstorms"] .idea a,
+  body[data-app-page="brainstorms"] .back a:hover,
+  body[data-app-page="brainstorms"] .see-also a:hover,
+  body[data-app-page="brainstorm-document"] #content h1,
+  body[data-app-page="brainstorm-document"] #content h2,
+  body[data-app-page="brainstorm-document"] #content h3,
+  body[data-app-page="brainstorm-document"] .back:hover { color: #f0f2f6; }
+  body[data-app-page="brainstorms"] .subtitle,
+  body[data-app-page="brainstorms"] .idea .date,
+  body[data-app-page="brainstorms"] .idea .desc,
+  body[data-app-page="brainstorms"] .back a,
+  body[data-app-page="brainstorms"] .see-also a,
+  body[data-app-page="brainstorm-document"] .back,
+  body[data-app-page="brainstorm-document"] .download,
+  body[data-app-page="brainstorm-document"] .meta,
+  body[data-app-page="brainstorm-document"] #content blockquote { color: #b5bdca; }
+  body[data-app-page="brainstorm-document"] header,
+  body[data-app-page="brainstorm-document"] #content hr { border-color: #434c5c; }
+  body[data-app-page="brainstorm-document"] .download,
+  body[data-app-page="brainstorm-document"] #content blockquote { border-color: #626f84; }
+  body[data-app-page="brainstorm-document"] .download:hover,
+  body[data-app-page="brainstorm-document"] #content pre,
+  body[data-app-page="brainstorm-document"] #content code { background: #303846; color: #e4e7ed; }
+  body[data-app-page="brainstorm-document"] #content pre code { background: none; }
+  body[data-app-page="brainstorm-document"] #content a { color: #9ac7ff; }
+
+  body[data-app-page="mockup-index"] { background: #171c20; color: #e3e8eb; }
+  body[data-app-page="mockup-index"] .card,
+  body[data-app-page="mockup-index"] .meta { background: #232a30; border-color: #465159; }
+  body[data-app-page="mockup-index"] .sub,
+  body[data-app-page="mockup-index"] .card .desc,
+  body[data-app-page="mockup-index"] .card .arrow,
+  body[data-app-page="mockup-index"] .meta { color: #b0bbc2; }
+  body[data-app-page="mockup-index"] .meta strong { color: #e3e8eb; }
+  body[data-app-page="mockup-index"] .card .v,
+  body[data-app-page="mockup-index"] a.inline { color: #65d8ca; }
+  body[data-app-page="mockup-index"] .card.latest .v,
+  body[data-app-page="mockup-index"] .card.latest::before { color: white; background: #126b64; }
+  body[data-app-page="mockup-index"] code { background: #343e46; }
+}
+
+@media (prefers-color-scheme: light) {
+  body[data-app-page="piano-duet"] { background: linear-gradient(135deg, #f7f7fc, #edf0f8); color: #25283a; }
+  body[data-app-page="piano-duet"] h1 { background-image: linear-gradient(90deg, #b52240, #a65400, #b52240); }
+  body[data-app-page="piano-duet"] .subtitle,
+  body[data-app-page="piano-duet"] .control-group label,
+  body[data-app-page="piano-duet"] .tuning-label,
+  body[data-app-page="piano-duet"] .keyboard-hint h3,
+  body[data-app-page="piano-duet"] .mapping-row,
+  body[data-app-page="piano-duet"] .white-keys,
+  body[data-app-page="piano-duet"] .black-keys { color: #53576a; }
+  body[data-app-page="piano-duet"] select,
+  body[data-app-page="piano-duet"] select option { background: white; color: #25283a; border-color: #858a9b; }
+  body[data-app-page="piano-duet"] .keyboard-hint { background: rgba(255, 255, 255, .75); }
+  body[data-app-page="piano-duet"] .duet-btn { background: #fff; color: #35394e; border-color: #858a9b; }
+  body[data-app-page="piano-duet"] .duet-btn:hover { border-color: #b52240; }
+  body[data-app-page="piano-duet"] .duet-btn.active { background: linear-gradient(135deg, #b52240, #995000); color: white; border-color: transparent; }
+  body[data-app-page="piano-duet"] .toggle-track { background: #cbd0dc; }
+  body[data-app-page="piano-duet"] .toggle-thumb { background: #626a7d; }
+  body[data-app-page="piano-duet"] .just-toggle.active .toggle-track { background: #efb6c2; }
+  body[data-app-page="piano-duet"] .just-toggle.active .toggle-thumb { background: #b52240; }
+}
