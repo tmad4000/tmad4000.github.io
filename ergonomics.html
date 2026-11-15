@@ -60,6 +60,7 @@
         .back a { color: #666; text-decoration: none; font-size: 0.9rem; }
         .back a:hover { color: #333; }
     </style>
+<link rel="stylesheet" href="app-assets/release.css">
 </head>
 <body>
     <h1>Ergonomics</h1>
@@ -214,6 +215,11 @@
 
     <p class="back"><a href="/">&#8592; Back to home</a></p>
 
-<script defer src="https://worldissuetracker.com/widget/wit-feedback.js" data-tracker-slug="jacobcole-ai-feedback" data-app="Jacob Cole website" data-mode="feedback" data-trigger="tab" data-label="Send feedback"></script>
+
+<footer class="app-release">
+  <span id="wit-feedback-mount"></span> · <span data-app-stamp data-src="version.json"></span>
+</footer>
+<script defer src="app-assets/app-stamp.js"></script>
+<script defer src="https://worldissuetracker.com/widget/wit-feedback.js" data-mount-selector="#wit-feedback-mount" data-tracker-slug="jacobcole-ai-feedback" data-app="Jacob Cole website" data-mode="feedback" data-trigger="tab" data-label="Send feedback"></script>
 </body>
 </html>

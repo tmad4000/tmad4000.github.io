@@ -30,4 +30,7 @@ GitHub Pages site at https://tmad4000.github.io
 
 ## Deployment
 - Automatically deployed via GitHub Pages on push to main
-- No build step required - static HTML/CSS/JS only
+- Static HTML/CSS/JS; the Pages Actions workflow stamps version.json from the deployed commit
+- VERSION is the single version source; relative update detail is shown in the footer
+- Tap or Enter on the stamp shows exact local time and commit
+- Pages must use Actions deployment rather than branch builds

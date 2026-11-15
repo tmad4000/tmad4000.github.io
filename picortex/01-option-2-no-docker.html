@@ -72,6 +72,7 @@
   footer{max-width:1100px;margin:0 auto;padding:36px 22px 80px;color:var(--muted);font-size:.85rem;border-top:1px solid var(--border)}
   footer .row{display:flex;gap:22px;flex-wrap:wrap}
 </style>
+<link rel="stylesheet" href="../app-assets/release.css">
 </head>
 <body>
 
@@ -358,10 +359,14 @@ export async function executeTurn(chat: Chat, message: Message, scope: Scope) {
     <a href="https://wikihub.globalbr.ai/@jacobcole/picortex/docs/plans/2026-04-23-prototype-options">Prototype options ↗</a>
     <a href="https://wikihub.globalbr.ai/@jacobcole/picortex/docs/prd/002-texting-experience">PRD 002 ↗</a>
   </div>
-<span id="wit-feedback-mount"></span>
 </footer>
 
 
-<script defer src="https://worldissuetracker.com/widget/wit-feedback.js" data-tracker-slug="picortex-feedback" data-app="Picortex" data-mode="feedback" data-mount-selector="#wit-feedback-mount" data-trigger="tab" data-label="Send feedback"></script>
+
+<footer class="app-release">
+  <span id="wit-feedback-mount"></span> · <span data-app-stamp data-src="../version.json"></span>
+</footer>
+<script defer src="../app-assets/app-stamp.js"></script>
+<script defer src="https://worldissuetracker.com/widget/wit-feedback.js" data-mount-selector="#wit-feedback-mount" data-tracker-slug="picortex-feedback" data-app="Picortex" data-mode="feedback" data-trigger="tab" data-label="Send feedback"></script>
 </body>
 </html>

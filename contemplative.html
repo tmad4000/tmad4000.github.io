@@ -220,6 +220,7 @@ footer a:hover { color: var(--ink); }
   li { font-size: 1.02rem; }
 }
 </style>
+<link rel="stylesheet" href="app-assets/release.css">
 </head>
 <body>
 <main class="frame fade-in">
@@ -303,11 +304,15 @@ footer a:hover { color: var(--ink); }
 
   <footer>
     still becoming &nbsp;·&nbsp; <a href="index.html">return to the wider doorway</a>
-  <span id="wit-feedback-mount"></span>
 </footer>
 
 </main>
 
-<script defer src="https://worldissuetracker.com/widget/wit-feedback.js" data-tracker-slug="jacobcole-ai-feedback" data-app="Jacob Cole website" data-mode="feedback" data-mount-selector="#wit-feedback-mount" data-trigger="tab" data-label="Send feedback"></script>
+
+<footer class="app-release">
+  <span id="wit-feedback-mount"></span> · <span data-app-stamp data-src="version.json"></span>
+</footer>
+<script defer src="app-assets/app-stamp.js"></script>
+<script defer src="https://worldissuetracker.com/widget/wit-feedback.js" data-mount-selector="#wit-feedback-mount" data-tracker-slug="jacobcole-ai-feedback" data-app="Jacob Cole website" data-mode="feedback" data-trigger="tab" data-label="Send feedback"></script>
 </body>
 </html>
