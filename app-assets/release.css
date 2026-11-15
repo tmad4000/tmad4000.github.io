@@ -2,3 +2,7 @@
 .app-stamp { font-variant-numeric: tabular-nums; white-space: nowrap; cursor: pointer; }
 .app-stamp:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
 .app-stamp[data-exact="1"] { white-space: normal; }
+
+/* These two pages center their main content with a body flex row. */
+body.has-release-footer { flex-wrap: wrap; }
+body.has-release-footer > .app-release { flex-basis: 100%; }
