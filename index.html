@@ -664,6 +664,11 @@
                 transform: translateY(0);
             }
         }
+        .links .harmony-project { align-items: center; gap: 1rem; }
+        .harmony-project img { width: 132px; height: 93px; object-fit: cover; border-radius: 8px; flex-shrink: 0; border: 1px solid var(--border, rgba(128,128,128,0.25)); }
+        .harmony-project-copy { display: flex; flex-direction: column; min-width: 0; }
+        .links .harmony-project .desc { white-space: normal; margin-left: 0; }
+        @media (max-width: 480px) { .harmony-project img { width: 90px; height: 72px; } }
     </style>
 </head>
 <body>
@@ -757,6 +762,10 @@
         <section id="projects" class="section" data-category="projects">
             <h2 class="section-title">Projects</h2>
             <nav class="links">
+                <a class="harmony-project" href="https://harmony.jacobcole.net" target="_blank" rel="noopener">
+                    <img src="images/harmony-singer.png" alt="Harmony Singer showing a sung note and two live harmony lines" width="1280" height="900" loading="lazy">
+                    <span class="harmony-project-copy"><span class="label">Harmony Singer</span><span class="desc">Sing a melody. Hear live, in-key harmonies in your own voice — headphones or speakers, no login needed.</span></span>
+                </a>
                 <a href="https://ideaflow.io/work-in-progress" target="_blank" rel="noopener">
                     <span class="icon">🌱</span>
                     <span class="label">Ideaflow — Work in progress</span>
